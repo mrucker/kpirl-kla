@@ -1,0 +1,247 @@
+**/data/studies/*
+
+**/NetLogo/trajectory.csv
+
+##Ignore Visual Studio temp files
+*.vs
+
+##Ignore Matlab temp files
+*.m~
+*.asv
+
+##Ignore R temporary files
+.DS_Store
+.Rhistory
+.RData
+
+##Ignore Microsoft Word temp files
+*~*.tmp
+*~*.docx
+
+
+
+#######################################################################################
+#Ignore all latex bild files. Expects latex projects to be in a directory named "latex"
+#######################################################################################
+
+## Core latex/pdflatex auxiliary files:
+**/latex/**/*.aux
+**/latex/**/*.lof
+**/latex/**/*.log
+**/latex/**/*.lot
+**/latex/**/*.fls
+**/latex/**/*.out
+**/latex/**/*.toc
+**/latex/**/*.fmt
+**/latex/**/*.fot
+**/latex/**/*.cb
+**/latex/**/*.cb2
+
+## Intermediate documents:
+**/latex/**/*.dvi
+**/latex/**/*-converted-to.*
+
+# these rules might exclude image files for figures etc.
+# *.ps
+# *.eps
+# *.pdf
+
+## Generated if empty string is given at "Please type another file name for output:"
+**/latex/**/*.pdf
+
+## Bibliography auxiliary files (bibtex/bib/latex/**/biber):
+**/latex/**/*.bbl
+**/latex/**/*.bcf
+**/latex/**/*.blg
+**/latex/**/*-blx.aux
+**/latex/**/*-blx.bib
+**/latex/**/*.brf
+**/latex/**/*.run.xml
+
+## Build tool auxiliary files:
+**/latex/**/*.fdb_latexmk
+**/latex/**/*.synctex
+**/latex/**/*.synctex(busy)
+**/latex/**/*.synctex.gz
+**/latex/**/*.synctex.gz(busy)
+**/latex/**/*.pdfsync
+
+## Auxiliary and intermediate files from other packages:
+# algorithms
+**/latex/**/*.alg
+**/latex/**/*.loa
+
+# achemso
+**/latex/**/acs-*.bib
+
+# amsthm
+**/latex/**/*.thm
+
+# beamer
+**/latex/**/*.nav
+**/latex/**/*.pre
+**/latex/**/*.snm
+**/latex/**/*.vrb
+
+# changes
+**/latex/**/*.soc
+
+# cprotect
+**/latex/**/*.cpt
+
+# elsarticle (documentclass of Elsevier journals)
+**/latex/**/*.spl
+
+# endnotes
+**/latex/**/*.ent
+
+# fixme
+**/latex/**/*.lox
+
+# feynmf/feynmp
+**/latex/**/*.mf
+**/latex/**/*.mp
+**/latex/**/*.t[1-9]
+**/latex/**/*.t[1-9][0-9]
+**/latex/**/*.tfm
+**/latex/**/*.[1-9]
+**/latex/**/*.[1-9][0-9]
+
+#(r)(e)ledmac/(r)(e)ledpar
+**/latex/**/*.end
+**/latex/**/*.?end
+**/latex/**/*.[1-9]
+**/latex/**/*.[1-9][0-9]
+**/latex/**/*.[1-9][0-9][0-9]
+**/latex/**/*.[1-9]R
+**/latex/**/*.[1-9][0-9]R
+**/latex/**/*.[1-9][0-9][0-9]R
+**/latex/**/*.eledsec[1-9]
+**/latex/**/*.eledsec[1-9]R
+**/latex/**/*.eledsec[1-9][0-9]
+**/latex/**/*.eledsec[1-9][0-9]R
+**/latex/**/*.eledsec[1-9][0-9][0-9]
+**/latex/**/*.eledsec[1-9][0-9][0-9]R
+
+# glossaries
+**/latex/**/*.acn
+**/latex/**/*.acr
+**/latex/**/*.glg
+**/latex/**/*.glo
+**/latex/**/*.gls
+**/latex/**/*.glsdefs
+
+# gnuplottex
+**/latex/**/*-gnuplottex-*
+
+# gregoriotex
+**/latex/**/*.gaux
+**/latex/**/*.gtex
+
+# hyperref
+**/latex/**/*.brf
+
+# knitr
+**/latex/**/*-concordance.tex
+# TODO Comment the next line if you want to keep your tikz graphics files
+**/latex/**/*.tikz
+**/latex/**/*-tikzDictionary
+
+# listings
+**/latex/**/*.lol
+
+# makeidx
+**/latex/**/*.idx
+**/latex/**/*.ilg
+**/latex/**/*.ind
+**/latex/**/*.ist
+
+# minitoc
+**/latex/**/*.maf
+**/latex/**/*.mlf
+**/latex/**/*.mlt
+**/latex/**/*.mtc[0-9]*
+
+# minted
+**/latex/**/_minted*
+**/latex/**/*.pyg
+
+# morewrites
+**/latex/**/*.mw
+
+# mylatexformat
+**/latex/**/*.fmt
+
+# nomencl
+**/latex/**/*.nlo
+
+# pax
+**/latex/**/*.pax
+
+# sagetex
+**/latex/**/*.sagetex.sage
+**/latex/**/*.sagetex.py
+**/latex/**/*.sagetex.scmd
+
+# scrwfile
+**/latex/**/*.wrt
+
+# sympy
+**/latex/**/*.sout
+**/latex/**/*.sympy
+**/latex/**/sympy-plots-for-*.tex/
+
+# pdfcomment
+**/latex/**/*.upa
+**/latex/**/*.upb
+
+# pythontex
+**/latex/**/*.pytxcode
+**/latex/**/pythontex-files-*/
+
+# thmtools
+**/latex/**/*.loe
+
+# TikZ & PGF
+**/latex/**/*.dpth
+**/latex/**/*.md5
+**/latex/**/*.auxlock
+
+# todonotes
+**/latex/**/*.tdo
+
+# easy-todo
+**/latex/**/*.lod
+
+# xindy
+**/latex/**/*.xdy
+
+# xypic precompiled matrices
+**/latex/**/*.xyc
+
+# endfloat
+**/latex/**/*.ttt
+**/latex/**/*.fff
+
+# Latexian
+**/latex/**/TSWLatexianTemp*
+
+## Editors:
+# WinEdt
+**/latex/**/*.bak
+**/latex/**/*.sav
+
+# Texpad
+**/latex/**/.texpadtmp
+
+# Kile
+**/latex/**/*.backup
+
+# KBibTeX
+**/latex/**/*~[0-9]*
+
+# auto folder when using emacs and auctex
+**/latex/**//auto/*
+
+# expex forward references with \gathertags
+**/latex/**/*-tags.tex

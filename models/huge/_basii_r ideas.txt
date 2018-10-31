@@ -1,0 +1,23 @@
+
+	I can adjust `den` to determine the distance between vals within set
+
+	val_to_rad = @(val, num) (val*pi)/(num/2)
+	val_to_loc = @(val, den) [cos(val*pi/2), sin(val*pi/den)]
+	
+	X-location = {val_to_loc(0.00,2), val_to_loc(0.50,2), val_to_loc(1.00,2)}
+	Y-location = {val_to_loc(0.00,2), val_to_loc(0.50,2), val_to_loc(1.00,2)}
+	X-Velocity = {val_to_loc(0.00,2), val_to_loc(0.50,2), val_to_loc(1.00,2)}
+	Y-Velocity = {val_to_loc(0.00,2), val_to_loc(0.50,2), val_to_loc(1.00,2)}
+
+	X-angle    = {val_to_loc(0.00,2), val_to_loc(0.25,2), val_to_loc(0.50,2), val_to_loc(0.75,2), val_to_loc(1.00,2)}
+	Y-angle    = {val_to_loc(0.00,2), val_to_loc(0.25,2), val_to_loc(0.50,2), val_to_loc(0.75,2), val_to_loc(1.00,2)}
+	
+	what if I literally encode the x-angle, y-angle? I think I like this... (actually, I don't think it matters, I just like the literal more..)
+	
+	X-angle    = {cos(val_to_rad(0,8)), cos(val_to_rad(1,8)), ..., cos(val_to_rad(6,8)), cos(val_to_rad(7,8))}
+	Y-angle    = {sin(val_to_rad(0,8)), sin(val_to_rad(1,8)), ..., sin(val_to_rad(6,8)), sin(val_to_rad(7,8))}
+	
+	
+	
+	With literal xy angle encoding... 10 dimensions ... cardinality of 648
+	With dummy   xy angle encoding... 12 dimensions ... cardinality of 648

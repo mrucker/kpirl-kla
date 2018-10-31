@@ -1,0 +1,61 @@
+    vb = [
+        %3^4 = 81
+        deriv_features(deriv_ord,:);
+        %2^2
+        touch_features(touch_ord,:);
+        %3^3
+        approach_features(appr_ord,:);
+        %3^2
+        location_features;
+    ];
+	
+	%03 v-x-magnitude        = {0, .5, 1}
+	%03 v-y-magnitude        = {0, .5, 1}
+	%03 a-x-magnitude        = {0, .5, 1}
+	%03 a-y-magnitude        = {0, .5, 1}
+	%01 enter-touch          = {0, 1}
+	%01 leave-touch          = {0, 1}
+	%01 empty-touch          = {0, 1}
+	%03 x-only -approach-cnt = {0, .5, 1}
+	%03 y-only -approach-cnt = {0, .5, 1}
+	%03 x-and-y-approach-cnt = {0, .5, 1}
+	%03 x-location           = {0, .5, 1}
+	%03 y-location           = {0, .5, 1}
+
+	What I'm defining here are the alternatives I'll consider.
+	
+	A move is valuable if
+		> it moves me towards several targets
+			> quantity
+		> it moves me towards several targets soon
+			> distance
+		> it doesn't close me off from other options
+			> location 
+				(aka, distance from edge and movement direction?)
+				(aka, average distance from all visible targets?)
+		> it touches a target
+			> goal
+		> it requires little effort
+			> small 2nd and 3rd derivatives
+			
+		
+	
+	%08 velocity-dir = {N, NE, E, SE, S, SW, W, NW}
+	%03 velocity-mag = {0-15, 15-50, 50+}
+	%03 acceleration = {0-15, 15-50, 50+}
+	%03 touch        = {enter touch, leave touch, no touch}
+	%24 approaching  = {N, NE, E, SE, S, SW, W, NW} x {0-2, 3-5, 6+ }
+	%09 location     = {W, C, E} x {N, C, S}
+	
+	%24 velocity     = {N, NE, E, SE, S, SW, W, NW} x {0-15, 15-50, 50+}
+	%03 acceleration = {0-15, 15-50, 50+}
+	%03 touch        = {enter touch, leave touch, no touch}
+	%09 approaching  = {L, S, R} x {0-2, 3-5, 6+ }
+	%09 location     = {W, C, E} x {N, C, S}
+	
+	%03 velocity      = {0-15, 15-50, 50+}
+	%03 acceleration  = {0-15, 15-50, 50+}
+	%03 edge distance = {0-100, 100 - 500, 500+}
+	%03 touch         = {enter touch, leave touch, no touch}
+	%09 approaching   = {L, S, R} x {0-2, 3-5, 6+ }
+	%09 location      = {W, C, E} x {N, C, S}
