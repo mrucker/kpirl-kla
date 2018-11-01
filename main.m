@@ -1,25 +1,5 @@
 clear; paths; close all
 
-%all these observations are in the trial 1 dataset
-
-%study 1 -- 1ff40e9f5818b8978.json super back and forth (RewardId = 2)
-
-%study 1 -- 1a92ecaf5864960f1.json very few touches but with correct radius so RL can get touches (RewardId = 3)
-    %this works well but brings up an interesting conundrum. It scores all the targets highly 
-    %but the dead space higher... This is broken by the way I handle the "top 10" since it makes 
-    %several states equal to empty space perhaps a solution to this is to subtract empty space 
-    %from targets making the majority of targets show 0 value instaed of majority showing .98
-
-%study 1 -- a3cb0e1e586811391.json stayed entirely on the right third of the screen, otherwise normal.
-
-%study 2 -- 1b37aabe5971bcc6c.json a normal test where I attempted to touch as many targets as I could
-
-%study 2 -- 452515135984d0d0d.json the T_N field for this experiment is extremely high in the ThesisExperiments table.
-
-%run_irl_on_one_experiment('c45a', '110e53fe5a585b7b1');
-%run_irl_on_all_experiments('c45a');
-%run_irl_on_new_experiments('c45a');
-
 run_irl_on_two_experiments('c45a', '1eafe9a45a58678af', '5cbf004e5a58678ae');
 %run_irl_on_two_experiments('c45a', '214803d35a5897ace', '1c29e0b85a5897ace');
 
@@ -97,13 +77,9 @@ function run_irl_on_two_experiments(study_id, experiment_id_1, experiment_id_2)
     obs_path = ['../../data/studies/', study_id, '/observations/'];
     res_path = ['../../data/studies/', study_id, '/results 4_10_2/'];
 
-    trajectory_episodes_1 = read_trajectory_episodes_from_file(obs_path, experiment_id_1);
-    trajectory_episodes_2 = read_trajectory_episodes_from_file(obs_path, experiment_id_2);
-
-    trajectory_episodes = horzcat(trajectory_episodes_1, trajectory_episodes_2);
-    
-    params  = struct ('epsilon',.000001, 'gamma',.9, 'seed',0, 'kernel', 5);
-    results = algorithm4run(trajectory_episodes, params, 1);
+    trajectory_episodes = read_trajectory_episodes_from_file(obs_path, experiment_id_1);
+    params              = struct ('epsilon',.000001, 'gamma',.9, 'seed',0, 'kernel', 5);
+    results             = algorithm4run(trajectory_episodes, params, 1);
 
     results.('episode_count') = numel(trajectory_episodes);
         

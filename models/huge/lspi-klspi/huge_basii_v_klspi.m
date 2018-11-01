@@ -1,4 +1,4 @@
-function phi = huge_basis_5(state, action, dic_data, para); persistent v_i v_p v_l a_m; 
+function phi = huge_basii_v_klspi(state, action, dic_data, para); persistent v_i v_p v_l a_m; 
 
     if(isempty(a_m))
         s_a = s_act_4_2();

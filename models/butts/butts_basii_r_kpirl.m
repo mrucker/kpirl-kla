@@ -1,31 +1,22 @@
-function [r_i, r_p, r_b, r_l] = huge_basii_r()
+function [r_i, r_p, r_b, r_l] = butts_basii_r_kpirl()
 
-    r_I = I([LEVELS_N(), 1]);
+    r_I = I(LEVELS_N());
 
     r_p = r_perms();
     r_i = @(states) 1 + r_I'*(statesfun(@r_levels, states)-1);
     r_b = @(states) r_feats(statesfun(@r_levels, states));
     r_l = @(states) statesfun(@r_levels, states);
+    
 end
 
 function rl = r_levels(states)
 
-    tou = is_touching_target(states);
+    trn = trn_levels(states);
+    pop = pop_levels(states);
+    rec = rec_levels(states);
+    int = int_levels(states);
 
-    if ~any(tou(:))
-        rl = ones(6, size(states,2));
-    else
-        tou = keep_first_touch_only(tou);
-
-        lox = dot(target_x_levels(states), tou) + ~any(tou, 1);
-        loy = dot(target_y_levels(states), tou) + ~any(tou, 1);
-        vel = dot(cursor_v_levels(states), tou) + ~any(tou, 1);
-        acc = dot(cursor_a_levels(states), tou) + ~any(tou, 1);
-        dir = dot(cursor_d_levels(states), tou) + ~any(tou, 1);
-        tou = 1*(~any(tou,1)) + 2*(any(tou,1));
-
-        rl = vertcat(lox, loy, vel, acc, dir, tou);
-    end
+    rl = vertcat(trn, pop, rec, int);
 end
 
 function rf = r_feats(levels)
@@ -55,80 +46,54 @@ end
 
 function rp = r_perms()
 
-    x = 1:LEVELS_N(1);
-    y = 1:LEVELS_N(2);
-    v = 1:LEVELS_N(3);
-    a = 1:LEVELS_N(4);
-    d = 1:LEVELS_N(5);
-    z = 2;
+    t = 1:LEVELS_N(1);
+    p = 1:LEVELS_N(2);
+    r = 1:LEVELS_N(3);
+    i = 1:LEVELS_N(4);
 
-    x_i = 1:size(x,2);
-    y_i = 1:size(y,2);
-    v_i = 1:size(v,2);
-    a_i = 1:size(a,2);
-    d_i = 1:size(d,2);
-    z_i = 1:size(z,2);
+    t_i = 1:size(t,2);
+    p_i = 1:size(p,2);
+    r_i = 1:size(r,2);
+    i_i = 1:size(i,2);
+    
+    [i_c, r_c, p_c, t_c] = ndgrid(i_i, r_i, p_i, t_i);
 
-    [z_c, d_c, a_c, v_c, y_c, x_c] = ndgrid(z_i, d_i, a_i, v_i, y_i, x_i);
-
-    touch_0 = [zeros(10,1); 4];
-    touch_1 = r_feats([
-        x(:,x_c(:));
-        y(:,y_c(:));
-        v(:,v_c(:));
-        a(:,a_c(:));
-        d(:,d_c(:));
-        z(:,z_c(:));
+    rp = r_feats([
+        t(:,t_c(:));
+        p(:,p_c(:));
+        r(:,r_c(:));
+        i(:,i_c(:));
     ]);
-
-    rp = horzcat(touch_0, touch_1);
-
 end
 
-function tx = target_x_levels(states)
+function tl = trn_levels(states)
 
-    val_x = states(12:3:end,1)/states(09,1);
-    lvl_x = bin_levels(val_x, LEVELS_B(1), 1, LEVELS_N(1));
-
-    tx = repmat(lvl_x, 1, size(states,2));
+    last4 = states(end-3:end,:);
+    
+    val_t = (last4(2,:) == last4(3,:)) & (last4(1,:) ~= last4(4,:));
+    
+    tl = bin_levels(val_t, LEVELS_B(1), 1, LEVELS_N(1));
 end
 
-function ty = target_y_levels(states)
-
-    val_y = states(13:3:end,1)/states(10,1);
-    lvl_y = bin_levels(val_y, LEVELS_B(2), 1, LEVELS_N(2));
-
-    ty = repmat(lvl_y, 1, size(states,2));
+function pl = pop_levels(states)
+    val_p = sum(states(1:end-2,:) == states(end,:),1)/(size(states,1)/2 - 1);
+    
+    pl = bin_levels(val_p, LEVELS_B(2), 1, LEVELS_N(2));
 end
 
-function cv = cursor_v_levels(states)
+function rl = rec_levels(states)
 
-    trg_n = (size(states,1) - 11)/3;
-
-    val_v = vecnorm(states(3:4,:));
-    lvl_v = bin_levels(val_v, LEVELS_B(3), 1, LEVELS_N(3));
-
-    cv = repmat(lvl_v, trg_n, 1);
+    last4 = states(end-3:end,:);    
+    val_r = (last4(2,:) == last4(3,:)) & (last4(1,:) == last4(4,:));
+    
+    rl = bin_levels(val_r, LEVELS_B(3), 1, LEVELS_N(3));
 end
 
-function ca = cursor_a_levels(states)
+function il = int_levels(states)
 
-    trg_n = (size(states,1) - 11)/3;
-
-    val_a = vecnorm(states(5:6,:));
-    lvl_a = bin_levels(val_a, LEVELS_B(4), 1, LEVELS_N(4));
-
-    ca = repmat(lvl_a, trg_n, 1);
-end
-
-function cd = cursor_d_levels(states)
-
-    trg_n = (size(states,1) - 11)/3;
-
-    val_d = atan2(-states(4,:), states(3,:)) + pi;
-    lvl_d = bin_levels(val_d, LEVELS_B(5), 1, LEVELS_N(5));
-
-    cd = repmat(lvl_d, trg_n, 1);
+    val_i = sum(states(1:2:end-2,:) == states(end-1,:) && states(2:2:end-2,:) == states(end,:))/sum(states(1:2:end-2,:) == states(end-1,:));
+    
+    il = bin_levels(val_i, LEVELS_B(4), 1, LEVELS_N(4));
 end
 
 %% Probably don't need to change %%
@@ -174,46 +139,8 @@ function bl = bin_levels(vals, bin_size, min_level, max_level)
     %%fifth fastest
 end
 
-function [cd, pd] = distance_from_targets(states)
-    cp = states(1:2,:);
-    pp = states(1:2,:) - states(3:4,:);
-    tp = [states(12:3:end, 1)';states(13:3:end, 1)'];
-
-    dtp = dot(tp,tp,1);
-    dcp = dot(cp,cp,1);
-    dpp = dot(pp,pp,1);
-
-    cd = dcp+dtp'-2*(tp'*cp);
-    pd = dpp+dtp'-2*(tp'*pp);
-end
-
-function t = is_touching_target(states)
-    r2 = states(11, 1).^2;
-
-    [cd, pd] = distance_from_targets(states);
-
-    ct = cd <= r2;
-    pt = pd <= r2;
-    nt = states(14:3:end, 1) <= 30; %in theory this could be 33 (aka, one observation 30 times a second)
-
-    t = ct&(~pt|nt);
-end
-
-function t = keep_first_touch_only(touches)
-
-    s = size(touches);
-    c = 1:size(touches,2);
-
-    [v,r] = max(touches,[],1);
-
-    t = zeros(s);
-    i = sub2ind(s, r(v~=0), c(v~=0));
-
-    t(i) = 1;
-end
-
 function l = LEVELS_N(i) 
-    l = [3, 3, 8, 6, 8];
+    l = [2, 30, 2, 30];
     
     if(nargin ~= 0)
         l = l(i);
