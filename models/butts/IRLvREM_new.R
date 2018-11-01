@@ -26,7 +26,7 @@ for (i in 1:(state.length-1)) {
 
 # sample an action 
 action.sampled <- sample(1:37, 2)
-  
+
 # transition_function(state, action)
 transition_function <- function(s, a) {
   if((length(s) + length(action.sampled))/2 < max.length) { #length(action.sampled) is always 2
@@ -60,6 +60,21 @@ get_reward_features <- function(s) {
 get_reward_features(s = state.sampled)
 get_reward_features(s = state.to)
 
+# generate whole trajectory
+whole.trajectory <- rep(NA, nrow(WTCPoliceCalls)*2)
+whole.trajectory[seq(1, length(whole.trajectory), 2)] <- WTCPoliceCalls$source
+whole.trajectory[seq(2, length(whole.trajectory), 2)] <- WTCPoliceCalls$recipient
+whole.trajectory
+
+trajectory.matrix <- matrix(rep("", nrow(WTCPoliceCalls)*nrow(WTCPoliceCalls)*2), 
+                               nrow = nrow(WTCPoliceCalls)*2, 
+                               ncol = nrow(WTCPoliceCalls))
+
+for (i in 1:nrow(WTCPoliceCalls)) {
+  trajectory.matrix[1:(i*2),i] <- whole.trajectory[1:(i*2)]  
+}
+write.csv(trajectory.matrix, "trajectory.matrix.csv", row.names = F)
+
 # plug in real data
 row <- sample(5:nrow(WTCPoliceCalls), 1)
 max.length <- nrow(WTCPoliceCalls)
@@ -74,3 +89,12 @@ state.to
 
 reward <- get_reward_features(state.to)
 reward
+
+# fit rem model
+wtcfit<-rem.dyad(WTCPoliceCalls, n=37,
+                  effects=c("PSAB-BY","NTDegRec", "PSAB-BA", "FrPSndSnd"),
+                 #covar=list(CovInt=WTCPoliceIsICR),
+                 hessian=TRUE)
+summary(wtcfit)
+
+
