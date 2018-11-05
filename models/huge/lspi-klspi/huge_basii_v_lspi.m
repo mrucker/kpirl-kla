@@ -1,12 +1,11 @@
-function phi = huge_basis_3_2(state, actions, dic_data, para); persistent v_i v_p v_l a_m; 
+function phi = huge_basii_v_lspi(state, actions, ~, ~); persistent v_i v_p v_l a_m; 
 
     if(isempty(a_m))
-        s_a = s_act_4_2();
-        a_m = s_a([]);
+        a_m = huge_state_actions([]);
     end
 
     if(isempty(v_p))
-        [v_i, v_p, ~, v_l] = v_basii_4_9();
+        [v_i, v_p, v_l] = v_basii_4_9();
 
         %v_p = full_radial_basis_features(v_p());
         %v_p = full_2nd_order_polynomial_features(v_p());

@@ -1,10 +1,9 @@
-function [v_i, v_p, v_b, v_l] = huge_basii_v()
+function [v_i, v_p, v_l] = huge_value_basii()
     
     v_I = I(LEVELS_N());
 
     v_p = @v_perms;
     v_i = @(levels) 1 + v_I'*(levels-1);
-    v_b = @(levels) v_feats(levels);
     v_l = @(states) statesfun(states);
 end
 

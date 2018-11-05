@@ -1,95 +1,99 @@
-function [policy, time] = kla(s_1, actions, reward, value_basii, trans_post, trans_pre, gamma, N, M, T, W)
+function [policy, time] = kla(domain, reward)
 
     gcp; %this is here to force the parallel pool to begin before we start timing
-    
-    a_start = tic;
 
-    [v_i, v_p, ~, v_l] = value_basii();
+    start = tic;
+        [v_i, v_p, v_l] = feval([domain '_value_basii']);
+        [s_1          ] = feval([domain '_random']);
+        [s_a          ] = feval([domain '_actions']);
+        [t_d, t_s     ] = feval([domain '_transitions']);
+        [paramaters   ] = feval([domain '_paramaters']);
 
-    v_p = v_p();
-    v_n = size(v_p,2);
-    v_v = 3*ones(1,v_n); %arbitrarily initialize all state values to 3
+        N     = parmaters.N;
+        M     = parmaters.M;
+        T     = parmaters.T;
+        W     = parmaters.W;
+        gamma = paramaters.gamma;
 
-    g_mat = ccell2mat(arrayfun(@(w)circshift([gamma.^(0:T-1), zeros(1,W-1)],w-1), 1:W, 'UniformOutput',false)');    
+        time = zeros(1,5);
 
-    %simply here to track simple performance
-    f_time = 0;
-    b_time = 0;
-    m_time = 0;
-    
-    %these variables manage the approximate "on-policy" sampling distribution
-    init_recycle = 4;
-    init_count   = 0;
-    init_growth  = M*(T+W-1);
-    init_states  = cell(init_growth*init_recycle,1);
-    
-    Y = NaN  (1, v_n); %last  visitation value
-    K = zeros(1, v_n); %total visitation count
-    J = NaN  (1, v_n); %last  visitation iter
+        v_n = size(v_p,2);
+        v_v = 3*ones(1,v_n); %arbitrarily initialize all state values to 3
 
-    %one for every value_basii updated for entire life of program (BAKF)
-    epsilon = NaN(1, v_n);
-    beta    = NaN(1, v_n);
-    nu      = NaN(1, v_n);
-    sig_sq  = NaN(1, v_n);
-    alpha   = NaN(1, v_n);
-    eta     = NaN(1, v_n);
-    lambda  = NaN(1, v_n);
+        g_mat = ccell2mat(arrayfun(@(w)circshift([gamma.^(0:T-1), zeros(1,W-1)],w-1), 1:W, 'UniformOutput',false)');
+
+        %these variables manage the approximate "on-policy" sampling distribution
+        init_recycle = 4;
+        init_count   = 0;
+        init_growth  = M*(T+W-1);
+        init_states  = cell(init_growth*init_recycle,1);
+
+        Y = NaN  (1, v_n); %last  visitation value
+        K = zeros(1, v_n); %total visitation count
+        J = NaN  (1, v_n); %last  visitation iter
+
+        %one for every value_basii updated for entire life of program (BAKF)
+        epsilon = NaN(1, v_n);
+        beta    = NaN(1, v_n);
+        nu      = NaN(1, v_n);
+        sig_sq  = NaN(1, v_n);
+        alpha   = NaN(1, v_n);
+        eta     = NaN(1, v_n);
+        lambda  = NaN(1, v_n);
+    time(1) = toc(start);
 
     for n = 1:N
-                
-        if mod(n-1,init_recycle) == 0
-            init_count = init_growth;
-            init_states(1:init_growth) = arrayfun(@(m) s_1(), 1:init_growth, 'UniformOutput', false);
-        end
 
-        t_start = tic;
-        
-        init = init_states(randperm(init_count, M)); 
-        stdY = std(Y(~isnan(Y)));
-
-        X_b_m = arrayfun(@(i) zeros(1,T+W-1), 1:M, 'UniformOutput', false);
-        X_s_m = arrayfun(@(i) cell (1,T+W-1), 1:M, 'UniformOutput', false);
-
-        temp_SE                 = sqrt(sig_sq);
-        temp_SE(isnan(temp_SE)) = stdY;
-
-        init_se = cellfun(@(s_t) temp_SE(v_i(v_l(trans_post(s_t, actions(s_t))))), init, 'UniformOutput', false);
-
-        parfor m = 1:M
-
-            s_t = init{m};
-
-            for t = 1:T+W-1
-
-                post_states = trans_post(s_t, actions(s_t));
-                post_v_is   = v_i(v_l(post_states));
-                post_values = v_v(post_v_is);
-
-                if(t == 1)
-                    post_values = post_values + 1.5*init_se{m};
-                end
-
-                [~,m_i] = max(post_values);
-                a_i = m_i(randi(numel(m_i)));
-
-                s_t = trans_pre(post_states(:,a_i), []);
-
-                X_s_m{m}{t} = s_t;
-                X_b_m{m}(t) = post_v_is(a_i);
-
+        start = tic;
+            if mod(n-1,init_recycle) == 0
+                init_count = init_growth;
+                init_states(1:init_growth) = arrayfun(@(m) s_1(), 1:init_growth, 'UniformOutput', false);
             end
-        end
-        f_time = f_time + toc(t_start);
 
-        %grows by M*(T+W-1) each n then resets at (n-1)%4==0
-        init_states(init_count + (1:init_growth)) = horzcat(X_s_m{:});
-        init_count = init_count + init_growth;
+            init = init_states(randperm(init_count, M)); 
+            stdY = std(Y(~isnan(Y)));
 
-        t_start = tic;
-        for m = 1:M
-            X_rewd = cellfun(reward, X_s_m{m});
+            X_b_m = arrayfun(@(i) zeros(1,T+W-1), 1:M, 'UniformOutput', false);
+            X_s_m = arrayfun(@(i) cell (1,T+W-1), 1:M, 'UniformOutput', false);
 
+            temp_SE                 = sqrt(sig_sq);
+            temp_SE(isnan(temp_SE)) = stdY;
+
+            init_se = cellfun(@(s_t) temp_SE(v_i(v_l(t_d(s_t, s_a(s_t))))), init, 'UniformOutput', false);
+
+            parfor m = 1:M
+
+                s_t = init{m};
+
+                for t = 1:T+W-1
+
+                    post_states = t_d(s_t, s_a(s_t));
+                    post_v_is   = v_i(v_l(post_states));
+                    post_values = v_v(post_v_is);
+
+                    if(t == 1)
+                        post_values = post_values + 1.5*init_se{m};
+                    end
+
+                    [~,m_i] = max(post_values);
+                    a_i = m_i(randi(numel(m_i)));
+
+                    s_t = t_s(post_states(:,a_i));
+
+                    X_s_m{m}{t} = s_t;
+                    X_b_m{m}(t) = post_v_is(a_i);
+
+                end
+            end
+
+            %grows by M*(T+W-1) each n then resets at (n-1)%4==0
+            init_states(init_count + (1:init_growth)) = horzcat(X_s_m{:});
+            init_count = init_count + init_growth;
+        time(2) = time(2) + toc(start);
+
+        start = tic;
+            for m = 1:M
+                X_rewd = cellfun(reward, X_s_m{m});
                 for w = 1:W
                     i = X_b_m{m}(w);
                     y = g_mat(w,:) * X_rewd';
@@ -167,10 +171,10 @@ function [policy, time] = kla(s_1, actions, reward, value_basii, trans_post, tra
                         lambda (i) = 0; % we don't use for a few iterations
                     end
                 end
-        end
-        b_time = b_time + toc(t_start);
+            end
+        time(3) = time(3) + toc(start);
 
-        t_start = tic;
+        start = tic;
 
             %https://www.mathworks.com/help/stats/fitrsvm.html#busljl4-BoxConstraint
             if iqr(Y) < .0001
@@ -186,12 +190,11 @@ function [policy, time] = kla(s_1, actions, reward, value_basii, trans_post, tra
 
             v_v = predict(v_f, vertcat(v_p, n*ones(1,v_n))')';
             
-        m_time = m_time + toc(t_start);
+        time(4) = time(4) + toc(start);
     end       
     
-    policy = policy_function(actions, @(ss) v_v(v_i(v_l(ss))), trans_post);
-    
-    a_time = toc(a_start);
-       
-    time   = [f_time, b_time, m_time, a_time];
+    start = tic;  
+        policy = policy_function(s_a, @(ss) v_v(v_i(v_l(ss))), t_d);
+    time(5) = time(5) + toc(start);
+
 end

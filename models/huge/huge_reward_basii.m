@@ -1,10 +1,9 @@
-function [r_i, r_p, r_b, r_l] = huge_basii_r()
+function [r_i, r_p, r_l] = huge_reward_basii()
 
     r_I = I([LEVELS_N(), 1]);
 
     r_p = r_perms();
     r_i = @(states) 1 + r_I'*(statesfun(@r_levels, states)-1);
-    r_b = @(states) r_feats(statesfun(@r_levels, states));
     r_l = @(states) statesfun(@r_levels, states);
 end
 

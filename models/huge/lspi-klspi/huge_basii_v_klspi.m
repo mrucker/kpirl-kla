@@ -6,7 +6,7 @@ function phi = huge_basii_v_klspi(state, action, dic_data, para); persistent v_i
     end
 
     if(isempty(v_p))
-        [v_i, v_p, ~, v_l] = v_basii_4_9();
+        [v_i, v_p, v_l] = v_basii_4_9();
         v_p = v_p();
     end
     

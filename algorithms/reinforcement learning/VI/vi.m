@@ -1,4 +1,4 @@
-function [V,P] = value_iteration(T, R, discount, epsilon, max_iter)
+function [V,P] = vi(T, R, discount, epsilon, max_iter)
 
     iter = 0;
 
