@@ -1,10 +1,10 @@
 function trajectories = huge_trajectories()
-    trajectories = read_trajectory_episodes_from_file('
+    trajectories = read_trajectory_episodes_from_file([cd '\domains\huge\data\'], 'huge_observed_trajectories.json');
 end
 
 function te = read_trajectory_episodes_from_file(path, file)
 
-    trajectory_observations = jsondecode(fileread([path, file, '.json']));
+    trajectory_observations = jsondecode(fileread([path, file]));
     trajectory_states       = huge_states_from(trajectory_observations);
 
     trajectory_state_trim_count   = 30; %we trim 30 from beginning and end because of noise
@@ -27,6 +27,8 @@ end
 
 function s = huge_states_from(observations)
 
+    td = huge_transitions();
+
     %assumed observation = [x, y, w, h, r, \forall targets {x, y, age}]
     assert(all(cellfun(@(o) isnumeric(o) && iscolumn(o), observations)), 'each observation must be a numeric col vector');
     assert(all(cellfun(@(o) mod(numel(o)-5, 3) == 0    , observations)), 'each observation must have 5 global features and 3x target features');
@@ -45,7 +47,7 @@ function s = huge_states_from(observations)
         ts = o(6:end);
 
         %states{i+1} = [adp_transition_post_decision(x,u); ts];
-        states{i+1} = [huge_trans_post(x,u); ts];
+        states{i+1} = [td(x,u); ts];
     end
 
     s = states;

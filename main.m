@@ -2,7 +2,8 @@ clear; paths; close all
 
 huge_paramaters = (struct('N',50, 'M',90, 'S',4, 'W',4, 'steps',10, 'samples',500, 'gamma',.9, 'epsilon',.001));
 
-reward = kpirl('huge', get_kernel(5));
+kernel = get_kernel(5);
+reward = kpirl('huge', kernel);
 
 function kernel = get_kernel(kernel_id)
     p = 2;

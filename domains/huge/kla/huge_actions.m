@@ -1,7 +1,7 @@
 function [a_v, a_m] = huge_actions()
 
     a_m = get_actions_matrix();
-    a_v = @(s) get_valid_actions(s, am);
+    a_v = @(s) get_valid_actions(s, a_m);
 
 end
 
@@ -16,7 +16,7 @@ function a = get_actions_matrix()
     a = vertcat(reshape(repmat(dx,numel(dx),1), [1,numel(dx)^2]), reshape(repmat(dy',1,numel(dy)), [1,numel(dy)^2]));
 end
 
-function am = get_valid_actions(state, am)
+function a_m = get_valid_actions(state, a_m)
 
     if(isempty(state))
         return;
@@ -29,7 +29,7 @@ function am = get_valid_actions(state, am)
         state = state{1};
     end
     
-    np = state(1:2) + am;
+    np = state(1:2) + a_m;
 
     np_too_small_x = np(1,:) < 0;
     np_too_small_y = np(2,:) < 0;
@@ -38,5 +38,5 @@ function am = get_valid_actions(state, am)
 
     valid_actions = ~(np_too_small_x|np_too_small_y|np_too_large_x|np_too_large_y);
 
-    am = am(:, valid_actions);
+    a_m = a_m(:, valid_actions);
 end

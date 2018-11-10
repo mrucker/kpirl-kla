@@ -1,2 +1,0 @@
-function butts_states_assert(states)
-end

@@ -1,11 +1,12 @@
 %Be careful, if states is too big, realizing the whole policy may overload memory.
 %Also, this assumes that reward is not dependent on action. If it is this won't work.
-function Pf = policy_function(Af, Vf, trans)
-    Pf = @(s) col_i(Af(s), max_i(Vf(trans(s, Af(s)))));
-end
+function a = best_action_from_state(state, actions, post, value)
+        
+    post_states = post(state, actions);
+    post_values = value(post_states);
+    post_max_i  = max_i(post_values);
 
-function a = col_i(matrix, i)
-    a = matrix(:,i);
+    a = actions(:,post_max_i);
 end
 
 function i = max_i(values)

@@ -1,7 +1,7 @@
-function [state] = butts_states_rand()
+function [state] = butts_random()
 
-    max_length = 40;
-    smp_length = randi(max_length);
+    paramaters = butts_paramaters();
+    smp_length = randi(paramaters.max_rand);
     
     state = zeros(2*smp_length,1);
     af    = butts_states_action();

@@ -5,14 +5,14 @@ function [policy, time] = kla(domain, reward)
     start = tic;
         [v_i, v_p, v_l] = feval([domain '_value_basii']);
         [s_1          ] = feval([domain '_random']);
-        [s_a          ] = feval([domain '_actions']);
+        [a_v          ] = feval([domain '_actions']);
         [t_d, t_s     ] = feval([domain '_transitions']);
         [paramaters   ] = feval([domain '_paramaters']);
 
-        N     = parmaters.N;
-        M     = parmaters.M;
-        T     = parmaters.T;
-        W     = parmaters.W;
+        N     = paramaters.N;
+        M     = paramaters.M;
+        T     = paramaters.T;
+        W     = paramaters.W;
         gamma = paramaters.gamma;
 
         time = zeros(1,5);
@@ -20,7 +20,7 @@ function [policy, time] = kla(domain, reward)
         v_n = size(v_p,2);
         v_v = 3*ones(1,v_n); %arbitrarily initialize all state values to 3
 
-        g_mat = ccell2mat(arrayfun(@(w)circshift([gamma.^(0:T-1), zeros(1,W-1)],w-1), 1:W, 'UniformOutput',false)');
+        g_mat = cell2mat(arrayfun(@(w)circshift([gamma.^(0:T-1), zeros(1,W-1)],w-1), 1:W, 'UniformOutput',false)');
 
         %these variables manage the approximate "on-policy" sampling distribution
         init_recycle = 4;
@@ -59,7 +59,7 @@ function [policy, time] = kla(domain, reward)
             temp_SE                 = sqrt(sig_sq);
             temp_SE(isnan(temp_SE)) = stdY;
 
-            init_se = cellfun(@(s_t) temp_SE(v_i(v_l(t_d(s_t, s_a(s_t))))), init, 'UniformOutput', false);
+            init_se = cellfun(@(s_t) temp_SE(v_i(v_l(t_d(s_t, a_v(s_t))))), init, 'UniformOutput', false);
 
             parfor m = 1:M
 
@@ -67,7 +67,7 @@ function [policy, time] = kla(domain, reward)
 
                 for t = 1:T+W-1
 
-                    post_states = t_d(s_t, s_a(s_t));
+                    post_states = t_d(s_t, a_v(s_t));
                     post_v_is   = v_i(v_l(post_states));
                     post_values = v_v(post_v_is);
 
@@ -184,17 +184,16 @@ function [policy, time] = kla(domain, reward)
             end
 
             X = vertcat(v_p(:,~isnan(Y)), J(~isnan(Y)));
-            Y = Y(~isnan(Y));
-            
-            v_f = fitrsvm(X',Y','KernelFunction','rbf', 'BoxConstraint', box_constraint, 'Solver', 'SMO', 'Standardize',true);
 
-            v_v = predict(v_f, vertcat(v_p, n*ones(1,v_n))')';
-            
+            v_m = fitrsvm(X',Y(~isnan(Y))','KernelFunction','rbf', 'BoxConstraint', box_constraint, 'Solver', 'SMO', 'Standardize',true);
+            v_v = predict(v_m, vertcat(v_p, n*ones(1,v_n))')';
+
         time(4) = time(4) + toc(start);
-    end       
-    
-    start = tic;  
-        policy = policy_function(s_a, @(ss) v_v(v_i(v_l(ss))), t_d);
+    end
+
+    start = tic;
+        values = @(s) v_v(v_i(v_l(s)));
+        policy = @(s) best_action_from_state(s, a_v(s), t_d, values);
     time(5) = time(5) + toc(start);
 
 end

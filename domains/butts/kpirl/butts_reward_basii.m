@@ -1,4 +1,4 @@
-function [r_i, r_p, r_b, r_l] = butts_basii_r_kpirl()
+function [r_i, r_p, r_b, r_l] = butts_reward_basii()
 
     r_I = I(LEVELS_N());
 

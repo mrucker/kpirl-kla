@@ -1,7 +1,7 @@
 function [t_d, t_s, t_b] = huge_transitions()
-    t_d = @(s,a) huge_trans_post(s,a);
-    t_s = @(s)   huge_trans_pre(s);    
     
+    t_d = @huge_trans_post;
+    t_s = @huge_trans_pre;
     t_b = @(s,a) t_s(t_d(s,a));
 end
 
