@@ -1,8 +1,8 @@
-clear; close all; try run('../../paths.m'); catch; end
+clear; close all; run([fullfile(fileparts(which(mfilename))) '\..\..\paths.m']);
 
 domain = 'huge';
 
-eval_rewds = 1;
+eval_rewds = 2;
 eval_gamma = .9;
 eval_steps = 10;
 eval_inits = 30;
