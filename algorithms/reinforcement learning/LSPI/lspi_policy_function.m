@@ -21,12 +21,13 @@ function [action, actionphi] = lspi_policy_function(policy, state)
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
-  
+  valid_actions = policy.actions(state);
+
   %%% Exploration or not? 
   if (rand < policy.explore)
     
     %%% Pick one action in random
-    action = randint(policy.actions);
+    action    = valid_actions(:,randi(size(valid_actions,2)));
     actionphi = feval(policy.basis, state, action);
     
   else
@@ -37,12 +38,12 @@ function [action, actionphi] = lspi_policy_function(policy, state)
     
     %%% Find first all actions with maximum Q-value
     
-    phis = feval(policy.basis, state, policy.actions);
+    phis = feval(policy.basis, state, valid_actions);
     qs   = phis' * policy.weights;
     
     maxq = max(qs);
     
-    besta = find(qs == maxq);
+    besta     = find(qs == maxq);
     actionphi = phis(:,qs == maxq);
     
 %     for a=1:policy.actions
@@ -65,7 +66,7 @@ function [action, actionphi] = lspi_policy_function(policy, state)
     which = 1;                         % Pick the first (deterministic)
     %which = randint(length(besta));    % Pick randomly
     
-    action = besta(which);
+    action    = valid_actions(:,besta(which));
     actionphi = actionphi(:,which);
     
   end

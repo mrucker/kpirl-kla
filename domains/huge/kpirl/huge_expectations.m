@@ -14,6 +14,6 @@ function expectation = huge_expectations(reward)
     samples = paramaters.samples;
     gamma   = paramaters.gamma;
 
-    policy      = kla(domain, reward);
+    policy      = lspi(domain, reward);
     expectation = expectation_from_simulations(policy, t_b, s_1, r_e, steps, samples, gamma);
 end
