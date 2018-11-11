@@ -6,7 +6,7 @@ eval_rewds = 1;
 eval_gamma = .9;
 eval_steps = 10;
 eval_inits = 30;
-eval_samps = 500;
+eval_samps = 500; %warning: reducing this will make the estimate of V more imprecise, making comparisons more suspect
 
 algos_parms = {
     'kla  ', struct();
