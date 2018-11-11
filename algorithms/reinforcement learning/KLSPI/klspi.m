@@ -1,5 +1,6 @@
+%A Wrapper made by Mark Rucker to allow KLSPI to integrate with kpirl more easily
 function [policy, time] = klspi(domain, reward); global R;
-    
+
     a_start = tic;
         R = reward;
 
@@ -17,7 +18,7 @@ function [policy, time] = klspi(domain, reward); global R;
         basis       = [domain '_value_basii_klspi'];
         eval_alg    = 5; % 1->lsq; 2->lsqfast; 3->lsqbe; 4->lsqbefast; 5->klsq;
 
-        policy = feval([domain '_initialize_policy'], 0.0, discount, basis);  
+        policy = feval([domain '_initialize_policy'], 0.0, discount, basis);
         policy.weights = 0;
 
         %%% Collect (additional) samples if requested
@@ -27,7 +28,7 @@ function [policy, time] = klspi(domain, reward); global R;
         para(2)=1;   % 
         para(3)=0.3; % Mu for ALD condition in spacification 
 
-        [~, all_policies, dic_t, para] = klspi_core(domain, eval_alg, maxiter, epsilon, samples, basis, discount, policy, para);              
+        [~, all_policies, dic_t, para] = klspi_core(domain, eval_alg, maxiter, epsilon, samples, basis, discount, policy, para);
 
         last_policy = all_policies{end};
 
@@ -36,7 +37,7 @@ function [policy, time] = klspi(domain, reward); global R;
         v_i    = @(s) feval(basis, s);
         values = @(s) v_v(v_i(s));
         policy = @(s) best_action_from_state(s, last_policy.actions(s), t_d, values);
-    
+
     time = toc(a_start);
 
 end
