@@ -1,4 +1,4 @@
-%A Wrapper made by Mark Rucker to allow KLSPI to integrate with kpirl more easily
+%A wrapper made by Mark Rucker to allow KLSPI to integrate with kpirl more easily
 function [policy, time] = klspi(domain, reward); global R;
 
     a_start = tic;

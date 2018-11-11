@@ -1,3 +1,4 @@
+%A wrapper made by Mark Rucker to allow LSPI to integrate with kpirl more easily
 function [policy, time] = lspi(domain, reward); global R;
 
     a_start = tic;

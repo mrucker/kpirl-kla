@@ -1,4 +1,3 @@
-%A Wrapper made by Mark Rucker to allow KLSPI to integrate with kpirl more easily
 function [reward,time] = kpirl(domain, kernel)
 
     [s_e       ] = feval([domain '_trajectories']);

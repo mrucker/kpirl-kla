@@ -99,10 +99,6 @@ while ( (iteration < maxiterations) & (distance > epsilon))
     %%% Store the current policy
     policy.time = policy.time + toc(i_start);
     all_policies{iteration+1} = policy;
- 
-    if(mod(iteration, 2) == 0)
-        %samples = k_collect_samples(domain, M, T, policy);
-    end
     
     Dic_old = 0; 
     %%% Depending on the domain, print additional info if needed

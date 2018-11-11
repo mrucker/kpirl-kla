@@ -1,0 +1,6 @@
+function [policy, time] = <algorithm>(domain, reward)
+
+policy is a function which takes a state and returns an action
+time   is a column vector whose sum equals the entire time it took for the algorithm to run
+domain is a vector string indicating which domain to reference in the domain folder
+reward is a function which takes a state and returns a decimal

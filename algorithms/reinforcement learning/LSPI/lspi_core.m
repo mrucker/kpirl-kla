@@ -99,6 +99,7 @@ function [policy, all_policies] = lspi_core(domain, algorithm, maxiterations, ..
   rand('state', sum(100*clock));
 
   
+  
   if nargin<8
       initialize_policy = [domain '_initialize_policy'];
       policy = feval(initialize_policy, 0.0, discount, basis);
@@ -174,11 +175,8 @@ function [policy, all_policies] = lspi_core(domain, algorithm, maxiterations, ..
     end
     distance = L2norm;
       
-      
-    
     %%% Print some information 
     %disp( ['   Norms -> Lmax : ' num2str(LMAXnorm) '   L2 : ' num2str(L2norm)] );
-    
     
     %%% Store the current policy
     policy.time = policy.time + toc(i_start);
@@ -186,12 +184,7 @@ function [policy, all_policies] = lspi_core(domain, algorithm, maxiterations, ..
     
     %%% Depending on the domain, print additional info if needed
     feval([domain '_print_info'], all_policies);
-    
-    if(mod(iteration, 3) == 0)
-        paramaters = feval([domain '_paramaters']);
-        samples    = collect_samples(domain, paramaters.M, paramaters.T, policy);
-    end
-    
+
   end
   
   
