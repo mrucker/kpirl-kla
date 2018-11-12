@@ -3,7 +3,7 @@ function [a_v, a_m] = butts_actions()
     paramaters = butts_paramaters();
 
     a_m = actions_matrix(paramaters.pop_size);
-    a_v = @(s) am;
+    a_v = @(s) a_m;
 end
 
 function a = actions_matrix(pop_size)

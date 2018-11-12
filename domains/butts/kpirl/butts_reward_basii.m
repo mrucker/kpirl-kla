@@ -1,11 +1,11 @@
-function [r_i, r_p, r_b, r_l] = butts_reward_basii()
+function [r_i, r_p, r_l] = butts_reward_basii()
 
     r_I = I(LEVELS_N());
 
     r_p = r_perms();
-    r_i = @(states) 1 + r_I'*(statesfun(@r_levels, states)-1);
-    r_b = @(states) r_feats(statesfun(@r_levels, states));
     r_l = @(states) statesfun(@r_levels, states);
+    r_i = @(states) 1 + r_I'*(r_l(states));
+    
     
 end
 
@@ -21,25 +21,22 @@ end
 
 function rf = r_feats(levels)
 
-    assert(all(levels(:)>0), 'bad levels');
+    lvl_to_d = @(val, den     ) val/den;
+    lvl_to_e = @(val, cnt     ) double(1:cnt == val')';
+    lvl_to_r = @(val, den, trn) (val~=-1) .* [cos(trn*pi/den + val*pi/den); sin(trn*pi/den + val*pi/den)];
 
-    val_to_rad = @(val, den, trn) (val~=-1) .* [cos(trn*pi/den + val*pi/den); sin(trn*pi/den + val*pi/den)];
+    assert(all(levels(:)>=1), 'bad levels');    
 
-    is_touched = (levels(end,:) == 2);
-
-    x_l = levels(1,:) .* is_touched;
-    y_l = levels(2,:) .* is_touched;
-    v_l = levels(3,:) .* is_touched;
-    a_l = levels(4,:) .* is_touched;
-    d_l = levels(5,:) .* is_touched;
+    t_l = levels(1,:);
+    p_l = levels(2,:);
+    r_l = levels(3,:);
+    i_l = levels(4,:);
 
     rf = [
-        val_to_rad(x_l-1, LEVELS_N(1)-1, 0.0) * 1/01;
-        val_to_rad(y_l-1, LEVELS_N(2)-1, 0.0) * 1/01;
-        val_to_rad(v_l-1, LEVELS_N(3)*2, 0.0) * 1/01;
-        val_to_rad(a_l-1, LEVELS_N(4)*2, 0.0) * 1/01;
-        val_to_rad(d_l-1, LEVELS_N(5)/2, 4.5) * 6/10;
-        4 * (levels(end,:) == 1);
+        lvl_to_d(t_l, LEVELS_N(1)-1)
+        lvl_to_d(p_l, LEVELS_N(2)-1)
+        lvl_to_d(r_l, LEVELS_N(3)-1)
+        lvl_to_d(i_l, LEVELS_N(4)-1)
     ];
 
 end
@@ -68,17 +65,17 @@ end
 
 function tl = trn_levels(states)
 
-    last4 = states(end-3:end,:);
+    last_4 = states(end-3:end,:);
     
-    val_t = (last4(2,:) == last4(3,:)) & (last4(1,:) ~= last4(4,:));
+    val_t = (last_4(2,:) == last_4(3,:)) & (last_4(1,:) ~= last_4(4,:));
     
-    tl = bin_levels(val_t, LEVELS_B(1), 1, LEVELS_N(1));
+    tl = bin_levels(val_t, 0, 1, LEVELS_N(1));
 end
 
 function pl = pop_levels(states)
     val_p = sum(states(1:end-2,:) == states(end,:),1)/(size(states,1)/2 - 1);
     
-    pl = bin_levels(val_p, LEVELS_B(2), 1, LEVELS_N(2));
+    pl = bin_levels(val_p, 0, 1, LEVELS_N(2));
 end
 
 function rl = rec_levels(states)
@@ -86,14 +83,15 @@ function rl = rec_levels(states)
     last4 = states(end-3:end,:);    
     val_r = (last4(2,:) == last4(3,:)) & (last4(1,:) == last4(4,:));
     
-    rl = bin_levels(val_r, LEVELS_B(3), 1, LEVELS_N(3));
+    rl = bin_levels(val_r, 0, 1, LEVELS_N(3));
 end
 
 function il = int_levels(states)
-
-    val_i = sum(states(1:2:end-2,:) == states(end-1,:) && states(2:2:end-2,:) == states(end,:))/sum(states(1:2:end-2,:) == states(end-1,:));
     
-    il = bin_levels(val_i, LEVELS_B(4), 1, LEVELS_N(4));
+    val_i = sum(states(1:2:end-2,:) == states(end-1,:) & states(2:2:end-2,:) == states(end,:), 1)./sum(states(1:2:end-2,:) == states(end-1,:),1);    
+    val_i(isnan(val_i)) = 0;
+    
+    il = bin_levels(val_i, 0, 1, LEVELS_N(4));
 end
 
 %% Probably don't need to change %%
@@ -110,12 +108,10 @@ function sf = statesfun(func, states)
     end
 end
 
-function bl = bin_levels(vals, bin_size, min_level, max_level)
+function bl = bin_levels(val, min, max, bins)
 
     %fastest
-    bl = ceil(vals/bin_size);
-    bl = max (bl, min_level);
-    bl = min (bl, max_level);
+    bl = floor((val-min)*(bins-1)/(max-min));
 
     %%second fastest
     %bl = min(ceil((vals+.01)/bin_s), bin_n);
@@ -142,14 +138,6 @@ end
 function l = LEVELS_N(i) 
     l = [2, 30, 2, 30];
     
-    if(nargin ~= 0)
-        l = l(i);
-    end
-end
-
-function l = LEVELS_B(i)
-    l = [1/LEVELS_N(1), 1/LEVELS_N(2), 6, 10, 2*pi/LEVELS_N(5)];
-
     if(nargin ~= 0)
         l = l(i);
     end

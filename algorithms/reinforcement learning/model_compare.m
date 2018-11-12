@@ -1,6 +1,6 @@
 clear; close all; run([fullfile(fileparts(which(mfilename))) '\..\..\paths.m']);
 
-domain = 'huge';
+domain = 'butts';
 
 eval_rewds = 2;
 eval_gamma = .9;
@@ -10,8 +10,8 @@ eval_samps = 500; %warning: reducing this will make the estimate of V more impre
 
 algos_parms = {
     'kla  ', struct();
-    'lspi ', struct();
-    'klspi', struct();
+   %'lspi ', struct();
+   %'klspi', struct();
 };
 
 [s_1          ] = feval([domain '_random']);
