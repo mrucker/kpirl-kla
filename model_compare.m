@@ -1,4 +1,4 @@
-clear; close all; run([fullfile(fileparts(which(mfilename))) '\..\..\paths.m']);
+clear; close all; paths;
 
 domain = 'butts';
 
