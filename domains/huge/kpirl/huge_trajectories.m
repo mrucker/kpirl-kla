@@ -1,5 +1,5 @@
 function trajectories = huge_trajectories()
-    trajectories = read_trajectory_episodes_from_file([fullfile(fileparts(which(mfilename))) '\..\data\'], 'huge_observed_trajectories.json');
+    trajectories = read_trajectory_episodes_from_file([fullfile(fileparts(which(mfilename))) '/../data/'], 'huge_observed_trajectories.json');
 end
 
 function te = read_trajectory_episodes_from_file(path, file)
