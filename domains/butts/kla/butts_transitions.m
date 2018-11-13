@@ -6,13 +6,16 @@ function [t_d, t_s, t_b] = butts_transitions()
 
 end
 
-function s2 = butts_trans_post(s1, a)
+function s2 = butts_trans_post(s1, a);persistent max_hist;
 
-    max_length = 40;
+    if(isempty(max_hist))
+        param = butts_paramaters();
+        max_hist = param.max_hist;
+    end
 
     s2 = s1;
 
-    if(size(s1,1)/2 >= max_length)
+    if(size(s1,1)/2 >= max_hist)
         s2 = circshift(s1,-2,1);
         s2 = repmat(s2,1,size(a,2));
         

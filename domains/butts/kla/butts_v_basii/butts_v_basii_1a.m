@@ -115,10 +115,12 @@ function sf = statesfun(func, states)
     end
 end
 
-function bl = bin_levels(val, min, max, bins)
+function bl = bin_levels(val, min_val, max_val, bins)
 
     %fastest
-    bl = floor((val-min)*(bins-1)/(max-min));
+    val = max([val min_val]);
+    val = min([val max_val]);
+    bl  = floor((val-min_val)*(bins-1)/(max_val-min_val));
 
     %%second fastest
     %bl = min(ceil((vals+.01)/bin_s), bin_n);

@@ -2,16 +2,16 @@ clear; close all; run([fullfile(fileparts(which(mfilename))) '\..\..\..\paths.m'
 
 domain = 'butts';
 
-eval_rewds = 2;
+eval_rewds = 30;
 eval_gamma = .9;
 eval_steps = 10;
 eval_inits = 30;
 eval_samps = 500; %warning: reducing this will make the estimate of V more imprecise -- making performance comparisons more suspect
 
 daps = {
-    'kla_1a', 'kla', struct('v_basii', 'butts_v_basii_1a');
-    'kla_1b', 'kla', struct('v_basii', 'butts_v_basii_1b');
-    'kla_1c', 'kla', struct('v_basii', 'butts_v_basii_1c');
+    'kla_1a', 'kla', struct('v_basii', '1a');
+    'kla_1b', 'kla', struct('v_basii', '1b');
+    'kla_1c', 'kla', struct('v_basii', '1c');
 };
 
 [s_1          ] = feval([domain '_random']);

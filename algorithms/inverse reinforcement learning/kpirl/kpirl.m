@@ -22,19 +22,27 @@ function [reward,time] = kpirl(domain, kernel)
 
         i  = 1;
 
-        rs{i} = rand(size(r_p,2),1)'*reward_features_gram;
-        ss{i} = feval([domain, '_expectations'], @(s) rs{i}(r_i(s)) );
-        sb{i} = ss{i};
-        ts{i} = Inf;
+        tic_id = tic;
+            rs{i} = rand(size(r_p,2),1)'*reward_features_gram;
+            ss{i} = feval([domain, '_expectations'], @(s) rs{i}(r_i(s)) );
+            sb{i} = ss{i};
+            ts{i} = Inf;
+        time = toc(tic_id);
 
         i = 2;
 
         while 1
-
-            rs{i} = (E-sb{i-1})'*reward_features_gram;
-            ss{i} = feval([domain, '_expectations'], @(s) rs{i}(r_i(s)) );
-            ts{i} = sqrt(E'*reward_features_gram*E + sb{i-1}'*reward_features_gram*sb{i-1} - 2*E'*reward_features_gram*sb{i-1});
-
+            
+            if ~exist('silent', 'var')
+                fprintf('Completed IRL iteration, i=%03d, t=%8.6f, time=%06.3f\n',[i-1,ts{i-1},time]);
+            end
+            
+            tic_id = tic;
+                rs{i} = (E-sb{i-1})'*reward_features_gram;
+                ss{i} = feval([domain, '_expectations'], @(s) rs{i}(r_i(s)) );
+                ts{i} = sqrt(E'*reward_features_gram*E + sb{i-1}'*reward_features_gram*sb{i-1} - 2*E'*reward_features_gram*sb{i-1});
+            time = toc(tic_id);
+            
             if  (abs(ts{i}-ts{i-1}) <= epsilon) || (ts{i} <= epsilon)
                 break;
             end
@@ -47,6 +55,10 @@ function [reward,time] = kpirl(domain, kernel)
             i = i + 1;
         end
 
+            if ~exist('silent', 'var')
+                fprintf('Completed IRL algorithm, i=%03d, t=%8.6f, time=%06.3f\n',[i,ts{i},time]);
+            end
+        
         %Abbeel and Ng suggested solving a convex optimization problem and choosing
         %the ss with the largest coefficient. This approach didn't seem to have a big
         %effect on the outcomes in our problem domains and introduced dependencies on 

@@ -3,7 +3,7 @@ function [state] = butts_random()
     [paramaters] = butts_paramaters();
     [a_v, a_m  ] = butts_actions();
     
-    a_n   = randi(paramaters.max_rand);    
+    a_n   = 2+randi(paramaters.max_rand);    
     state = zeros(2*a_n,1);
     
     

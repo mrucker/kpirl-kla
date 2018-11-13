@@ -6,13 +6,13 @@ function te = read_trajectory_episodes_from_file(path, file)
 
     paramaters = butts_paramaters();
 
-    trajectory_observations = csvread(fileread([path, file]));
+    trajectory_observations = csvread([path, file]);
     trajectory_states       = states_from(trajectory_observations);
 
     trajectory_episodes_length    = paramaters.epi_size;
     trajectory_episodes_step_size = paramaters.epi_step;
 
-    trajectory_epsiodes_start  = 1;
+    trajectory_epsiodes_start  = 4;
     trajectory_epsiodes_finish = numel(trajectory_states) - trajectory_episodes_length;
     trajectory_episodes_count  = floor((trajectory_epsiodes_finish - trajectory_epsiodes_start)/trajectory_episodes_step_size);
 
@@ -32,7 +32,7 @@ function s = states_from(observations)
     
     for i = 1:size(observations,1)
         o = observations(i,:);
-        s{i} = {o(1,o(1,:)~=0)};
+        s{i} = {o(1,o(1,:)~=0)'};
     end
 
 end

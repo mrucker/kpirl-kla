@@ -1,4 +1,4 @@
-function [v_i, v_p, v_l] = butts_v_basii_1b()
+function [v_i, v_p, v_l] = butts_v_basii_1c()
 
     v_I = I(LEVELS_N());
 
@@ -115,10 +115,12 @@ function sf = statesfun(func, states)
     end
 end
 
-function bl = bin_levels(val, min, max, bins)
+function bl = bin_levels(val, min_val, max_val, bins)
 
     %fastest
-    bl = floor((val-min)*(bins-1)/(max-min));
+    val = max([val min_val]);
+    val = min([val max_val]);
+    bl  = floor((val-min_val)*(bins-1)/(max_val-min_val));
 
     %%second fastest
     %bl = min(ceil((vals+.01)/bin_s), bin_n);
@@ -143,7 +145,7 @@ function bl = bin_levels(val, min, max, bins)
 end
 
 function l = LEVELS_N(i)
-    l = [2, 15, 2, 15];
+    l = [2, 60, 2, 60];
     
     if(nargin ~= 0)
         l = l(i);
