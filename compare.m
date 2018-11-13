@@ -1,32 +1,33 @@
 clear; close all; paths;
 
-domain = 'butts';
+domain = 'huge';
 
 eval_rewds = 2;
 eval_gamma = .9;
 eval_steps = 10;
 eval_inits = 30;
-eval_samps = 500; %warning: reducing this will make the estimate of V more imprecise, making comparisons more suspect
+eval_samps = 500; %warning: reducing this will make the estimate of V more imprecise -- making performance comparisons more suspect
 
-algos_parms = {
-    'kla  ', struct();
-   %'lspi ', struct();
-   %'klspi', struct();
+daps = {
+    'kla  ', 'kla'  ,struct();
+    'lspi ', 'lspi' ,struct();
+    'klspi', 'klspi',struct();
 };
 
 [s_1          ] = feval([domain '_random']);
 [t_d, t_s, t_b] = feval([domain '_transitions']);
 [r_i, r_p, r_l] = feval([domain '_reward_basii']);
 
-evals_rewards = arrayfun(@(i) get_random_reward_function(r_p, r_i)  , 1:eval_rewds, 'UniformOutput', false)';
+rwds = arrayfun(@(i) get_random_reward_function(r_p, r_i)  , 1:eval_rewds, 'UniformOutput', false)';
 
-for ai = 1:size(algos_parms,1)
+for ai = 1:size(daps,1)
     average_value = 0;
     average_time  = 0;
-    for ri = 1:size(eval_rewds,1)
-        algo = algos_parms{ai,1};
-        parm = algos_parms{ai,2};
-        rewd = evals_rewards{ri};
+    for ri = 1:size(rwds,1)
+        desc = daps{ai,1};
+        algo = daps{ai,2};
+        parm = daps{ai,3};
+        rewd = rwds{ri,1};
 
         [    parm    ] = feval([domain '_paramaters'], parm);
         [policy, time] = feval(strtrim(algo), domain, rewd);
@@ -35,7 +36,7 @@ for ai = 1:size(algos_parms,1)
         average_value = (1-1/ri) *average_value + (1/ri) * this_value;
         average_time  = (1-1/ri) *average_time  + (1/ri) * sum(time);
     end
-    p_results(algo, average_time, average_value);
+    p_results(desc, average_time, average_value);
 end
 
 fprintf('\n');

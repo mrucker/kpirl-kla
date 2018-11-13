@@ -1,15 +1,14 @@
-function [r_i, r_p, r_l] = butts_reward_basii()
+function [v_i, v_p, v_l] = butts_v_basii_1b()
 
-    r_I = I(LEVELS_N());
+    v_I = I(LEVELS_N());
 
-    r_p = r_perms();
-    r_l = @(states) statesfun(@r_levels, states);
-    r_i = @(states) 1 + r_I'*(r_l(states));
-    
-    
+    v_p = perms();
+    v_l = @(states) statesfun(@levels, states);
+    v_i = @(states) 1 + v_I'*(v_l(states));
+
 end
 
-function rl = r_levels(states)
+function rl = levels(states)
 
     trn = trn_levels(states);
     pop = pop_levels(states);
@@ -19,11 +18,11 @@ function rl = r_levels(states)
     rl = vertcat(trn, pop, rec, int);
 end
 
-function rf = r_feats(levels)
+function rf = feats(levels)
 
     lvl_to_d = @(val, den     ) val/den;
-    lvl_to_e = @(val, cnt     ) double(1:cnt == val')';
-    lvl_to_r = @(val, den, trn) (val~=-1) .* [cos(trn*pi/den + val*pi/den); sin(trn*pi/den + val*pi/den)];
+    %lvl_to_e = @(val, cnt     ) double(1:cnt == val')';
+    %lvl_to_r = @(val, den, trn) (val~=-1) .* [cos(trn*pi/den + val*pi/den); sin(trn*pi/den + val*pi/den)];
 
     assert(all(levels(:)>=1), 'bad levels');    
 
@@ -41,7 +40,7 @@ function rf = r_feats(levels)
 
 end
 
-function rp = r_perms()
+function rp = perms()
 
     t = 1:LEVELS_N(1);
     p = 1:LEVELS_N(2);
@@ -55,7 +54,7 @@ function rp = r_perms()
     
     [i_c, r_c, p_c, t_c] = ndgrid(i_i, r_i, p_i, t_i);
 
-    rp = r_feats([
+    rp = feats([
         t(:,t_c(:));
         p(:,p_c(:));
         r(:,r_c(:));
@@ -143,8 +142,8 @@ function bl = bin_levels(val, min, max, bins)
     %%fifth fastest
 end
 
-function l = LEVELS_N(i) 
-    l = [2, 30, 2, 30];
+function l = LEVELS_N(i)
+    l = [2, 15, 2, 15];
     
     if(nargin ~= 0)
         l = l(i);
