@@ -1,4 +1,4 @@
-function [v_i, v_p, v_l] = butts_v_basii_1b()
+function [v_i, v_p, v_l] = rem_v_basii_1b()
 
     v_I = I(LEVELS_N());
 
@@ -11,11 +11,9 @@ end
 function rl = levels(states)
 
     trn = trn_levels(states);
-    pop = pop_levels(states);
     rec = rec_levels(states);
-    int = int_levels(states);
 
-    rl = vertcat(trn, pop, rec, int);
+    rl = vertcat(trn, rec);
 end
 
 function rf = feats(levels)
@@ -27,15 +25,11 @@ function rf = feats(levels)
     assert(all(levels(:)>=1), 'bad levels');    
 
     t_l = levels(1,:);
-    p_l = levels(2,:);
-    r_l = levels(3,:);
-    i_l = levels(4,:);
+    r_l = levels(2,:);
 
     rf = [
         lvl_to_d(t_l, LEVELS_N(1)-1)
-        lvl_to_d(p_l, LEVELS_N(2)-1)
-        lvl_to_d(r_l, LEVELS_N(3)-1)
-        lvl_to_d(i_l, LEVELS_N(4)-1)
+        lvl_to_d(r_l, LEVELS_N(2)-1)
     ];
 
 end
@@ -43,22 +37,16 @@ end
 function rp = perms()
 
     t = 1:LEVELS_N(1);
-    p = 1:LEVELS_N(2);
-    r = 1:LEVELS_N(3);
-    i = 1:LEVELS_N(4);
+    r = 1:LEVELS_N(2);
 
     t_i = 1:size(t,2);
-    p_i = 1:size(p,2);
     r_i = 1:size(r,2);
-    i_i = 1:size(i,2);
     
-    [i_c, r_c, p_c, t_c] = ndgrid(i_i, r_i, p_i, t_i);
+    [r_c, t_c] = ndgrid(r_i, t_i);
 
     rp = feats([
         t(:,t_c(:));
-        p(:,p_c(:));
         r(:,r_c(:));
-        i(:,i_c(:));
     ]);
 end
 
@@ -75,12 +63,6 @@ function tl = trn_levels(states)
     end
 end
 
-function pl = pop_levels(states)
-    val_p = sum(states(1:end-2,:) == states(end,:),1)/(size(states,1)/2 - 1);
-    
-    pl = bin_levels(val_p, 0, 1, LEVELS_N(2));
-end
-
 function rl = rec_levels(states)
 
     if(size(states,1) < 4) 
@@ -89,16 +71,8 @@ function rl = rec_levels(states)
         last4 = states(end-3:end,:);    
         val_r = (last4(2,:) == last4(3,:)) & (last4(1,:) == last4(4,:));
 
-        rl = bin_levels(val_r, 0, 1, LEVELS_N(3));
+        rl = bin_levels(val_r, 0, 1, LEVELS_N(2));
     end
-end
-
-function il = int_levels(states)
-    
-    val_i = sum(states(1:2:end-2,:) == states(end-1,:) & states(2:2:end-2,:) == states(end,:), 1)./sum(states(1:2:end-2,:) == states(end-1,:),1);    
-    val_i(isnan(val_i)) = 0;
-    
-    il = bin_levels(val_i, 0, 1, LEVELS_N(4));
 end
 
 %% Probably don't need to change %%
@@ -145,7 +119,7 @@ function bl = bin_levels(val, min_val, max_val, bins)
 end
 
 function l = LEVELS_N(i)
-    l = [2, 15, 2, 15];
+    l = [2, 2];
     
     if(nargin ~= 0)
         l = l(i);

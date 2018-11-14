@@ -1,6 +1,6 @@
-function [a_v, a_m] = butts_actions()
+function [a_v, a_m] = rem_actions()
 
-    paramaters = butts_paramaters();
+    paramaters = rem_paramaters();
 
     a_m = actions_matrix(paramaters.pop_size);
     a_v = @(s) a_m;

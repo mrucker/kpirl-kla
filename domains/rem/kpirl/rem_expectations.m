@@ -1,6 +1,6 @@
-function expectation = butts_expectations(reward)
+function expectation = rem_expectations(reward)
 
-    domain = 'butts';
+    domain = 'rem';
 
     [r_i, r_p     ] = feval([domain '_reward_basii']);
     [  ~,   ~, t_b] = feval([domain '_transitions']);

@@ -6,7 +6,7 @@ library(informR)
 library(relevent)
 library(dplyr)
 
-setwd("C:/Users/Peter/Downloads/PROJECT_IRLvREM_2018/try_butts_newtake")
+setwd("C:/Users/Peter/Downloads/PROJECT_IRLvREM_2018/try_rem_newtake")
 load("../relevent_sunbelt_2014.Rdata") 
 
 head(WTCPoliceCalls)

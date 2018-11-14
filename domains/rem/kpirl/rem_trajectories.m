@@ -1,13 +1,13 @@
-function trajectories = butts_trajectories()
+function trajectories = rem_trajectories()
     trajectories = read_trajectory_episodes_from_file([fullfile(fileparts(which(mfilename))) '\..\data\'], 'matlab-trajectories.csv');
 end
 
 function te = read_trajectory_episodes_from_file(path, file)
 
-    paramaters = butts_paramaters();
+    paramaters = rem_paramaters();
 
     trajectory_observations = csvread([path, file]);
-    trajectory_states       = states_from(trajectory_observations);
+    trajectory_states       = states_from(trajectory_observations, paramaters.max_hist);
 
     trajectory_episodes_length    = paramaters.epi_size;
     trajectory_episodes_step_size = paramaters.epi_step;
@@ -26,13 +26,18 @@ function te = read_trajectory_episodes_from_file(path, file)
     end
 end
 
-function s = states_from(observations)
+function s = states_from(observations, max_hist)
 
     s = cell(1,size(observations,1));
-    
+
     for i = 1:size(observations,1)
         o = observations(i,:);
-        s{i} = {o(1,o(1,:)~=0)'};
+
+        s{i} = o(1,o(1,:)~=0)';
+
+        if(size(s{i},1) > max_hist*2)
+            s{i} = s{i}(end-(max_hist)*2+1:end,1);
+        end
     end
 
 end

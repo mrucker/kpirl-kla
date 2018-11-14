@@ -1,12 +1,11 @@
-function [r_i, r_p, r_l] = butts_reward_basii()
+function [r_i, r_p, r_l] = rem_reward_basii()
 
     r_I = I(LEVELS_N());
 
     r_p = r_perms();
     r_l = @(states) statesfun(@r_levels, states);
     r_i = @(states) 1 + r_I'*(r_l(states));
-    
-    
+
 end
 
 function rl = r_levels(states)

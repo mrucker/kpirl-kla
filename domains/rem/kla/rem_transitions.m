@@ -1,15 +1,19 @@
-function [t_d, t_s, t_b] = butts_transitions()
+function [t_d, t_s, t_b] = rem_transitions()
 
-    t_d = @butts_trans_post;
-    t_s = @butts_trans_pre;
+    t_d = @rem_trans_post;
+    t_s = @rem_trans_pre;
     t_b = @(s,a) t_s(t_d(s,a));
 
 end
 
-function s2 = butts_trans_post(s1, a);persistent max_hist;
+function s2 = rem_trans_post(s1, a);persistent max_hist;
+
+    if iscell(s1)
+        s1 = cell2mat(s1);
+    end
 
     if(isempty(max_hist))
-        param = butts_paramaters();
+        param = rem_paramaters();
         max_hist = param.max_hist;
     end
 
@@ -26,7 +30,7 @@ function s2 = butts_trans_post(s1, a);persistent max_hist;
     end
 end
 
-function s2 = butts_trans_pre(s1)
+function s2 = rem_trans_pre(s1)
 
     s2 = s1;
     

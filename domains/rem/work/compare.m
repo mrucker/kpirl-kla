@@ -1,17 +1,16 @@
 clear; close all; run([fullfile(fileparts(which(mfilename))) '/../../../paths.m']);
 
-domain = 'butts';
+domain = 'rem';
 
 eval_rewds = 30;
 eval_gamma = .9;
 eval_steps = 10;
-eval_inits = 30;
 eval_samps = 500; %warning: reducing this will make the estimate of V more imprecise -- making performance comparisons more suspect
 
 daps = {
-    'kla_1a', 'kla', struct('v_basii', '1a');
-    'kla_1b', 'kla', struct('v_basii', '1b');
-    'kla_1c', 'kla', struct('v_basii', '1c');
+    'kla_1a', 'kla', struct('v_basii', '1a', 'N', 10);
+    'kla_1b', 'kla', struct('v_basii', '1b', 'N', 10);
+    'kla_1c', 'kla', struct('v_basii', '1c', 'N', 10);
 };
 
 [s_1          ] = feval([domain '_random']);
@@ -42,7 +41,8 @@ end
 fprintf('\n');
 
 function r_f = get_random_reward_function(r_p, r_i) 
-    r_v = (2*rand(size(r_p,1),1) - 1)' * r_p;
+    %r_v = (2*rand(size(r_p,1),1) - 1)' * r_p;
+    r_v = 1 - rand(1,size(r_p,2))*2;
     r_f = @(s) r_v(r_i(s));
 end
 
