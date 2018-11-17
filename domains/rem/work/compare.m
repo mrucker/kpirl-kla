@@ -2,15 +2,15 @@ clear; close all; run([fullfile(fileparts(which(mfilename))) '/../../../paths.m'
 
 domain = 'rem';
 
-eval_rewds = 30;
+eval_rewds = 1;
 eval_gamma = .9;
 eval_steps = 10;
 eval_samps = 500; %warning: reducing this will make the estimate of V more imprecise -- making performance comparisons more suspect
 
 daps = {
     'kla_1a', 'kla', struct('v_basii', '1a', 'N', 10);
-    'kla_1a', 'kla', struct('v_basii', '1b', 'N', 10);
-    'kla_1a', 'kla', struct('v_basii', '1c', 'N', 10);
+    'kla_1b', 'kla', struct('v_basii', '1b', 'N', 10);
+    'kla_1c', 'kla', struct('v_basii', '1c', 'N', 10);
 };
 
 [s_1          ] = feval([domain '_random']);
