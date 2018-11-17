@@ -118,8 +118,8 @@ end
 function bl = bin_levels(val, min_val, max_val, bins)
 
     %fastest
-    val = max([val min_val]);
-    val = min([val max_val]);
+    val = max([val;min_val*ones(1,size(val,2))],[], 1);
+    val = min([val;max_val*ones(1,size(val,2))],[], 1);
     bl  = floor((val-min_val)*(bins-1)/(max_val-min_val));
 
     %%second fastest

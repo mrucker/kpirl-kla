@@ -1,4 +1,4 @@
-function [reward,weight,time] = kpirl(domain, kernel)
+function [reward_function, state_importance, time] = kpirl(domain, kernel)
 
     a_tic = tic;
         [s_e       ] = feval([domain '_trajectories']);
@@ -67,8 +67,8 @@ function [reward,weight,time] = kpirl(domain, kernel)
         %the convex optimization approach then you need to replace this line.
         [~,m_i] = min(diag((E-cell2mat(ss))'*reward_features_gram*(E-cell2mat(ss))));
 
-        weight = E-sb{m_i-1};
-        reward = rs{m_i};
+        state_importance = E-sb{m_i-1};
+        reward_function  = rs{m_i};
     time = toc(a_tic);
 
 end

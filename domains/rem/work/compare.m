@@ -9,8 +9,8 @@ eval_samps = 500; %warning: reducing this will make the estimate of V more impre
 
 daps = {
     'kla_1a', 'kla', struct('v_basii', '1a', 'N', 10);
-    'kla_1b', 'kla', struct('v_basii', '1b', 'N', 10);
-    'kla_1c', 'kla', struct('v_basii', '1c', 'N', 10);
+    'kla_1a', 'kla', struct('v_basii', '1b', 'N', 10);
+    'kla_1a', 'kla', struct('v_basii', '1c', 'N', 10);
 };
 
 [s_1          ] = feval([domain '_random']);
