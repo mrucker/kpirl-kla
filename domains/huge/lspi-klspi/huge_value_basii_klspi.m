@@ -1,11 +1,11 @@
-function phi = huge_value_basii_klspi(state, actions, dic_data, para); persistent t_d v_i v_p v_l;
+function phi = huge_value_basii_klspi(state, actions, dic_data, para); persistent t_d v_i v_p;
 
     if(isempty(t_d))
         [t_d] = huge_transitions();
     end
 
     if(isempty(v_p))        
-        [v_i, v_p, v_l] = huge_value_basii();
+        [v_i, v_p] = huge_value_basii();
     end
     
     if(nargin == 0)
@@ -13,7 +13,7 @@ function phi = huge_value_basii_klspi(state, actions, dic_data, para); persisten
     end
 
     if(nargin == 1 && ~isempty(state))
-        phi = v_i(v_l(state));
+        phi = v_i(state);
     end
 
     if(nargin==2)
@@ -25,7 +25,7 @@ function phi = huge_value_basii_klspi(state, actions, dic_data, para); persisten
         width = para;
 
         if(~isempty(state))
-            state_feature = v_p(:,v_i(v_l(t_d(state, actions))));
+            state_feature = v_p(:,v_i(t_d(state, actions)));
         else
             state_feature = v_p;
         end

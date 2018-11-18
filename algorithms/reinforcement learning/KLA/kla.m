@@ -3,11 +3,11 @@ function [policy, time] = kla(domain, reward)
     gcp; %this is here to force the parallel pool to begin before we start timing
 
     start = tic;
-        [v_i, v_p, v_l] = feval([domain '_value_basii']);
-        [s_1          ] = feval([domain '_random']);
-        [a_v          ] = feval([domain '_actions']);
-        [t_d, t_s     ] = feval([domain '_transitions']);
-        [paramaters   ] = feval([domain '_paramaters']);
+        [v_i, v_p  ] = feval([domain '_value_basii']);
+        [s_1       ] = feval([domain '_random']);
+        [a_v       ] = feval([domain '_actions']);
+        [t_d, t_s  ] = feval([domain '_transitions']);
+        [paramaters] = feval([domain '_paramaters']);
 
         N     = paramaters.N;
         M     = paramaters.M;
@@ -52,6 +52,10 @@ function [policy, time] = kla(domain, reward)
 
             init = init_states(randperm(init_count, M)); 
             stdY = std(Y(~isnan(Y)));
+            
+            if(isnan(stdY))
+                stdY = 0;
+            end
 
             X_b_m = arrayfun(@(i) zeros(1,T+W-1), 1:M, 'UniformOutput', false);
             X_s_m = arrayfun(@(i) cell (1,T+W-1), 1:M, 'UniformOutput', false);
@@ -59,7 +63,7 @@ function [policy, time] = kla(domain, reward)
             temp_SE                 = sqrt(sig_sq);
             temp_SE(isnan(temp_SE)) = stdY;
 
-            init_se = cellfun(@(s_t) temp_SE(v_i(v_l(t_d(s_t, a_v(s_t))))), init, 'UniformOutput', false);
+            init_se = cellfun(@(s_t) temp_SE(v_i(t_d(s_t, a_v(s_t)))), init, 'UniformOutput', false);
 
             parfor m = 1:M
 
@@ -68,14 +72,15 @@ function [policy, time] = kla(domain, reward)
                 for t = 1:T+W-1
 
                     post_states = t_d(s_t, a_v(s_t));
-                    post_v_is   = v_i(v_l(post_states));
+                    post_v_is   = v_i(post_states);
                     post_values = v_v(post_v_is);
 
                     if(t == 1)
                         post_values = post_values + 1.5*init_se{m};
                     end
 
-                    [~,m_i] = max(post_values);
+                    m_v = max(post_values);
+                    m_i = find(post_values == m_v);
                     a_i = m_i(randi(numel(m_i)));
 
                     s_t = t_s(post_states(:,a_i));
@@ -192,7 +197,7 @@ function [policy, time] = kla(domain, reward)
     end
 
     start = tic;
-        values = @(s) v_v(v_i(v_l(s)));
+        values = @(s) v_v(v_i(s));
         policy = @(s) best_action_from_state(s, a_v(s), t_d, values);
     time(5) = time(5) + toc(start);
 

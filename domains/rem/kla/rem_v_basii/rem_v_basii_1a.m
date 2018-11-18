@@ -1,10 +1,9 @@
-function [v_i, v_p, v_l] = rem_v_basii_1a()
+function [v_i, v_p] = rem_v_basii_1a()
 
     v_I = I(LEVELS_N());
 
     v_p = perms();
-    v_l = @(states) statesfun(@levels, states);
-    v_i = @(states) 1 + v_I'*(v_l(states));
+    v_i = @(states) 1 + v_I'*(statesfun(@levels, states));
 
 end
 

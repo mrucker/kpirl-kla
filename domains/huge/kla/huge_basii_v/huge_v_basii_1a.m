@@ -1,13 +1,12 @@
-function [v_i, v_p, v_l] = huge_v_basii_1a()
+function [v_i, v_p] = huge_v_basii_1a()
     
     v_I = I(LEVELS_N());
 
-    v_p = v_perms();
-    v_i = @(levels) 1 + v_I'*(levels-1);
-    v_l = @(states) statesfun(states);
+    v_p = perms();
+    v_i = @(states) 1 + v_I'*(statesfun(@levels, states)-1);
 end
 
-function vl = v_levels(states)
+function vl = levels(states)
 
     l_p = cursor_p_levels(states);
     l_v = cursor_v_levels(states);
@@ -17,7 +16,7 @@ function vl = v_levels(states)
     vl = vertcat(l_p, l_v, l_a, l_t);
 end
 
-function [vf] = v_feats(levels)
+function vf = feats(levels)
 
     val_to_d = @(val,den) val/den;
     val_to_e = @(val,  n) double(1:n == val')';
@@ -35,7 +34,7 @@ function [vf] = v_feats(levels)
 
 end
 
-function vp = v_perms()
+function vp = perms()
 
     p_x_i = 1:LEVELS_N(1);
     p_y_i = 1:LEVELS_N(2);
@@ -48,7 +47,7 @@ function vp = v_perms()
 
     [t_n_c, t_t_c, a_d_c, a_m_c, v_d_c, v_m_c, p_y_c, p_x_c] = ndgrid(t_n_i, t_t_i, a_y_i, a_x_i, v_y_i, v_x_i, p_y_i, p_x_i);
 
-    vp = v_feats([
+    vp = feats([
         p_x_i(:,p_x_c(:));
         p_y_i(:,p_y_c(:));
         v_x_i(:,v_m_c(:));
@@ -133,11 +132,11 @@ function v = I(n)
     v = arrayfun(@(i) prod(n(i:end)), 2:numel(n))';
 end
 
-function sf = statesfun(states)
+function sf = statesfun(func, states)
     if iscell(states)
-        sf = cell2mat(cellfun(@v_levels, states, 'UniformOutput',false));
+        sf = cell2mat(cellfun(func, states, 'UniformOutput',false));
     else
-        sf = v_levels(states);
+        sf = func(states);
     end
 end
 

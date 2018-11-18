@@ -13,9 +13,9 @@ daps = {
     'kla_1c', 'kla', struct('v_basii', '1c', 'N', 10);
 };
 
-[s_1          ] = feval([domain '_random']);
-[t_d, t_s, t_b] = feval([domain '_transitions']);
-[r_i, r_p, r_l] = feval([domain '_reward_basii']);
+[s_1     ] = feval([domain '_random']);
+[~,~, t_b] = feval([domain '_transitions']);
+[r_i, r_p] = feval([domain '_reward_basii']);
 
 rwds = arrayfun(@(i) get_random_reward_function(r_p, r_i)  , 1:eval_rewds, 'UniformOutput', false)';
 

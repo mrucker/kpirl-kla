@@ -1,13 +1,12 @@
-function [r_i, r_p, r_l] = huge_reward_basii()
+function [r_i, r_p] = huge_reward_basii()
 
     r_I = I([LEVELS_N(), 1]);
 
-    r_p = r_perms();
-    r_i = @(states) 1 + r_I'*(statesfun(@r_levels, states)-1);
-    r_l = @(states) statesfun(@r_levels, states);
+    r_p = perms();
+    r_i = @(states) 1 + r_I'*(statesfun(@levels, states)-1);
 end
 
-function rl = r_levels(states)
+function rl = levels(states)
 
     tou = is_touching_target(states);
 
@@ -27,7 +26,7 @@ function rl = r_levels(states)
     end
 end
 
-function rf = r_feats(levels)
+function rf = feats(levels)
 
     assert(all(levels(:)>0), 'bad levels');
 
@@ -52,7 +51,7 @@ function rf = r_feats(levels)
 
 end
 
-function rp = r_perms()
+function rp = perms()
 
     x = 1:LEVELS_N(1);
     y = 1:LEVELS_N(2);
@@ -71,7 +70,7 @@ function rp = r_perms()
     [z_c, d_c, a_c, v_c, y_c, x_c] = ndgrid(z_i, d_i, a_i, v_i, y_i, x_i);
 
     touch_0 = [zeros(10,1); 4];
-    touch_1 = r_feats([
+    touch_1 = feats([
         x(:,x_c(:));
         y(:,y_c(:));
         v(:,v_c(:));

@@ -2,7 +2,7 @@ clear; close all; paths;
 
 domain = 'huge';
 
-eval_rewds = 5;
+eval_rewds = 30;
 eval_gamma = .9;
 eval_steps = 10;
 eval_inits = 30;
@@ -15,9 +15,9 @@ daps = {
 %    'klspi' , 'klspi',struct('v_basii', '1a');
 };
 
-[s_1          ] = feval([domain '_random']);
-[t_d, t_s, t_b] = feval([domain '_transitions']);
-[r_i, r_p, r_l] = feval([domain '_reward_basii']);
+[s_1     ] = feval([domain '_random']);
+[~,~, t_b] = feval([domain '_transitions']);
+[r_i, r_p] = feval([domain '_reward_basii']);
 
 rwds = arrayfun(@(i) get_random_reward_function(r_p, r_i)  , 1:eval_rewds, 'UniformOutput', false)';
 
@@ -43,8 +43,8 @@ end
 fprintf('\n');
 
 function r_f = get_random_reward_function(r_p, r_i) 
-    %r_v = (2*rand(size(r_p,1),1) - 1)' * r_p;
-    r_v = 1 - rand(1,size(r_p,2))*2;
+    r_v = [(2*rand(size(r_p,1)-1,1) - 1); 0]' * r_p;    
+    %r_v = [0 1 - rand(1,size(r_p,2)-1)*2];
     r_f = @(s) r_v(r_i(s));
 end
 

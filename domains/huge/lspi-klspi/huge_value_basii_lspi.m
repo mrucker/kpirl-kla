@@ -1,11 +1,11 @@
-function phi = huge_value_basii_lspi(state, actions, ~, ~); persistent t_d v_i v_p v_l; 
+function phi = huge_value_basii_lspi(state, actions, ~, ~); persistent t_d v_i v_p; 
 
     if(isempty(t_d))
         [t_d] = huge_transitions();
     end
 
     if(isempty(v_p))
-        [v_i, v_p, v_l] = huge_value_basii();
+        [v_i, v_p] = huge_value_basii();
 
         %v_p = full_radial_basis_features(v_p());
         %v_p = full_2nd_order_polynomial_features(v_p());
@@ -22,11 +22,11 @@ function phi = huge_value_basii_lspi(state, actions, ~, ~); persistent t_d v_i v
     end
 
     if(nargin == 1 && ~isempty(state))
-        phi = v_i(v_l(state));
+        phi = v_i(state);
     end
     
     if(nargin==2)
-        phi = v_p(:,v_i(v_l(t_d(state, actions))));
+        phi = v_p(:,v_i(t_d(state, actions)));
     end
     
     if(nargin > 2)
