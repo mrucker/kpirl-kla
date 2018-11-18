@@ -79,9 +79,16 @@ function [policy, time] = kla(domain, reward)
                         post_values = post_values + 1.5*init_se{m};
                     end
 
-                    m_v = max(post_values);
-                    m_i = find(post_values == m_v);
-                    a_i = m_i(randi(numel(m_i)));
+                    %while this is satisfying intellectually,
+                    %in my testing it didn't seem to make a big difference in policy value
+                    %while it definitely slowed down the algorithm (i.e. from 6 seconds to 9 seconds in my testing)
+                    %m_v = max(post_values);
+                    %m_i = find(post_values == m_v);
+                    %a_i = m_i(randi(numel(m_i)));
+                    
+                    %this is the other option to the above commented out code
+                    %rather than selecting a random action of highest value we just pick the first one
+                    [~,a_i] = max(post_values);
 
                     s_t = t_s(post_states(:,a_i));
 

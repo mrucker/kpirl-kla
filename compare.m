@@ -2,7 +2,7 @@ clear; close all; paths;
 
 domain = 'huge';
 
-eval_rewds = 30;
+eval_rewds = 10;
 eval_gamma = .9;
 eval_steps = 10;
 eval_inits = 30;
@@ -43,7 +43,7 @@ end
 fprintf('\n');
 
 function r_f = get_random_reward_function(r_p, r_i) 
-    r_v = [(2*rand(size(r_p,1)-1,1) - 1); 0]' * r_p;    
+    r_v = [(2*rand(size(r_p,1)-1,1) - 1); 0]' * r_p;
     %r_v = [0 1 - rand(1,size(r_p,2)-1)*2];
     r_f = @(s) r_v(r_i(s));
 end
