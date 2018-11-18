@@ -12,7 +12,7 @@ daps = {
     'kla_1a', 'kla'  ,struct('v_basii', '1a');
     'kla_1b', 'kla'  ,struct('v_basii', '1b');
     'lspi ' , 'lspi' ,struct('v_basii', '1a');
-%    'klspi' , 'klspi',struct('v_basii', '1a');
+    'klspi' , 'klspi',struct('v_basii', '1a');
 };
 
 [s_1     ] = feval([domain '_random']);
