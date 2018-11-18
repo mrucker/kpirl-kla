@@ -2,17 +2,17 @@ clear; close all; paths;
 
 domain = 'huge';
 
-eval_rewds = 10;
+eval_rewds = 1;
 eval_gamma = .9;
 eval_steps = 10;
 eval_inits = 30;
 eval_samps = 500; %warning: reducing this will make the estimate of V more imprecise -- making performance comparisons more suspect
 
 daps = {
-    'kla_1a', 'kla'  ,struct('v_basii', '1a');
-    'kla_1b', 'kla'  ,struct('v_basii', '1b');
-    'lspi ' , 'lspi' ,struct('v_basii', '1a');
-    'klspi' , 'klspi',struct('v_basii', '1a');
+    'kla_1a', 'kla'  ,struct('v_basii', '1a', 'N', 50);
+    'kla_1b', 'kla'  ,struct('v_basii', '1b', 'N', 50);
+    'lspi ' , 'lspi' ,struct('v_basii', '1a', 'N', 30);
+    'klspi' , 'klspi',struct('v_basii', '1a', 'N', 30);
 };
 
 [s_1     ] = feval([domain '_random']);
@@ -43,8 +43,8 @@ end
 fprintf('\n');
 
 function r_f = get_random_reward_function(r_p, r_i) 
-    r_v = [(2*rand(size(r_p,1)-1,1) - 1); 0]' * r_p;
-    %r_v = [0 1 - rand(1,size(r_p,2)-1)*2];
+    %r_v = [(2*rand(size(r_p,1)-1,1) - 1); 0]' * r_p;
+    r_v = [0 1 - rand(1,size(r_p,2)-1)*2];
     r_f = @(s) r_v(r_i(s));
 end
 
