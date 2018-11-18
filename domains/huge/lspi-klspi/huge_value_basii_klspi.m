@@ -17,7 +17,7 @@ function phi = huge_value_basii_klspi(state, actions, dic_data, para); persisten
     end
 
     if(nargin==2)
-        phi = v_p(:,v_i(v_l(t_d(state, actions))));
+        phi = v_p(:,v_i(t_d(state, actions)));
     end
 
     if(nargin > 2)
