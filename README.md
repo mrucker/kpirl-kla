@@ -23,7 +23,7 @@ KLA is an RL algorithm created specifically to be used with KPIRL in large state
 		* _KLSPI_ - Kernel-based least squares policy iteration
 		* _LSPI_ - Least-squares policy iteration	
 * _domains_ - specific problem domains that have been implemented to use the algorithms
-	* _<domain name>_ - unique for each domain
+	* _\<domain name\>_ - unique for each domain
 		* _data_ - contains the raw data for the specific domain (no standardization here)
 		* _algos_ - contains the necessary function implementations for the various algorithms
 		* _work_ - catch all folder for domain specific work/research (no standardization here)
