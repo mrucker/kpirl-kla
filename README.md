@@ -32,24 +32,36 @@ KLA is an RL algorithm created specifically to be used with KPIRL in large state
 	
 ## Quick Start
 
-Two example files have been provided in the root directory for a "quick start". These files use the "huge" domain but could easily be used in new domains. The files should be executable out-of-the-box without any modification. Further documentation is provided in-line within the files.
+Two example files have been provided in the root directory for a "quick start". These files use the "huge" domain, but could easily be used with any domain. The files are executable "out-of-the-box". Further documentation is provided in-line within the files.
 
-* example_compare.m -- this file compares the performance of three different RL algorithms in the "huge" domain. To compare performance a number of random reward functions are generated, then a policy is learned for each of these functions using the RL algorithms. Using the learned policies a number of random episodes are generated. Each episode's value is calculated, and the expected value for each RL algorithm is output for comparison.
+* _example_compare.m_ - this file compares the performance of three different RL algorithms in the "huge" domain. To compare performance a number of random reward functions are generated, then a policy is learned for each of these functions using the RL algorithms. Using the learned policies a number of random episodes are generated. Each episode's value is calculated, and the expected value for each RL algorithm is output for comparison.
 
-* example_inverse.m -- this files shows how to use kpirl to calculate the reward function for the "huge" domain.
+* _example_inverse.m_ - this files shows how to use kpirl to calculate the reward function for the "huge" domain.
 
-* paths.m -- temporarily adds all required paths to Matlab (these persist only to the ned of the current session, so the Path space isn't polluted)
+* _paths.m_ - temporarily adds all required paths to Matlab (these persist only to the ned of the current session, so the Path space isn't polluted)
 
 ## Algorithm Functions
 
 ### KPIRL Functions
 
-	* 
+	* \<domain\>_expectations
+	* \<domain\>_reward_basii
+	* \<domain\>_trajectories
+	* \<domain\>_paramaters
 
 ### KLA Functions
 
+	* \<domain\>_actions
+	* \<domain\>_random
+	* \<domain\>_transitions
+	* \<domain\>_value_basii
+	* \<domain\>_paramaters
+
 ### LSPI Functions
 
+	* Look at the README file in the LSPI algorithm folder
+
 ### KLSPI Functions
-
-
+	
+	* All the standard LSPI functions (see above referenced README)
+	* \<domain\>_value_basii_klspi
