@@ -1,4 +1,4 @@
-clear; close all; paths;
+clear; close all; qs_paths;
 
 domain = 'huge';
 
