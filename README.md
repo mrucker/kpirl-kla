@@ -15,20 +15,20 @@ KLA is an RL algorithm created specifically to be used with KPIRL in large state
 	
 ## Directory Structure
 
-* __algorithms__ - contains the algorithm implementationsn included in this repository (many for comparison purposes)
-	* __inverse reinforcement learning__
-		* __KPIRL__ - Kernel projection inverse reinforcement learning
-	* __reinforcement learning__
-		* __KLA__ - Kernel lookup approximation
-		* __KLSPI__ - Kernel-based least squares policy iteration
-		* __ LSPI__ - Least-squares policy iteration	
-* __domains__ - specific problem domains that have been implemented to use the algorithms
-	* __<domain name>__ - unique for each domain
-		* __data__ - contains the raw data for the specific domain (no standardization here)
-		* __algos__ - contains the necessary function implementations for the various algorithms
-		* __work__ - catch all folder for domain specific work/research (no standardization here)
-* __shared__ - a collection of utility functions that can be used across domains
-	* __kernel__ - implementations of popular kernel methods that can be interchanged for KPIRL
+* _algorithms_ - contains the algorithm implementationsn included in this repository (many for comparison purposes)
+	* _inverse reinforcement learning_
+		* _KPIRL_ - Kernel projection inverse reinforcement learning
+	* _reinforcement learning_
+		* _KLA_ - Kernel lookup approximation
+		* _KLSPI_ - Kernel-based least squares policy iteration
+		* _LSPI_ - Least-squares policy iteration	
+* _domains_ - specific problem domains that have been implemented to use the algorithms
+	* _<domain name>_ - unique for each domain
+		* _data_ - contains the raw data for the specific domain (no standardization here)
+		* _algos_ - contains the necessary function implementations for the various algorithms
+		* _work_ - catch all folder for domain specific work/research (no standardization here)
+* _shared_ - a collection of utility functions that can be used across domains
+	* _kernel_ - implementations of popular kernel methods that can be interchanged for KPIRL
 	
 ## Quick Start
 
