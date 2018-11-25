@@ -34,11 +34,11 @@ KLA is an RL algorithm created specifically to be used with KPIRL in large state
 
 Two example files have been provided in the root directory for a "quick start". These files use the "huge" domain, but could easily be used with any domain. The files are executable "out-of-the-box". Further documentation is provided in-line within the files.
 
-* _eg_compare.m_ - this file compares the performance of three different RL algorithms in the "huge" domain. To compare performance a number of random reward functions are generated, then a policy is learned for each of these functions using the RL algorithms. Using the learned policies a number of random episodes are generated. Each episode's value is calculated, and the expected value for each RL algorithm is output for comparison.
+* _qs_compare.m_ - compares the performance of three different RL algorithms in the "huge" domain. To compare performance a number of random reward functions are generated, then a policy is learned for each of these functions using the RL algorithms. Using the learned policies a number of random episodes are generated. Each episode's value is calculated, and the expected value for each RL algorithm is output for comparison.
 
-* _eg_inverse.m_ - this files shows how to use kpirl to calculate the reward function for the "huge" domain.
+* _qs_inverse.m_ - uses kpirl on the "huge" domain to calculate the reward function.
 
-* _paths.m_ - temporarily adds all required paths to Matlab (these persist only to the ned of the current session, so the Path space isn't polluted)
+* _qs_paths.m_ - adds all required paths to Matlab until the end of the current session
 
 ## Algorithm Functions
 
