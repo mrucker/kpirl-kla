@@ -1,4 +1,4 @@
-function [reward_function, state_importance, time] = kpirl(domain, kernel)
+function [reward_function, time_measurements, state_importance] = kpirl(domain)
 
     a_tic = tic;
         [s_e       ] = feval([domain '_trajectories']);
@@ -7,6 +7,7 @@ function [reward_function, state_importance, time] = kpirl(domain, kernel)
 
         epsilon = paramaters.epsilon;
         gamma   = paramaters.gamma;
+        kernel  = paramaters.kernel;
 
         r_n = size(r_p,2);
         r_e = @(s) double((1:r_n)' == r_i(s));
@@ -27,21 +28,21 @@ function [reward_function, state_importance, time] = kpirl(domain, kernel)
             ss{i} = feval([domain, '_expectations'], @(s) rs{i}(r_i(s)) );
             sb{i} = ss{i};
             ts{i} = Inf;
-        time = toc(tic_id);
+        time_measurements = toc(tic_id);
 
         i = 2;
 
         while 1
             
             if ~exist('silent', 'var')
-                fprintf('Completed IRL iteration, i=%03d, t=%8.6f, time=%06.3f\n',[i-1,ts{i-1},time]);
+                fprintf('Completed IRL iteration, i=%03d, t=%8.6f, time=%06.3f\n',[i-1,ts{i-1},time_measurements]);
             end
             
             tic_id = tic;
                 rs{i} = (E-sb{i-1})'*reward_features_gram;
                 ss{i} = feval([domain, '_expectations'], @(s) rs{i}(r_i(s)) );
                 ts{i} = sqrt(E'*reward_features_gram*E + sb{i-1}'*reward_features_gram*sb{i-1} - 2*E'*reward_features_gram*sb{i-1});
-            time = toc(tic_id);
+            time_measurements = toc(tic_id);
             
             if  (abs(ts{i}-ts{i-1}) <= epsilon) || (ts{i} <= epsilon)
                 break;
@@ -56,7 +57,7 @@ function [reward_function, state_importance, time] = kpirl(domain, kernel)
         end
 
             if ~exist('silent', 'var')
-                fprintf('Completed IRL algorithm, i=%03d, t=%8.6f, time=%06.3f\n',[i,ts{i},time]);
+                fprintf('Completed IRL algorithm, i=%03d, t=%8.6f, time=%06.3f\n',[i,ts{i},time_measurements]);
             end
         
         %Abbeel and Ng suggested solving a convex optimization problem and choosing
@@ -69,6 +70,6 @@ function [reward_function, state_importance, time] = kpirl(domain, kernel)
 
         state_importance = E-sb{m_i-1};
         reward_function  = rs{m_i};
-    time = toc(a_tic);
+    time_measurements = toc(a_tic);
 
 end

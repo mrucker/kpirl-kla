@@ -17,11 +17,12 @@ KLA is an RL algorithm created specifically to be used with KPIRL in large state
 
 * _algorithms_ - contains the algorithm implementationsn included in this repository (many for comparison purposes)
 	* _inverse reinforcement learning_
+		* _PIRL_ - Projection inverse reinforcemnt learning ([paper](https://dl.acm.org/citation.cfm?id=1015430))
 		* _KPIRL_ - Kernel projection inverse reinforcement learning
 	* _reinforcement learning_
 		* _KLA_ - Kernel lookup approximation
-		* _KLSPI_ - Kernel-based least squares policy iteration
-		* _LSPI_ - Least-squares policy iteration	
+		* _KLSPI_ - Kernel-based least squares policy iteration ([paper](https://ieeexplore.ieee.org/abstract/document/4267723))
+		* _LSPI_ - Least-squares policy iteration ([paper](http://www.jmlr.org/papers/v4/lagoudakis03a.html))
 * _domains_ - specific problem domain implementations
 	* _\<domain name\>_ - folder name unique for each domain
 		* _data_ - contains the raw data for the specific domain (no standardization here)
