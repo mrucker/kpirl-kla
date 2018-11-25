@@ -11,6 +11,6 @@ kernel = k_gaussian(k_norm(),.6);
 
 [reward, state_importance, ~] = kpirl('rem', kernel);
 
-[r_i, r_p, r_l] = rem_reward_basii();
+[r_i, r_p] = rem_reward_basii();
 
 r_p * state_importance

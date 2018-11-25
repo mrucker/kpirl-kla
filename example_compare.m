@@ -2,17 +2,16 @@ clear; close all; paths;
 
 domain = 'huge';
 
-eval_rewds = 30;
+eval_rewds = 2;
 eval_gamma = .9;
 eval_steps = 10;
 eval_inits = 30;
 eval_samps = 500; %warning: reducing this will make the estimate of V more imprecise -- making performance comparisons more suspect
 
 daps = {
-    'kla_1a', 'kla'  ,struct('v_basii', '1a', 'N', 50);
-    'kla_1b', 'kla'  ,struct('v_basii', '1b', 'N', 50);
-    'lspi ' , 'lspi' ,struct('v_basii', '1a', 'N', 30);
-    'klspi' , 'klspi',struct('v_basii', '1a', 'N', 30);
+    'kla  ' , 'kla'  , struct('N', 50);
+    'lspi ' , 'lspi' , struct('N', 30);
+    'klspi' , 'klspi', struct('N', 30);
 };
 
 [s_1     ] = feval([domain '_random']);
