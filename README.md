@@ -9,9 +9,9 @@ KLA is an RL algorithm created specifically to be used with KPIRL in large state
 
 ## Requirements
 
-1. Matlab
-	1. Statistics and Machine Learning Toolbox (for `pdist` in k_norm.m)
-	2. Parallel Computing Toolbox (for `parfor` in kla.m )
+* Matlab
+	* Statistics and Machine Learning Toolbox (for `pdist` in k_norm.m)
+	* Parallel Computing Toolbox (for `parfor` in kla.m )
 	
 ## Directory Structure
 
@@ -22,8 +22,8 @@ KLA is an RL algorithm created specifically to be used with KPIRL in large state
 		* _KLA_ - Kernel lookup approximation
 		* _KLSPI_ - Kernel-based least squares policy iteration
 		* _LSPI_ - Least-squares policy iteration	
-* _domains_ - specific problem domains that have been implemented to use the algorithms
-	* _\<domain name\>_ - unique for each domain
+* _domains_ - specific problem domain implementations
+	* _\<domain name\>_ - folder name unique for each domain
 		* _data_ - contains the raw data for the specific domain (no standardization here)
 		* _algos_ - contains the necessary function implementations for the various algorithms
 		* _work_ - catch all folder for domain specific work/research (no standardization here)
