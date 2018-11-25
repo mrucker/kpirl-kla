@@ -1,4 +1,5 @@
-%A wrapper made by Mark Rucker to allow KLSPI to integrate with kpirl more easily
+% A wrapper that conforms KLSPI to the RL interface
+% The original klspi function is now called kslpi_core
 function [policy, time] = klspi(domain, reward); global R;
 
     a_start = tic;
