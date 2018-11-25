@@ -10,22 +10,25 @@ KLA is an RL algorithm created specifically to be used with KPIRL in large state
 ## Requirements
 
 1. Matlab
-	1. Statistics and Machine Learning Toolbox (for the `pdist` in k_norm.m)
+	1. Statistics and Machine Learning Toolbox (for `pdist` in k_norm.m)
 	2. Parallel Computing Toolbox (for `parfor` in kla.m )
 	
-## Project Structure
+## Directory Structure
 
-* algorithms -- contains the algorithm implementationsn included in this repository (many for comparison purposes)
-	* Kernel projection inverse reinforcement learning (KPIRL)
-	* Kernel Lookup Approximation (KLA)
-	* Least Squares Policy Iteration (LSPI)
-	* Kernel Least Squares Policy Iteration (KLSPI)
-* domains -- specific problem domains that have been implemented to use the algorithms
-	* data -- contains the raw data for the specific domain (no standardization here)
-	* algos -- contains the necessary function implementations for the various algorithms
-	* work -- catch all folder for domain specific work/research (no standardization here)
-*shared -- a collection of utility functions that can be used across domains
-	* kernel -- implementations of popular kernel methods that can be interchanged in KPIRL
+* __algorithms__ - contains the algorithm implementationsn included in this repository (many for comparison purposes)
+	* __inverse reinforcement learning__
+		* __KPIRL__ - Kernel projection inverse reinforcement learning
+	* __reinforcement learning__
+		* __KLA__ - Kernel lookup approximation
+		* __KLSPI__ - Kernel-based least squares policy iteration
+		* __ LSPI__ - Least-squares policy iteration	
+* __domains__ - specific problem domains that have been implemented to use the algorithms
+	* __<domain name>__ - unique for each domain
+		* __data__ - contains the raw data for the specific domain (no standardization here)
+		* __algos__ - contains the necessary function implementations for the various algorithms
+		* __work__ - catch all folder for domain specific work/research (no standardization here)
+* __shared__ - a collection of utility functions that can be used across domains
+	* __kernel__ - implementations of popular kernel methods that can be interchanged for KPIRL
 	
 ## Quick Start
 
@@ -40,6 +43,8 @@ Two example files have been provided in the root directory for a "quick start". 
 ## Algorithm Functions
 
 ### KPIRL Functions
+
+	* 
 
 ### KLA Functions
 
