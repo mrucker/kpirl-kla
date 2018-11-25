@@ -37,7 +37,7 @@ Two example files have been provided in the root directory for a "quick start". 
 
 * paths.m -- temporarily adds all required paths to Matlab (these persist only to the ned of the current session, so the Path space isn't polluted)
 
-##Algorithm Functions
+## Algorithm Functions
 
 ### KPIRL Functions
 
