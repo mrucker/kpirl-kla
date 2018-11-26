@@ -1,4 +1,4 @@
-clear; close all; run([fullfile(fileparts(which(mfilename))) '/../../../qs_paths.m']);
+clear; close all; run(fullfile(fileparts(which(mfilename)), '..', '..', '..', 'qs_paths.m'));
 
 domain = 'huge';
 
