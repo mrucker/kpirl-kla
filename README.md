@@ -46,6 +46,10 @@ Two example files have been provided in the root directory for a "quick start". 
 ### KPIRL Functions
 
 	* \<domain\>_expectations
+		* Input:
+			* reward -- a function which takes a state and returns a reward value (i.e. (state) => reward value)
+		* Output:
+			* expectation -- a column vector whose size equals the number of distinct reward function basii sets for the proposed IRL reward function (this is not necessarily the number of states), and whose rows contain the percentage of time each row basii is visited when following the given reward. For example, if one is learning a reward function for tic-tac-toe, the number of states is 19,683. One set of basii would a dummy variable for every single state. In this case the returned column vector would have 19,683 elements representing the percentage of time in each state when optimally pursuing the passed in reward. Another potential set of basii might simply be the number of spaces filled with the agent's pieces. In this case there would be six basii representations (0-5 marks, or five if one wanted to exclude the zero basii), and the returned expectation column would approximately be 1/6 for each basii since each basii is visited determinstically each game (with some slight variation depending on how quickly games are won or lost and if one goes first or second).
 	* \<domain\>_reward_basii
 	* \<domain\>_trajectories
 	* \<domain\>_paramaters
