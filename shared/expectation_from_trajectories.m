@@ -4,7 +4,11 @@ function [feature_expectation] = expectation_from_trajectories(trajectories, fea
 
     for m = 1:numel(trajectories)
         for t = 1:size(trajectories{m},2)
-            feature_expectation = feature_expectation + gamma^(t-1) * features(trajectories{m}{t});
+            if iscell(trajectories{m})
+                feature_expectation = feature_expectation + gamma^(t-1) * features(trajectories{m}{t});
+            else
+                feature_expectation = feature_expectation + gamma^(t-1) * features(trajectories{m}(:,t));
+            end
         end
     end
 

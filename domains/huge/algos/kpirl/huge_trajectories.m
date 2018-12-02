@@ -1,10 +1,10 @@
 function trajectories = huge_trajectories()
-    trajectories = read_trajectory_episodes_from_file([fullfile(fileparts(which(mfilename))) '/../../data/'], 'huge_observed_trajectories.json');
+    trajectories = read_trajectory_episodes_from_file(fullfile(fileparts(which(mfilename)), '..', '..', 'data'), 'huge_observed_trajectories.json');
 end
 
 function te = read_trajectory_episodes_from_file(path, file)
 
-    trajectory_observations = jsondecode(fileread([path, file]));
+    trajectory_observations = jsondecode(fileread([path filesep file]));
     trajectory_states       = huge_states_from(trajectory_observations);
 
     trajectory_state_trim_count   = 30; %we trim 30 from beginning and end because of noise

@@ -47,12 +47,26 @@ Two example files have been provided in the root directory for a "quick start". 
 
 	* \<domain\>_expectations
 		* Input:
-			* reward -- a function which takes a state and returns a reward value (i.e. (state) => reward value)
+			* reward -- a function which takes a state and returns a reward value (i.e. (state) => reward value). The function should be able to take a set of states (represented by a matrix or cell array, [s_1, s_2, s_3 ...]) and return a row vector of rewards ([r_1, r_2, r_3]).
 		* Output:
 			* expectation -- a column vector whose size equals the number of distinct reward function basii sets for the proposed IRL reward function (this is not necessarily the number of states), and whose rows contain the percentage of time each row basii is visited when following the given reward. For example, if one is learning a reward function for tic-tac-toe, the number of states is 19,683. One set of basii would a dummy variable for every single state. In this case the returned column vector would have 19,683 elements representing the percentage of time in each state when optimally pursuing the passed in reward. Another potential set of basii might simply be the number of spaces filled with the agent's pieces. In this case there would be six basii representations (0-5 marks, or five if one wanted to exclude the zero basii), and the returned expectation column would approximately be 1/6 for each basii since each basii is visited determinstically each game (with some slight variation depending on how quickly games are won or lost and if one goes first or second).
+	
 	* \<domain\>_reward_basii
+		* Output: 
+			* r_i -- a function that takes a matrix or cell array of state(s) and returns a row vector containing the basii index for the state(s)
+			* r_p -- a matrix whose columns contain all reward basii representations. 
+			
+			* The basii representation for a given state can be retrieved by combining the returns (i.e. reward_basii_for_state = r_p(:,r_i(state)) ).
+			
 	* \<domain\>_trajectories
+		* Output:
+			* trajectories -- a cell array of expert trajectories. Trajectories can be represented as either a matrix, whose column vectors are states or as a cell array themselves. (i.e., trajectories = {trajectory_1, trajectory_2, ...} and trajectory_1 = <[s_1, s_2, ...] | {s_1, s_2, ...}>)
+		
 	* \<domain\>_paramaters
+		* Input:
+			* p_in -- an optional struct that will be used to change the existing paramaters. If not passed in the current settings are returned.
+		* Output:
+			* p_out -- a struct which contains the paramaters for the various algorithms. This function needs to persist the paramters from call to call in order to work properly. The example domains do this via matlab's `persistent` command though it could be done other ways if necessary.
 
 ### KLA Functions
 

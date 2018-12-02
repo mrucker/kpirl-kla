@@ -1,12 +1,12 @@
 function trajectories = rem_trajectories()
-    trajectories = read_trajectory_episodes_from_file([fullfile(fileparts(which(mfilename))) '/../../data/'], 'matlab-trajectories.csv');
+    trajectories = read_trajectory_episodes_from_file(fullfile(fileparts(which(mfilename)), '..', '..', 'data'), 'matlab-trajectories.csv');
 end
 
 function te = read_trajectory_episodes_from_file(path, file)
 
     paramaters = rem_paramaters();
 
-    trajectory_observations = csvread([path, file]);
+    trajectory_observations = csvread([path filesep file]);
     trajectory_states       = states_from(trajectory_observations, paramaters.max_hist);
 
     trajectory_episodes_length    = paramaters.epi_size;
