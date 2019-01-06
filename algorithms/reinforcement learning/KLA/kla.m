@@ -41,29 +41,23 @@ function [policy, time] = kla(domain, reward)
         eta     = NaN(1, v_n);
         lambda  = NaN(1, v_n);
     time(1) = toc(start);
-
+    
     for n = 1:N
 
         start = tic;
-            if mod(n-1,init_recycle) == 0
-                init_count = init_growth;
-                init_states(1:init_growth) = arrayfun(@(m) s_1(), 1:init_growth, 'UniformOutput', false);
+
+            if mod(n,init_recycle) == 1
+                init_states(init_count + (1:init_growth)) = arrayfun(@(m) s_1(), 1:init_growth, 'UniformOutput', false);
+                init_count = init_count + init_growth;
             end
 
             init = init_states(randperm(init_count, M)); 
-            stdY = std(Y(~isnan(Y)));
-            
-            if(isnan(stdY))
-                stdY = 0;
-            end
 
             X_b_m = arrayfun(@(i) zeros(1,T+W-1), 1:M, 'UniformOutput', false);
             X_s_m = arrayfun(@(i) cell (1,T+W-1), 1:M, 'UniformOutput', false);
 
-            temp_SE                 = sqrt(sig_sq);
-            temp_SE(isnan(temp_SE)) = stdY;
-
-            init_se = cellfun(@(s_t) temp_SE(v_i(t_d(s_t, a_v(s_t)))), init, 'UniformOutput', false);
+            SE      = sqrt(sig_sq ./ K);
+            SE(K<3) = max([SE(K>=3),0]);
 
             parfor m = 1:M
 
@@ -71,36 +65,36 @@ function [policy, time] = kla(domain, reward)
 
                 for t = 1:T+W-1
 
-                    post_states = t_d(s_t, a_v(s_t));
-                    post_v_is   = v_i(post_states);
-                    post_values = v_v(post_v_is);
+                    post_s_as = t_d(s_t, a_v(s_t));
+                    post_v_is = v_i(post_s_as);
+                    post_v_vs = v_v(post_v_is);
 
                     if(t == 1)
-                        post_values = post_values + 1.5*init_se{m};
+                        post_v_vs = post_v_vs + 2 * SE(post_v_is);
                     end
 
                     %while this is satisfying intellectually,
-                    %in my testing it didn't seem to make a big difference in policy value
-                    %while it definitely slowed down the algorithm (i.e. from 6 seconds to 9 seconds in my testing)
+                    %in my testing it didn't seem to make a big difference in policy value,
+                    %and it definitely slowed down the algorithm (i.e. from 6 seconds to 9 seconds in my testing)
                     %m_v = max(post_values);
                     %m_i = find(post_values == m_v);
                     %a_i = m_i(randi(numel(m_i)));
-                    
+
                     %this is the other option to the above commented out code
                     %rather than selecting a random action of highest value we just pick the first one
-                    [~,a_i] = max(post_values);
+                    [~,a_i] = max(post_v_vs);
 
-                    s_t = t_s(post_states(:,a_i));
-
-                    X_s_m{m}{t} = s_t;
+                    X_s_m{m}{t} = t_s(post_s_as(:,a_i));
                     X_b_m{m}(t) = post_v_is(a_i);
 
+                    s_t = X_s_m{m}{t};
+                    
                 end
             end
 
-            %grows by M*(T+W-1) each n then resets at (n-1)%4==0
             init_states(init_count + (1:init_growth)) = horzcat(X_s_m{:});
             init_count = init_count + init_growth;
+
         time(2) = time(2) + toc(start);
 
         start = tic;
@@ -207,5 +201,4 @@ function [policy, time] = kla(domain, reward)
         values = @(s) v_v(v_i(s));
         policy = @(s) best_action_from_state(s, a_v(s), t_d, values);
     time(5) = time(5) + toc(start);
-
 end
