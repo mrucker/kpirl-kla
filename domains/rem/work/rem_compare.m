@@ -1,11 +1,14 @@
 clear; close all; run(fullfile(fileparts(which(mfilename)), '..', '..', '..', 'qs_paths.m'));
 
+%WARNING: The distribution of V is unknown making traditional confidence bounds around mean using SE suspect
+%WARNING: reducing eval_samps will make the estimate of V less precise -- making performance comparisons more suspect
+
 domain = 'rem';
 
 eval_rewds = 30;
 eval_gamma = 1;
 eval_steps = 10;
-eval_samps = 500; %warning: reducing this will make the estimate of V less precise -- making performance comparisons more suspect
+eval_samps = 400;
 
 daps = {
     'kla' , 'kla' , struct('v_basii', '1a', 'N', 20, 'T', 1 , 'W', 2, 'gamma', 1);

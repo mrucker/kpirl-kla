@@ -1,12 +1,15 @@
 clear; close all; qs_paths;
 
+%WARNING: The distribution of V is unknown making traditional confidence bounds around mean using SE suspect
+%WARNING: reducing eval_samps will make the estimate of V less precise -- making performance comparisons more suspect
+
 domain = 'huge';
 
 eval_rewds = 20;
 eval_gamma = .9;
 eval_steps = 10;
 eval_inits = 30;
-eval_samps = 400; %warning: reducing this will make the estimate of V more imprecise -- making performance comparisons more suspect
+eval_samps = 400;
 
 daps = {
     'kla  ' , 'kla'  , struct('N', 50);
