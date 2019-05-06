@@ -35,7 +35,7 @@ function [policy, time] = kla(domain, reward)
         %one for every value_basii updated for entire life of program (BAKF)
         epsilon = NaN(1, v_n);
         beta    = NaN(1, v_n);
-        nu      = NaN(1, v_n);
+        var     = NaN(1, v_n);
         sig_sq  = NaN(1, v_n);
         alpha   = NaN(1, v_n);
         eta     = NaN(1, v_n);
@@ -56,7 +56,7 @@ function [policy, time] = kla(domain, reward)
             X_b_m = arrayfun(@(i) zeros(1,T+W-1), 1:M, 'UniformOutput', false);
             X_s_m = arrayfun(@(i) cell (1,T+W-1), 1:M, 'UniformOutput', false);
 
-            SE      = sqrt(sig_sq ./ K);
+            SE      = sqrt(var);
             SE(K<3) = max([SE(K>=3),0]);
 
             parfor m = 1:M
@@ -122,8 +122,8 @@ function [policy, time] = kla(domain, reward)
                             e = .5*(.5 - rand);
                         end
 
-                        b = (1-eta(i))*beta(i) + eta(i)*e;
-                        v = (1-eta(i))*nu(i) + eta(i)*(e^2);
+                        b = (1-eta(i))*beta(i) + eta(i)*(e  );
+                        v = (1-eta(i))*var (i) + eta(i)*(e^2);
                         s = (v - b^2)/(1+lambda(i));
 
                         if(k > 2)
@@ -132,7 +132,7 @@ function [policy, time] = kla(domain, reward)
 
                         epsilon(i) = e;
                         beta   (i) = b;
-                        nu     (i) = v;
+                        var    (i) = v;
                         sig_sq (i) = s;
 
                         Y(i) = (1-alpha(i))*Y(i) + alpha(i)*y;
@@ -141,8 +141,6 @@ function [policy, time] = kla(domain, reward)
 
                         l = ((1-alpha(i))^2)*lambda(i) + alpha(i)^2;
 
-                        %the book suggests k <= 2... but it just seems to take longer
-                        %for my particlar setup to get an estimate of the bias
                         if (k <= 2)
                             a = 1/(k+1);
                         else
@@ -155,8 +153,6 @@ function [policy, time] = kla(domain, reward)
                             e = eta(i)/(1+eta(i)-.05);
                         end
 
-                        %while it seems incorrect... I think it is ok for
-                        %alpha to be less than one... I think... any([a,e] < 0)
                         assert(~( any(1.0001 < [a,e]) || any(isnan([a, e, l])) || any(isinf([a, e, l]))));
 
                         alpha (i) = a;
@@ -171,7 +167,7 @@ function [policy, time] = kla(domain, reward)
                         %this is the "initialization" step from the algorithm
                         epsilon(i) = 0; % we don't use for a few iterations
                         beta   (i) = 0; % we don't use for a few iterations
-                        nu     (i) = 0; % we don't use for a few iterations
+                        var     (i) = 0; % we don't use for a few iterations
                         alpha  (i) = 1;
                         eta    (i) = 1;
                         lambda (i) = 0; % we don't use for a few iterations
