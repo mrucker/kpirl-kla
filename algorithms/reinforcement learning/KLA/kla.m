@@ -1,4 +1,4 @@
-function [policy, time] = kla(domain, reward)
+function [policy, time] = kla2(domain, reward)
 
     gcp; %this is here to force the parallel pool to begin before we start timing
 
@@ -41,7 +41,7 @@ function [policy, time] = kla(domain, reward)
         eta     = NaN(1, v_n);
         lambda  = NaN(1, v_n);
     time(1) = toc(start);
-    
+
     for n = 1:N
 
         start = tic;
@@ -56,7 +56,7 @@ function [policy, time] = kla(domain, reward)
             X_b_m = arrayfun(@(i) zeros(1,T+W-1), 1:M, 'UniformOutput', false);
             X_s_m = arrayfun(@(i) cell (1,T+W-1), 1:M, 'UniformOutput', false);
 
-            SE      = sqrt(var);
+            SE      = -1/2 * beta + sqrt(lambda.*sig_sq);
             SE(K<3) = max([SE(K>=3),0]);
 
             parfor m = 1:M
