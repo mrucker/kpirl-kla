@@ -34,7 +34,7 @@ for ai = 1:size(daps,1)
         parm = daps{ai,3};
         rewd = rwds{ri,1};
 
-        feval([domain '_paramaters'], parm);
+        feval([domain '_parameters'], parm);
 
         [policy, t] = feval(algo, domain, rewd);
         [v        ] = expectation_from_simulations(policy, t_b, s_1, rewd, eval_steps, eval_samps, eval_gamma);

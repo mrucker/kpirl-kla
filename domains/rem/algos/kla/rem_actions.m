@@ -1,8 +1,8 @@
 function [a_v, a_m] = rem_actions()
 
-    paramaters = rem_paramaters();
+    parameters = rem_parameters();
 
-    a_m = actions_matrix(paramaters.pop_size);
+    a_m = actions_matrix(parameters.pop_size);
     a_v = @(s) a_m;
 end
 

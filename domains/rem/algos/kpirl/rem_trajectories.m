@@ -4,13 +4,13 @@ end
 
 function te = read_trajectory_episodes_from_file(path, file)
 
-    paramaters = rem_paramaters();
+    parameters = rem_parameters();
 
     trajectory_observations = csvread([path filesep file]);
-    trajectory_states       = states_from(trajectory_observations, paramaters.max_hist);
+    trajectory_states       = states_from(trajectory_observations, parameters.max_hist);
 
-    trajectory_episodes_length    = paramaters.epi_size;
-    trajectory_episodes_step_size = paramaters.epi_step;
+    trajectory_episodes_length    = parameters.epi_size;
+    trajectory_episodes_step_size = parameters.epi_step;
 
     trajectory_epsiodes_start  = 4;
     trajectory_epsiodes_finish = numel(trajectory_states) - trajectory_episodes_length;

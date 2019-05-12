@@ -1,4 +1,4 @@
-function p_out = rem_paramaters(p_in); persistent paramaters;
+function p_out = rem_parameters(p_in); persistent paramaters;
 
     if(nargin == 1)
         paramaters = p_in;

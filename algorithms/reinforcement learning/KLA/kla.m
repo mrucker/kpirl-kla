@@ -1,4 +1,4 @@
-function [policy, time] = kla2(domain, reward)
+function [policy, time] = kla(domain, reward)
 
     gcp; %this is here to force the parallel pool to begin before we start timing
 
@@ -7,13 +7,13 @@ function [policy, time] = kla2(domain, reward)
         [s_1       ] = feval([domain '_random']);
         [a_v       ] = feval([domain '_actions']);
         [t_d, t_s  ] = feval([domain '_transitions']);
-        [paramaters] = feval([domain '_paramaters']);
+        [parameters] = feval([domain '_parameters']);
 
-        N     = paramaters.N;
-        M     = paramaters.M;
-        T     = paramaters.T;
-        W     = paramaters.W;
-        gamma = paramaters.gamma;
+        N     = parameters.N;
+        M     = parameters.M;
+        T     = parameters.T;
+        W     = parameters.W;
+        gamma = parameters.gamma;
 
         time = zeros(1,5);
 
@@ -55,9 +55,12 @@ function [policy, time] = kla2(domain, reward)
 
             X_b_m = arrayfun(@(i) zeros(1,T+W-1), 1:M, 'UniformOutput', false);
             X_s_m = arrayfun(@(i) cell (1,T+W-1), 1:M, 'UniformOutput', false);
-
-            SE      = -1/2 * beta + sqrt(lambda.*sig_sq);
-            SE(K<3) = max([SE(K>=3),0]);
+                        
+            SD      = sqrt(lambda.*sig_sq);
+            SD(K<3) = max([SD(K>=3),0]);
+            
+            BI      = beta;
+            BI(K<3) = mean([BI(K>=3),0]);
 
             parfor m = 1:M
 
@@ -70,7 +73,7 @@ function [policy, time] = kla2(domain, reward)
                     post_v_vs = v_v(post_v_is);
 
                     if(t == 1)
-                        post_v_vs = post_v_vs + 2 * SE(post_v_is);
+                        post_v_vs = post_v_vs + BI(post_v_is) + 2 * SD(post_v_is);
                     end
 
                     %while this is satisfying intellectually,

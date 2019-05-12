@@ -2,17 +2,16 @@ clear; close all; run(fullfile(fileparts(which(mfilename)), '..', '..', '..', 'q
 
 domain = 'huge';
 
-eval_rewds = 10;
+eval_rewds = 100;
 eval_gamma = .9;
 eval_steps = 10;
 eval_inits = 30;
 eval_samps = 500; %warning: reducing this will make the estimate of V more imprecise -- making performance comparisons more suspect
 
 daps = {
-    'kla_1a', 'kla'  ,struct('v_basii', '1a');
-    'kla_1b', 'kla'  ,struct('v_basii', '1b');
+    'kla  ' , 'kla'  ,struct('v_basii', '1a');
     'lspi ' , 'lspi' ,struct('v_basii', '1a');
-%    'klspi' , 'klspi',struct('v_basii', '1a');
+    'klspi' , 'klspi',struct('v_basii', '1a');
 };
 
 [s_1     ] = feval([domain '_random']);
@@ -28,12 +27,16 @@ for ai = 1:size(daps,1)
     
     for ri = 1:size(rwds,1)
 
+        if mod(ri, 500) == 0
+            disp(ri)
+        end
+        
         desc = daps{ai,1};
         algo = daps{ai,2};
         parm = daps{ai,3};
         rewd = rwds{ri,1};
 
-        feval([domain '_paramaters'], parm);
+        feval([domain '_parameters'], parm);
 
         [policy, t] = feval(algo, domain, rewd);
         [v        ] = expectation_from_simulations(policy, t_b, s_1, rewd, eval_steps, eval_samps, eval_gamma);

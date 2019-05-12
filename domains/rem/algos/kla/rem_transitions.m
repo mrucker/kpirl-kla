@@ -13,7 +13,7 @@ function s2 = rem_trans_post(s1, a);persistent max_hist;
     end
 
     if(isempty(max_hist))
-        param = rem_paramaters();
+        param = rem_parameters();
         max_hist = param.max_hist;
     end
 

@@ -1,7 +1,7 @@
 function [v_i, v_p] = huge_value_basii()
 
-    paramaters = huge_paramaters();
+    parameters = huge_parameters();
     
-    [v_i, v_p] = feval(['huge_v_basii_' paramaters.v_basii]);
+    [v_i, v_p] = feval(['huge_v_basii_' parameters.v_basii]);
 
 end
