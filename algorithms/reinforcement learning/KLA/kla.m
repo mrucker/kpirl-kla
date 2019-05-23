@@ -170,7 +170,7 @@ function [policy, time] = kla(domain, reward)
                         %this is the "initialization" step from the algorithm
                         epsilon(i) = 0; % we don't use for a few iterations
                         beta   (i) = 0; % we don't use for a few iterations
-                        var     (i) = 0; % we don't use for a few iterations
+                        var    (i) = 0; % we don't use for a few iterations
                         alpha  (i) = 1;
                         eta    (i) = 1;
                         lambda (i) = 0; % we don't use for a few iterations

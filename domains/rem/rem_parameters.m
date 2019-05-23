@@ -1,10 +1,10 @@
-function p_out = rem_parameters(p_in); persistent paramaters;
+function p_out = rem_parameters(p_in); persistent parameters;
 
     if(nargin == 1)
-        paramaters = p_in;
+        parameters = p_in;
     end
 
-    p_out = fill_default_params(paramaters, default_params());
+    p_out = fill_default_params(parameters, default_params());
 
 end
 

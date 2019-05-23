@@ -8,14 +8,14 @@ function [policy, time] = klspi(domain, reward); global R;
         clear [domain '_value_basii_klspi'];
         clear [domain '_simulator'];
 
-        [paramaters] = feval([domain '_paramaters']);
+        [parameters] = feval([domain '_parameters']);
         [t_d       ] = feval([domain '_transitions']);
 
-        maxiter     = paramaters.N;
-        epsilon     = paramaters.epsilon;
-        maxepisodes = paramaters.M;
-        maxsteps    = paramaters.T;
-        discount    = paramaters.gamma;
+        maxiter     = parameters.N;
+        epsilon     = parameters.epsilon;
+        maxepisodes = parameters.M;
+        maxsteps    = parameters.T;
+        discount    = parameters.gamma;
         basis       = [domain '_value_basii_klspi'];
         eval_alg    = 5; % 1->lsq; 2->lsqfast; 3->lsqbe; 4->lsqbefast; 5->klsq;
 

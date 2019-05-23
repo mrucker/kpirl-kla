@@ -62,11 +62,11 @@ Two example files have been provided in the root directory for a "quick start". 
 		* Output:
 			* trajectories -- a cell array of expert trajectories. Trajectories can be represented as either a matrix, whose column vectors are states or as a cell array themselves. (i.e., trajectories = {trajectory_1, trajectory_2, ...} and trajectory_1 = <[s_1, s_2, ...] | {s_1, s_2, ...}>)
 		
-	* <domain>_paramaters
+	* <domain>_parameters
 		* Input:
-			* p_in -- an optional struct that will be used to change the existing paramaters. If not passed in the current settings are returned.
+			* p_in -- an optional struct that will be used to change the existing parameters. If not passed in the current settings are returned.
 		* Output:
-			* p_out -- a struct which contains the paramaters for the various algorithms. This function needs to persist the paramters from call to call in order to work properly. The example domains do this via matlab's `persistent` command though it could be done other ways if necessary.
+			* p_out -- a struct which contains the parameters for the various algorithms. This function needs to persist the paramters from call to call in order to work properly. The example domains do this via matlab's `persistent` command though it could be done other ways if necessary.
 
 ### KLA Functions
 
@@ -74,7 +74,7 @@ Two example files have been provided in the root directory for a "quick start". 
 	* \<domain\>_random
 	* \<domain\>_transitions
 	* \<domain\>_value_basii
-	* \<domain\>_paramaters
+	* \<domain\>_parameters
 
 ### LSPI Functions
 
