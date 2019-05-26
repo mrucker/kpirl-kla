@@ -1,4 +1,4 @@
-function [a_v, a_m] = huge_actions()
+function [a_v] = huge_actions()
 
     a_m = get_actions_matrix();
     a_v = @(s) get_valid_actions(s, a_m);

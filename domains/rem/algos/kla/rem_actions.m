@@ -1,4 +1,4 @@
-function [a_v, a_m] = rem_actions()
+function [a_v] = rem_actions()
 
     parameters = rem_parameters();
 
