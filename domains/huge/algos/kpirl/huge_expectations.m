@@ -10,10 +10,11 @@ function expectation = huge_expectations(reward)
     r_n = size(r_p, 2);
     r_e = @(s) double((1:r_n)' == r_i(s));
 
-    steps   = parameters.steps;
     samples = parameters.samples;
+    steps   = parameters.steps;
     gamma   = parameters.gamma;
 
-    policy      = kla(domain, reward);
-    expectation = expectation_from_simulations(policy, t_b, s_1, r_e, steps, samples, gamma);
+    policy       = kla(domain, reward);
+    trajectories = trajectories_from_simulations(policy, t_b, s_1, samples, steps); 
+    expectation  = expectation_from_trajectories(trajectories, r_e, gamma);
 end

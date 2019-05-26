@@ -1,4 +1,4 @@
-function [reward_function, time_measurements, state_importance] = kpirl(domain)
+function [reward_function, time_measurements] = kpirl(domain)
 
     a_tic = tic;
         [s_e       ] = feval([domain '_trajectories']);
@@ -80,8 +80,7 @@ function [reward_function, time_measurements, state_importance] = kpirl(domain)
         %the convex optimization approach then you need to replace this line.
         [~,m_i] = min(diag((E(nz)-sm(nz,:))'*rg*(E(nz)-sm(nz,:))));
 
-        state_importance = E-sb{m_i-1};
-        reward_function  = rs{m_i};
+        reward_function = rs{m_i};
     time_measurements = toc(a_tic);
 
 end
