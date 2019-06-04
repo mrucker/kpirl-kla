@@ -1,13 +1,13 @@
-function [policy, time] = kla(domain, reward)
+function [policy, time] = kla_spd(domain, reward)
 
     gcp; %this is here to force the parallel pool to begin before we start timing
 
     start = tic;
-        [v_i, v_p  ] = feval([domain '_value_basii']);
-        [s_1       ] = feval([domain '_random']);
-        [a_v       ] = feval([domain '_actions']);
-        [t_d, t_s  ] = feval([domain '_transitions']);
-        [parameters] = feval([domain '_parameters']);
+        [v_l, v_i, v_p] = feval([domain '_value_basii']);
+        [s_1          ] = feval([domain '_random']);
+        [a_f          ] = feval([domain '_actions']);
+        [t_d, t_s     ] = feval([domain '_transitions']);
+        [parameters   ] = feval([domain '_parameters']);
 
         N     = parameters.N;
         M     = parameters.M;
@@ -17,16 +17,15 @@ function [policy, time] = kla(domain, reward)
 
         time = zeros(1,5);
 
-        v_n = size(v_p,2);
-        v_v = 3*ones(1,v_n); %arbitrarily initialize all state values to 3
+        v_n = v_i();
+        v_p = v_p(v_l());
+        v_f = @(s) 3*ones(1,size(s,2)); %arbitrarily initialize all state values to 3
 
         g_mat = cell2mat(arrayfun(@(w)circshift([gamma.^(0:T-1), zeros(1,W-1)],w-1), 1:W, 'UniformOutput',false)');
 
         %these variables manage the approximate "on-policy" sampling distribution
         init_recycle = 4;
-        init_count   = 0;
-        init_growth  = M*(T+W-1);
-        init_states  = cell(init_growth*init_recycle,1);
+        init_start   = 30;
 
         Y = NaN  (1, v_n); %last  visitation value
         K = zeros(1, v_n); %total visitation count
@@ -45,67 +44,55 @@ function [policy, time] = kla(domain, reward)
     for n = 1:N
 
         start = tic;
+            SE      = sqrt(lambda.*sig_sq);
+            SE(K<3) = max([SE(K>=3),0]);
 
-            if mod(n,init_recycle) == 1
-                init_states(init_count + (1:init_growth)) = arrayfun(@(m) s_1(), 1:init_growth, 'UniformOutput', false);
-                init_count = init_count + init_growth;
-            end
-
-            init = init_states(randperm(init_count, M)); 
-
-            X_b_m = arrayfun(@(i) zeros(1,T+W-1), 1:M, 'UniformOutput', false);
-            X_s_m = arrayfun(@(i) cell (1,T+W-1), 1:M, 'UniformOutput', false);
-                        
-            SD      = sqrt(lambda.*sig_sq);
-            SD(K<3) = max([SD(K>=3),0]);
-            
             BI      = beta;
             BI(K<3) = mean([BI(K>=3),0]);
 
+            if mod(n,init_recycle) == 1
+                init_states = arrayfun(@(m) s_1(), 1:init_start, 'UniformOutput', false);
+            end
+
+            init_s  = init_states(randi(size(init_states,2), 1, M));
+            init_p = cellfun(@(s) v_i(v_l(t_d(s, a_f(s)))), init_s, 'UniformOutput',false);            
+            init_B = cellfun(@(p) BI(p), init_p, 'UniformOutput',false);
+            init_E = cellfun(@(p) SE(p), init_p, 'UniformOutput',false);
+
+            t_m = arrayfun(@(i) cell (1,T+W-1), 1:M, 'UniformOutput', false);
+
             parfor m = 1:M
 
-                s_t = init{m};
+                s_t = init_s{m};
 
                 for t = 1:T+W-1
 
-                    post_s_as = t_d(s_t, a_v(s_t));
-                    post_v_is = v_i(post_s_as);
-                    post_v_vs = v_v(post_v_is);
+                    post_s_as = t_d(s_t, a_f(s_t));
+                    post_v_vs = v_f(post_s_as);
 
                     if(t == 1)
-                        post_v_vs = post_v_vs + BI(post_v_is) + 2 * SD(post_v_is);
+                        post_v_vs = post_v_vs + init_B{m} + 2 * init_E{m};
                     end
 
-                    %while this is satisfying intellectually,
-                    %in my testing it didn't seem to make a big difference in policy value,
-                    %and it definitely slowed down the algorithm (i.e. from 6 seconds to 9 seconds in my testing)
-                    %m_v = max(post_values);
-                    %m_i = find(post_values == m_v);
-                    %a_i = m_i(randi(numel(m_i)));
-
-                    %this is the other option to the above commented out code
-                    %rather than selecting a random action of highest value we just pick the first one
+                    % rather than selecting a random action of highest value we just pick the first one
+                    % experimentation on the "huge" domain suggeted there was no difference in performance
                     [~,a_i] = max(post_v_vs);
 
-                    X_s_m{m}{t} = t_s(post_s_as(:,a_i));
-                    X_b_m{m}(t) = post_v_is(a_i);
-
-                    s_t = X_s_m{m}{t};
-                    
+                    t_m{m}{t} = post_s_as(:,a_i);
+                    s_t       = t_s(t_m{m}{t});
                 end
             end
 
-            init_states(init_count + (1:init_growth)) = horzcat(X_s_m{:});
-            init_count = init_count + init_growth;
+            init_states = horzcat(init_states, t_s(horzcat(t_m{:})));
 
         time(2) = time(2) + toc(start);
 
         start = tic;
             for m = 1:M
-                X_rewd = cellfun(reward, X_s_m{m});
+                t_r = reward(t_s(t_m{m}));
                 for w = 1:W
-                    i = X_b_m{m}(w);
-                    y = g_mat(w,:) * X_rewd';
+                    i = v_i(v_l(t_m{m}{w}));
+                    y = g_mat(w,:) * t_r';
                     k = K(i);
 
                     if ~isnan(Y(i))
@@ -188,16 +175,16 @@ function [policy, time] = kla(domain, reward)
                 box_constraint = iqr(Y)/1.349;
             end
 
-            X = vertcat(v_p(:,~isnan(Y)), J(~isnan(Y)));
+            X = v_p(:,~isnan(Y));
 
             v_m = fitrsvm(X',Y(~isnan(Y))','KernelFunction','rbf', 'BoxConstraint', box_constraint, 'Solver', 'SMO', 'Standardize',true);
-            v_v = predict(v_m, vertcat(v_p, n*ones(1,v_n))')';
+            v_v = predict(v_m, v_p')';
+            v_f = @(s) v_v(v_i(v_l(s)));
 
         time(4) = time(4) + toc(start);
     end
 
     start = tic;
-        values = @(s) v_v(v_i(s));
-        policy = @(s) best_action_from_state(s, a_v(s), t_d, values);
+        policy = @(s) best_action_from_state(s, a_f(s), t_d, v_f);
     time(5) = time(5) + toc(start);
 end

@@ -25,7 +25,11 @@ function s = huge_trans_post(s, a)
 end
 
 function s = huge_trans_pre(s)
-    s = update_new_targets_state(s);
+    if iscell(s)
+        s = cellfun(@update_new_targets_state, s, 'UniformOutput',false);
+    else
+        s = update_new_targets_state(s);
+    end
 end
 
 function s = update_cursor_state(s,u)

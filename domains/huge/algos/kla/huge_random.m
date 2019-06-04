@@ -1,5 +1,5 @@
 function s_1 = huge_random()
-    trajectories = huge_trajectories();
+    trajectories = huge_expert_trajectories();
     parameters   = huge_parameters();
 
     trajectory_count  = numel(trajectories);

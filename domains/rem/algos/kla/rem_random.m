@@ -1,7 +1,7 @@
 function [s_1] = rem_random()
 
-    trajectories = rem_trajectories();
-    parameters   = huge_parameters();
+    trajectories = rem_expert_trajectories();
+    parameters   = rem_parameters();
 
     trajectory_count  = numel(trajectories);
     trajectory_length = size(trajectories{1},2);

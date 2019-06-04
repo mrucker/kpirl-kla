@@ -23,6 +23,8 @@ function algorithm_parameter_compare(domain, daps, rwd_value_generator, eval_rew
             [trajects ] = trajectories_from_simulations(policy, t_b, s_1, eval_samps, eval_steps);
             [v        ] = expectation_from_trajectories(trajects, rewd, eval_gamma);
 
+            disp(t)
+
             t = sum(t);
 
             avg_v_old = avg_v;
@@ -60,12 +62,12 @@ end
 
 function r_f = get_reward_functions(domain, count, rwd_value_generator)
 
-    [r_i, r_p] = feval([domain '_reward_basii']);
-    
+    [r_l, r_i, r_p] = feval([domain '_reward_basii']);
+
     r_f = cell(count,1);
 
     for i = 1:count
-        r_v = rwd_value_generator(r_p);
-        r_f{i} = @(s) r_v(r_i(s));
+        r_v = rwd_value_generator(r_p(r_l()));
+        r_f{i} = @(s) r_v(r_i(r_l(s)));
     end
 end
