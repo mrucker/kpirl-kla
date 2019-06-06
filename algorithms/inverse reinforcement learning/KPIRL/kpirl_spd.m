@@ -53,12 +53,12 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
                 end
             time_measurements = toc(tic_id);
 
-            if  (i > 1) && (abs(t_s{i}-t_s{i-1}) <= epsilon) || (t_s{i} <= epsilon)
-                break;
-            end
-
             if ~exist('silent', 'var')
                 fprintf('Completed IRL algorithm, i=%03d, t=%8.6f, time=%06.3f\n',[i,t_s{i},time_measurements]);
+            end
+
+            if  (i > 1) && (abs(t_s{i}-t_s{i-1}) <= epsilon) || (t_s{i} <= epsilon)
+                break;
             end
         end
 
