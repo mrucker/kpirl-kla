@@ -1,16 +1,11 @@
 function bl = bin_levels(val, min_val, max_val, bins)
 
-    %?????????????????????????
-    %bl = ceil(vals/bin_size);
-    %bl = max (bl, min_level);
-    %bl = min (bl, max_level);
-
     %fastest
-    val = max([val;min_val*ones(1,size(val,2))],[], 1);
-    val = min([val;max_val*ones(1,size(val,2))],[], 1);
-    bl  = floor((val-min_val)*bins/(max_val-min_val+1));
-    bl  = bl + 1; % 1-based rather than 0-based
-
+    bs = bins/(max_val-min_val);
+    bl = ceil(bs*(val-min_val));
+    bl = max (bl, 1   );
+    bl = min (bl, bins);
+    
     %%second fastest
     %bl = min(ceil((vals+.01)/bin_s), bin_n);
     %%second fastest

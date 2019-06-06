@@ -2,10 +2,7 @@ function [v_l, v_i, v_p] = huge_v_basii_1a()
     n_levels = [3 3 3 3 3 3 3 6];
 
     state2levels = {
-        @cursor_p_levels;
-        @cursor_v_levels;
-        @cursor_a_levels;
-        @target_t_levels;
+        @level_rollup
     };
 
     level2features = {
@@ -20,6 +17,15 @@ function [v_l, v_i, v_p] = huge_v_basii_1a()
     };
 
     [v_l, v_i, v_p] = basic_basii(n_levels, state2levels, level2features);
+    
+    function ll = level_rollup(states)
+        l_p = cursor_p_levels(states);
+        l_v = cursor_v_levels(states);
+        l_a = cursor_a_levels(states);
+        l_t = target_t_levels(states);
+
+        ll = vertcat(l_p, l_v, l_a, l_t);
+    end
     
     function lp = cursor_p_levels(states)
 

@@ -36,7 +36,11 @@ function [v_l, v_i, v_p] = basic_basii(partitions, state2levels, level2features)
             end
 
         else
-            levels = cell2mat(cellfun(@(state2level) statesfun(state2level, states), state2levels, 'UniformOutput', false));
+            if(numel(state2levels) == 1)
+                levels = statesfun(state2levels{1}, states);
+            else
+                levels = cell2mat(cellfun(@(state2level) statesfun(state2level, states), state2levels, 'UniformOutput', false));
+            end
         end
     end
 
@@ -46,7 +50,10 @@ function [v_l, v_i, v_p] = basic_basii(partitions, state2levels, level2features)
         else
             partition_indexes = indexers_per_partition'*(levels - 1);
             current_partition = (partition_indexes >= 0);
-            indexes = 1 + sum((partition_indexes + n_combos_cum_sum) .* current_partition,1);
+            indexes = 1 + sum((partition_indexes + n_combos_cum_sum) .* current_partition,1);            
+            
+            assert(all(sum(current_partition,1)==1), 'bad levels')
+            
         end
     end
 
@@ -54,8 +61,12 @@ function [v_l, v_i, v_p] = basic_basii(partitions, state2levels, level2features)
         if nargin == 0
             features = sum(cellfun(@(l2f) numel(l2f(1)), level2features));
         else
-           assert(all(levels(:)>=0), 'bad levels');
-           features = cell2mat(arrayfun(@(i) level2features{i}(levels(i,:)), 1:n_levels_per_partition, 'UniformOutput', false)'); 
+            assert(all(levels(:)>=0), 'bad levels');
+            if(numel(level2features) == 1)
+                features = level2features{1}(levels);
+            else
+                features = cell2mat(arrayfun(@(i) level2features{i}(levels(i,:)), 1:sum(n_levels_per_partition), 'UniformOutput', false)'); 
+            end
         end
     end
 

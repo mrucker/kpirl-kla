@@ -2,14 +2,14 @@ clear; close all; run(fullfile(fileparts(which(mfilename)), '..', '..', '..', 'q
 
 domain = 'huge';
 
-eval_rewds = 4;
+eval_rewds = 10;
 eval_gamma = .9;
 eval_steps = 10;
 eval_samps = 500; %warning: reducing this will make the estimate of V more imprecise -- making performance comparisons more suspect
 
 daps = {
     'kla_spd  1a' , 'kla_spd'  ,struct('v_basii', '1a');
-    'kla_spd  1b' , 'kla_spd'  ,struct('v_basii', '1b');
+    %'kla_spd  1b' , 'kla_spd'  ,struct('v_basii', '1b');
     %'lspi ' , 'lspi' ,struct('v_basii', '1a');
     %'klspi' , 'klspi',struct('v_basii', '1a');
 };
