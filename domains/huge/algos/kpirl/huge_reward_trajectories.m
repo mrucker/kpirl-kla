@@ -9,6 +9,6 @@ function trajectories = huge_reward_trajectories(reward)
     samples = parameters.samples;
     steps   = parameters.steps;
 
-    policy       = kla(domain, reward);
+    policy       = kla_spd(domain, reward);
     trajectories = trajectories_from_simulations(policy, t_b, s_1, samples, steps);
 end
