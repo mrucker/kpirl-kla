@@ -15,7 +15,7 @@ function [policy, time] = kla_mem(domain, reward)
         W     = parameters.W;
         gamma = parameters.gamma;
 
-        time = zeros(1,5);
+        time = zeros(1,6);
 
         v_n = v_i();        
         v_f = @(s) 3*ones(1,size(s,2)); %arbitrarily initialize all state values to 3
@@ -32,32 +32,42 @@ function [policy, time] = kla_mem(domain, reward)
         J = sparse(v_n, 1    ); %last  visitation iter
 
         %one for every value_basii updated for entire life of program (BAKF)
-        epsilon = NaN(1, v_n);
-        beta    = NaN(1, v_n);
-        var     = NaN(1, v_n);
-        sig_sq  = NaN(1, v_n);
-        alpha   = NaN(1, v_n);
-        eta     = NaN(1, v_n);
-        lambda  = NaN(1, v_n);
+        epsilon = sparse(v_n, 1);
+        beta    = sparse(v_n, 1);
+        var     = sparse(v_n, 1);
+        sig_sq  = sparse(v_n, 1);
+        alpha   = sparse(v_n, 1);
+        eta     = sparse(v_n, 1);
+        lambda  = sparse(v_n, 1);
+                    
     time(1) = toc(start);
 
     for n = 1:N
 
         start = tic;
-            SE      = sqrt(lambda.*sig_sq);
-            SE(K<3) = max([SE(K>=3),0]);
+            SE     = sqrt(lambda.*sig_sq);
+            max_SE = max([SE(K>=3);0]);
 
-            BI      = beta;
-            BI(K<3) = mean([BI(K>=3),0]);
+            BI     = beta;
+            avg_BI = mean([BI(K>=3);0]);
+            
+            init_state_bias          = @(i) BI(i) + (BI(i) == 0) * avg_BI;
+            init_state_error         = @(i) SE(i) + (SE(i) == 0) * max_SE;
+            confidence_interval      = @(i) full( init_state_bias(i) + 2* init_state_error(i));
+            init_state_indexes       = @(s) v_i(t_d(s, a_f(s)));
+            init_confidence_interval = @(s) confidence_interval(init_state_indexes(s));
 
             if mod(n,init_recycle) == 1
                 init_states = arrayfun(@(m) s_1(), 1:init_start, 'UniformOutput', false);
             end
-
+            
             init_s = init_states(randi(numel(init_states), 1, M));
+            init_C = cellfun(init_confidence_interval, init_s, 'UniformOutput',false);
 
             t_m = arrayfun(@(i) cell (1,T+W-1), 1:M, 'UniformOutput', false);
+        time(2) = time(2) + toc(start);
 
+        start = tic;
             parfor m = 1:M
 
                 s_t = init_s{m};
@@ -68,8 +78,7 @@ function [policy, time] = kla_mem(domain, reward)
                     post_v_vs = v_f(post_s_as);
 
                     if(t == 1)
-                        post_v_is = v_i(post_s_as);
-                        post_v_vs = post_v_vs + BI(post_v_is) + 2 * SE(post_v_is);
+                        post_v_vs = post_v_vs + init_C{m}';
                     end
 
                     % rather than selecting a random action of highest value we just pick the first one
@@ -83,7 +92,7 @@ function [policy, time] = kla_mem(domain, reward)
 
             init_states = horzcat(init_states, t_s(horzcat(t_m{:})));
 
-        time(2) = time(2) + toc(start);
+        time(3) = time(3) + toc(start);
 
         start = tic;
             for m = 1:M
@@ -163,7 +172,7 @@ function [policy, time] = kla_mem(domain, reward)
                     end
                 end
             end
-        time(3) = time(3) + toc(start);
+        time(4) = time(4) + toc(start);
 
         start = tic;
 
@@ -180,10 +189,10 @@ function [policy, time] = kla_mem(domain, reward)
             v_m = fitrsvm(x, y, 'KernelFunction','rbf', 'BoxConstraint', box_constraint, 'Solver', 'SMO', 'Standardize',true);
             v_f = @(s) predict(v_m, v_p(s)')';
 
-        time(4) = time(4) + toc(start);
+        time(5) = time(5) + toc(start);
     end
 
     start = tic;
         policy = @(s) best_action_from_state(s, a_f(s), t_d, v_f);
-    time(5) = time(5) + toc(start);
+    time(6) = time(6) + toc(start);
 end

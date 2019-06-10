@@ -8,7 +8,7 @@ eval_steps = 10;
 eval_samps = 500; %warning: reducing this will make the estimate of V more imprecise -- making performance comparisons more suspect
 
 daps = {
-    'kla_spd  1a' , 'kla_spd'  ,struct('v_basii', '1a');
+    %'kla_spd  1a' , 'kla_spd'  ,struct('v_basii', '1a');
     %'kla_spd  1b' , 'kla_spd'  ,struct('v_basii', '1b');
     'kla_mem  1a' , 'kla_mem'  ,struct('v_basii', '1a');
 };
