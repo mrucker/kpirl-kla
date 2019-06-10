@@ -1,5 +1,5 @@
 function [v_i, v_p] = krand_reward_basii()
-    n_levels = [9, 30, 21, 31, 10, 7];
+    n_levels = [9, 30, 21, 31, 96, 7];
 
     state2levels = {
         @rail_type_levels;
