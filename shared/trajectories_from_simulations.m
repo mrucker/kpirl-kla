@@ -2,7 +2,7 @@ function [trajectories] = trajectories_from_simulations(policy, transition, rand
 
     trajectories = cell(1, trajectory_count);
 
-    for t = 1:trajectory_count
+    parfor t = 1:trajectory_count
         trajectory = cell(1, trajectory_length);
         trajectory{1} = rand_state_generator();
 

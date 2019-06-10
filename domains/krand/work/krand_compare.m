@@ -7,7 +7,7 @@ domain = 'krand';
 
 eval_rewds = 4;    %How many times it runs KLA
 eval_gamma = 0.9;  %Gamma associated with value function (how much we discount each successive reward)
-eval_steps = 8334; %How many states does the algorithm generate to see how good the value function is?
+eval_steps = 2000; %How many states does the algorithm generate to see how good the value function is?
 eval_samps = 100;  %Making this many trajectories
 
 daps = {};
