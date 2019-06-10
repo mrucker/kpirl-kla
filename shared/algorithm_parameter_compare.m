@@ -1,9 +1,10 @@
-function algorithm_parameter_compare(domain, daps, rwd_value_generator, eval_rewds, eval_samps, eval_steps, eval_gamma)
+function algorithm_parameter_compare(domain, daps, rwd_func_generator, eval_rewds, eval_samps, eval_steps, eval_gamma)
 
     [s_1     ] = feval([domain '_random']);
     [~,~, t_b] = feval([domain '_transitions']);
+    [r_i, r_p] = feval([domain '_reward_basii']);
     
-    rwds = get_reward_functions(domain, eval_rewds, rwd_value_generator);
+    rwds = arrayfun(@(i) rwd_func_generator(r_i,r_p), 1:eval_rewds, 'UniformOutput', false)';
 
     for ai = 1:size(daps,1)
 
@@ -23,9 +24,7 @@ function algorithm_parameter_compare(domain, daps, rwd_value_generator, eval_rew
             [trajects ] = trajectories_from_simulations(policy, t_b, s_1, eval_samps, eval_steps);
             [v        ] = expectation_from_trajectories(trajects, rewd, eval_gamma);
 
-            disp(t)
-
-            t = sum(t);
+            t = sum(t,2);
 
             avg_v_old = avg_v;
             avg_t_old = avg_t;
@@ -58,16 +57,4 @@ function p_results(desc, avg_t, avg_v, SE_t, SE_v)
     fprintf('\t avg_V = %7.3f;', avg_v);
     fprintf('\t SE_V = %7.3f;' , SE_v );
     fprintf('\n');
-end
-
-function r_f = get_reward_functions(domain, count, rwd_value_generator)
-
-    [r_l, r_i, r_p] = feval([domain '_reward_basii']);
-
-    r_f = cell(count,1);
-
-    for i = 1:count
-        r_v = rwd_value_generator(r_p(r_l()));
-        r_f{i} = @(s) r_v(r_i(r_l(s)));
-    end
 end

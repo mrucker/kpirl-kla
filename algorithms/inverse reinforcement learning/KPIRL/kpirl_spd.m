@@ -1,17 +1,17 @@
 function [reward_function, time_measurements] = kpirl_spd(domain)
 
     a_tic = tic;
-        [E_t          ] = feval([domain '_expert_trajectories']);
-        [r_l, r_i, r_p] = feval([domain '_reward_basii']);
-        [parameters   ] = feval([domain '_parameters']);
+        [E_t       ] = feval([domain '_expert_trajectories']);
+        [r_i, r_p  ] = feval([domain '_reward_basii']);
+        [parameters] = feval([domain '_parameters']);
 
         epsilon = parameters.epsilon;
         gamma   = parameters.gamma;
         kernel  = parameters.kernel;
 
         r_n = r_i();
-        r_p = r_p(r_l());
-        r_e = @(s) double((1:r_n)' == r_i(r_l(s)));
+        r_p = r_p(1:r_n);
+        r_e = @(s) double((1:r_n)' == r_i(s));
 
         s_E = expectation_from_trajectories(E_t, r_e, gamma);
 
@@ -28,14 +28,14 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
             tic_id = tic;
                 if i == 1
                     r_v    = rand(1,r_n);
-                    r_f{i} = @(s) r_v(r_i(r_l(s)));
+                    r_f{i} = @(s) r_v(r_i(s));
                     t_s{i} = Inf;
                 else
                     n_z    = (s_E ~= 0) | (s_b{i-1} ~= 0);
                     r_g    = kernel(r_p(:,n_z),r_p);
                     t_g    = kernel(r_p(:,n_z),r_p(:,n_z));
                     r_v    = (s_E(n_z)-s_b{i-1}(n_z))'*r_g;
-                    r_f{i} = @(s) r_v(r_i(r_l(s)));
+                    r_f{i} = @(s) r_v(r_i(s));
                     t_s{i} = sqrt(s_E(n_z)'*t_g*s_E(n_z) + s_b{i-1}(n_z)'*t_g*s_b{i-1}(n_z) - 2*s_E(n_z)'*t_g*s_b{i-1}(n_z));
                 end
 

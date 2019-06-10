@@ -1,4 +1,4 @@
-function [r_l, r_i, r_p] = huge_reward_basii()
+function [r_i, r_p] = huge_reward_basii()
 
     partitions = {[3, 3, 8, 6, 8], 1};
     
@@ -12,10 +12,10 @@ function [r_l, r_i, r_p] = huge_reward_basii()
         level2circle(partitions{1}(3)*2, 0  );
         level2circle(partitions{1}(4)*2, 0  );
         level2circle(partitions{1}(5)/2, 4.5); % removed `* 6/10`;
-        level2linear(1/4);
+        level2scalar(4);
     };
 
-    [r_l, r_i, r_p] = basic_basii(partitions, state2levels, level2features);
+    [r_i, r_p] = basic_basii(partitions, state2levels, level2features);
     
     function ls = level_rollup(states)
 

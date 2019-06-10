@@ -1,4 +1,4 @@
-function [v_l, v_i, v_p] = rem_v_basii_1a()
+function [v_i, v_p] = rem_v_basii_1a()
 
     n_levels = [2, 30, 2, 30];
 
@@ -16,7 +16,7 @@ function [v_l, v_i, v_p] = rem_v_basii_1a()
         level2linear(n_levels(4));
     };
 
-    [v_l, v_i, v_p] = basic_basii(n_levels, state2levels, level2features);
+    [v_i, v_p] = basic_basii(n_levels, state2levels, level2features);
     
     function tl = trn_level(states)
         if(size(states,1) < 4) 

@@ -1,4 +1,4 @@
-function [r_l, r_i, r_p] = rem_reward_basii()
+function [r_i, r_p] = rem_reward_basii()
 
     n_levels = [2, 30, 2, 30];
 
@@ -52,5 +52,5 @@ function [r_l, r_i, r_p] = rem_reward_basii()
         il = bin_levels(val_i, 0, 1, n_levels(4));
     end
 
-    [r_l, r_i, r_p] = basic_basii(n_levels, state2levels, level2phis);
+    [r_i, r_p] = basic_basii(n_levels, state2levels, level2phis);
 end

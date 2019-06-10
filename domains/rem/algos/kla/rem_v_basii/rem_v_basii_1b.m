@@ -1,4 +1,4 @@
-function [v_l, v_i, v_f] = rem_v_basii_1b()
+function [v_i, v_p] = rem_v_basii_1b()
 
     n_levels = [2, 2];
 
@@ -37,5 +37,5 @@ function [v_l, v_i, v_f] = rem_v_basii_1b()
         end
     end
 
-    [v_l, v_i, v_f] = basic_basii(n_levels, state2levels, level2features);
+    [v_i, v_p] = basic_basii(n_levels, state2levels, level2features);
 end

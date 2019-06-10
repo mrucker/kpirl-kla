@@ -1,7 +1,7 @@
-function [v_l, v_i, v_p] = rem_value_basii()
+function [v_i, v_p] = rem_value_basii()
 
     parameters = rem_parameters();
     
-    [v_l, v_i, v_p] = feval(['rem_v_basii_' parameters.v_basii]);
+    [v_i, v_p] = feval(['rem_v_basii_' parameters.v_basii]);
 
 end

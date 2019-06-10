@@ -1,99 +1,100 @@
-function [v_l, v_i, v_p] = basic_basii(partitions, state2levels, level2features)
+function [b_i, b_p] = basic_basii(partitions, state2levels, level2features)
 
     if ~iscell(partitions)
         partitions = {partitions};
     end
-    
+
     n_levels_per_partition = cellfun(@numel, partitions);
     n_combos_per_partition = cellfun(@prod , partitions);
-    indexers_per_partition = cell2mat(arrayfun(@i_partition2indexer, 1:numel(partitions), 'UniformOutput', false));
+    partition_index_matrix = create_partition_index_matrix(partitions);
 
     n_combos_cum_sum = cumsum([0, n_combos_per_partition])';
     n_combos_cum_sum(end) = [];
 
-    v_l = @states2levels;
-    v_i = @levels2indexes;
-    v_p = @levels2features;
+    b_i = @in2indexes;
+    b_p = @in2features;
+
+    function indexes = in2indexes(in)
+        assert(nargin == 0 || is_states(in), 'unsupported input');
+
+        if nargin == 0
+            indexes = sum(cellfun(@prod, partitions));
+        else
+            indexes = levels2indexes(states2levels(in));
+        end
+    end
+
+    function features = in2features(in)
+        assert(nargin == 0 || is_states(in) || is_indexes(in), 'unsupported input');
+
+        if nargin == 0
+            features = numel(levels2features(indexes2levels(1)));
+        elseif is_states(in)
+            features = levels2features(states2levels(in));
+        else
+            features = levels2features(indexes2levels(in));
+        end
+    end
 
     function levels = states2levels(states)
-        if nargin == 0
-            i_levels = 1;
-            i_combos = 1;
-            levels = zeros(sum(n_levels_per_partition), sum(n_combos_per_partition));
-
-            for partition_ranges = partitions
-                
-                partition_levels = arrayfun(@(n) 1:n, partition_ranges{1}, 'UniformOutput',false);
-                partition_combos = cartesian(partition_levels{:});
-
-                n_levels = size(partition_levels,2);
-                n_combos = size(partition_combos,2);
-
-                levels(i_levels:i_levels+n_levels-1, i_combos:i_combos+n_combos-1) = partition_combos;
-
-                i_levels = i_levels + n_levels;
-                i_combos = i_combos + n_combos;
-            end
-
+        if(numel(state2levels) == 1)
+            levels = statesfun(state2levels{1}, states);
         else
-            if(numel(state2levels) == 1)
-                levels = statesfun(state2levels{1}, states);
-            else
-                levels = cell2mat(cellfun(@(state2level) statesfun(state2level, states), state2levels, 'UniformOutput', false));
-            end
+            levels = cell2mat(cellfun(@(state2level) statesfun(state2level, states), state2levels, 'UniformOutput', false));
+        end
+
+        assert(all(levels(:)>=0), 'bad levels');
+    end
+
+    function levels = indexes2levels(indexes)
+        cum               = indexes - cumsum(n_combos_per_partition') + n_combos_per_partition';
+        valid_cum         = (cum > 0) & (cum <= n_combos_per_partition');
+        partition_indexes = cum .* valid_cum;
+        levels            = cell2mat(arrayfun(@(i) ind2subv(partitions{i}, partition_indexes(i,:)), 1:numel(partitions), 'UniformOutput',false)');
+    end
+
+    function features = levels2features(levels)
+        if(numel(level2features) == 1)
+            features = level2features{1}(levels);
+        else
+            features = cell2mat(arrayfun(@(i) level2features{i}(levels(i,:)), 1:sum(n_levels_per_partition), 'UniformOutput', false)'); 
         end
     end
 
     function indexes = levels2indexes(levels)
-        if nargin == 0
-            indexes = sum(cellfun(@prod, partitions));
-        else
-            partition_indexes = indexers_per_partition'*(levels - 1);
-            current_partition = (partition_indexes >= 0);
-            indexes = 1 + sum((partition_indexes + n_combos_cum_sum) .* current_partition,1);            
-            
-            assert(all(sum(current_partition,1)==1), 'bad levels')
-            
-        end
-    end
+        partition_indexes = partition_index_matrix'*(levels - 1);
+        current_partition = (partition_indexes >= 0);
+        assert(all(sum(current_partition,1)==1), 'bad partitions')
 
-    function features = levels2features(levels)
-        if nargin == 0
-            features = sum(cellfun(@(l2f) numel(l2f(1)), level2features));
-        else
-            assert(all(levels(:)>=0), 'bad levels');
-            if(numel(level2features) == 1)
-                features = level2features{1}(levels);
-            else
-                features = cell2mat(arrayfun(@(i) level2features{i}(levels(i,:)), 1:sum(n_levels_per_partition), 'UniformOutput', false)'); 
-            end
-        end
-    end
-
-    function indexer = i_partition2indexer(i_partition)
-
-        i_level  = 1 + sum(arrayfun(@(i) numel(partitions{i}), 1:i_partition-1));
-        n_levels = sum(cellfun(@numel, partitions));    
-
-        partition = partitions{i_partition};
-        partition(1    ) = [];
-        partition(end+1) = 1;
-
-        indexer                                     = zeros(n_levels,1);    
-        indexer(i_level:i_level+numel(partition)-1) = cumprod(partition,'reverse');
+        indexes = 1 + sum((partition_indexes + n_combos_cum_sum) .* current_partition,1);
     end
 end
 
-function permutations = cartesian(varargin)
-    n = nargin;
+function is = is_states(in)
+    is = size(in,1) > 1 || iscell(in) || isstruct(in);
+end
 
-    [F{1:n}] = ndgrid(varargin{:});
+function is = is_indexes(in)
+    is = size(in,1) == 1 && ~iscell(in) && isnumeric(in) && all(floor(in) == in);
+end
 
-    for i=n:-1:1
-        G(:,i) = F{i}(:);
+function partition_index_matrix = create_partition_index_matrix(partitions)
+
+    n_levels_per_partition = cellfun(@numel, partitions);
+
+    partition_offsets      = cumsum(horzcat(1, n_levels_per_partition(1:end-1)));
+    partition_index_matrix = zeros(sum(n_levels_per_partition), numel(partitions));
+
+    for i = 1:numel(partitions)
+
+        partition        = partitions{i};
+        partition(1    ) = [];
+        partition(end+1) = 1;
+
+        partition_indexer_loc = partition_offsets(i):partition_offsets(i)+n_levels_per_partition(i)-1;
+
+        partition_index_matrix(partition_indexer_loc, i) = cumprod(partition,'reverse')';
     end
-
-    permutations = unique(G , 'rows')';
 end
 
 function output = statesfun(func, states)
@@ -102,4 +103,11 @@ function output = statesfun(func, states)
     else
         output = func(states);
     end
+end
+
+function subv = ind2subv(siz,ndx)
+    
+    [out{1:length(siz)}] = ind2sub(siz,ndx); 
+    
+    subv = cell2mat(out') .* (ndx > 0);
 end

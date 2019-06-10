@@ -3,11 +3,11 @@ function [policy, time] = kla_spd(domain, reward)
     gcp; %this is here to force the parallel pool to begin before we start timing
 
     start = tic;
-        [v_l, v_i, v_p] = feval([domain '_value_basii']);
-        [s_1          ] = feval([domain '_random']);
-        [a_f          ] = feval([domain '_actions']);
-        [t_d, t_s     ] = feval([domain '_transitions']);
-        [parameters   ] = feval([domain '_parameters']);
+        [v_i, v_p  ] = feval([domain '_value_basii']);
+        [s_1       ] = feval([domain '_random']);
+        [a_f       ] = feval([domain '_actions']);
+        [t_d, t_s  ] = feval([domain '_transitions']);
+        [parameters] = feval([domain '_parameters']);
 
         N     = parameters.N;
         M     = parameters.M;
@@ -18,7 +18,7 @@ function [policy, time] = kla_spd(domain, reward)
         time = zeros(1,5);
 
         v_n = v_i();
-        v_p = v_p(v_l());
+        v_p = v_p(1:v_n);
         v_f = @(s) 3*ones(1,size(s,2)); %arbitrarily initialize all state values to 3
 
         g_mat = cell2mat(arrayfun(@(w)circshift([gamma.^(0:T-1), zeros(1,W-1)],w-1), 1:W, 'UniformOutput',false)');
@@ -55,9 +55,6 @@ function [policy, time] = kla_spd(domain, reward)
             end
 
             init_s  = init_states(randi(size(init_states,2), 1, M));
-            init_p = cellfun(@(s) v_i(v_l(t_d(s, a_f(s)))), init_s, 'UniformOutput',false);            
-            init_B = cellfun(@(p) BI(p), init_p, 'UniformOutput',false);
-            init_E = cellfun(@(p) SE(p), init_p, 'UniformOutput',false);
 
             t_m = arrayfun(@(i) cell (1,T+W-1), 1:M, 'UniformOutput', false);
 
@@ -71,7 +68,8 @@ function [policy, time] = kla_spd(domain, reward)
                     post_v_vs = v_f(post_s_as);
 
                     if(t == 1)
-                        post_v_vs = post_v_vs + init_B{m} + 2 * init_E{m};
+                        post_v_is = v_i(post_s_as);
+                        post_v_vs = post_v_vs + BI(post_v_is) + 2 * SE(post_v_is);
                     end
 
                     % rather than selecting a random action of highest value we just pick the first one
@@ -91,7 +89,7 @@ function [policy, time] = kla_spd(domain, reward)
             for m = 1:M
                 t_r = reward(t_s(t_m{m}));
                 for w = 1:W
-                    i = v_i(v_l(t_m{m}{w}));
+                    i = v_i(t_m{m}{w});
                     y = g_mat(w,:) * t_r';
                     k = K(i);
 
@@ -179,7 +177,7 @@ function [policy, time] = kla_spd(domain, reward)
 
             v_m = fitrsvm(X',Y(~isnan(Y))','KernelFunction','rbf', 'BoxConstraint', box_constraint, 'Solver', 'SMO', 'Standardize',true);
             v_v = predict(v_m, v_p')';
-            v_f = @(s) v_v(v_i(v_l(s)));
+            v_f = @(s) v_v(v_i(s));
 
         time(4) = time(4) + toc(start);
     end
