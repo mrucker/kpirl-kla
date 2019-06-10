@@ -34,7 +34,7 @@ function new_s = krand_trans_post(s, a)
     
     i = sub2ind([gw_sz gw_sz], new_location(1,:), new_location(2,:));
     
-    new_s = grid_world(i,:);
+    new_s = table2struct(grid_world(i,:));
     
     for i = 1:size(new_s,1)
         new_s(i).time = s.time+5;

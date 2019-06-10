@@ -18,8 +18,7 @@ function te = read_trajectory_episodes_from_file(path, file)
 
     ind = sub2ind([gw_sz gw_sz], c2_x, r2_y);
 
-    %trajectory_states = table2struct(trajectory_observations);
-    trajectory_states = grid_world(ind,:);
+    trajectory_states = table2struct(grid_world(ind,:));
     R = num2cell(r2_y);
     C = num2cell(c2_x);
     [trajectory_states(:).row] = R{:};

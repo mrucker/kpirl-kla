@@ -23,15 +23,15 @@ function [v_i, v_p] = krand_reward_basii()
 
     function rail_type_level = rail_type_levels(states)
 
-        rail_type_level = states.rail_type;
-        rail_type_level(isnan(rail_type_level)) = 0;
+        rail_type_level = 1+states.rail_type;
+        rail_type_level(isnan(rail_type_level)) = 1;
 
     end
 
     function highway_type_level = highway_type_levels(states)
 
-        highway_type_level = states.hwy_typ;
-        highway_type_level(isnan(highway_type_level)) = 0;
+        highway_type_level = 1+states.hwy_typ;
+        highway_type_level(isnan(highway_type_level)) = 1;
 
     end
 
@@ -45,8 +45,8 @@ function [v_i, v_p] = krand_reward_basii()
 
     function building_type_level = building_type_levels(states)
 
-        building_type_level = states.bldg_typ;
-        building_type_level(isnan(building_type_level)) = 0;
+        building_type_level = 1+states.bldg_typ;
+        building_type_level(isnan(building_type_level)) = 1;
 
     end
 

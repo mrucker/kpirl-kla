@@ -18,7 +18,7 @@ function p_out = krand_parameters(p_in); persistent parameters;
         grid_world = (fullfile(fileparts(which(mfilename)), 'data', 'allowed3.csv'));
         grid_world = readtable(grid_world);
         grid_world = grid_world(:,3:6);  %Rail type, street type, street maxspeed, building type
-        grid_world = table2struct(grid_world);
+        %grid_world = table2struct(grid_world);
 
         parameters.grid_world      = grid_world;
         parameters.grid_world_size = sqrt(size(grid_world, 1));
