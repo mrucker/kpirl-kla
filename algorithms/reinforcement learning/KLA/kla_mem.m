@@ -26,10 +26,10 @@ function [policy, time] = kla_mem(domain, reward)
         init_recycle = 4;
         init_start   = 30;
 
-        X = zeros(v_p(), v_n); %basii functions values
-        Y = NaN  (1    , v_n); %last  visitation value
-        K = zeros(1    , v_n); %total visitation count
-        J = NaN  (1    , v_n); %last  visitation iter
+        X = sparse(v_n, v_p()); %basii functions values
+        Y = sparse(v_n, 1    ); %last  visitation value
+        K = sparse(v_n, 1    ); %total visitation count
+        J = sparse(v_n, 1    ); %last  visitation iter
 
         %one for every value_basii updated for entire life of program (BAKF)
         epsilon = NaN(1, v_n);
@@ -151,7 +151,7 @@ function [policy, time] = kla_mem(domain, reward)
                         Y(  i) = y;
                         K(  i) = 1;
                         J(  i) = n;
-                        X(:,i) = v_p(t_m{m}{w});
+                        X(i,:) = v_p(t_m{m}{w})';
 
                         %this is the "initialization" step from the algorithm
                         epsilon(i) = 0; % we don't use for a few iterations
@@ -167,17 +167,17 @@ function [policy, time] = kla_mem(domain, reward)
 
         start = tic;
 
-            x = X(:, K > 0)';
-            y = Y(   K > 0)';
+            x = full(X(K > 0, :));
+            y = full(Y(K > 0   ));
 
             %https://www.mathworks.com/help/stats/fitrsvm.html#busljl4-BoxConstraint
             if iqr(y) < .0001
                 box_constraint = 1;
             else
-                box_constraint = iqr(Y)/1.349;
+                box_constraint = iqr(y)/1.349;
             end
 
-            v_m = fitrsvm(x,y,'KernelFunction','rbf', 'BoxConstraint', box_constraint, 'Solver', 'SMO', 'Standardize',true);
+            v_m = fitrsvm(x, y, 'KernelFunction','rbf', 'BoxConstraint', box_constraint, 'Solver', 'SMO', 'Standardize',true);
             v_f = @(s) predict(v_m, v_p(s)')';
 
         time(4) = time(4) + toc(start);

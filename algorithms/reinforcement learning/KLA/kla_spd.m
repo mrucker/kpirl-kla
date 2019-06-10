@@ -166,16 +166,17 @@ function [policy, time] = kla_spd(domain, reward)
 
         start = tic;
 
+            x = v_p(:, K > 0);
+            y =   Y(   K > 0);
+        
             %https://www.mathworks.com/help/stats/fitrsvm.html#busljl4-BoxConstraint
-            if iqr(Y) < .0001
+            if iqr(y) < .0001
                 box_constraint = 1;
             else
-                box_constraint = iqr(Y)/1.349;
+                box_constraint = iqr(y)/1.349;
             end
 
-            X = v_p(:,~isnan(Y));
-
-            v_m = fitrsvm(X',Y(~isnan(Y))','KernelFunction','rbf', 'BoxConstraint', box_constraint, 'Solver', 'SMO', 'Standardize',true);
+            v_m = fitrsvm(x',y','KernelFunction','rbf', 'BoxConstraint', box_constraint, 'Solver', 'SMO', 'Standardize',true);
             v_v = predict(v_m, v_p')';
             v_f = @(s) v_v(v_i(s));
 
