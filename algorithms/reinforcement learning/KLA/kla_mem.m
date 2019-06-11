@@ -17,7 +17,6 @@ function [policy, time] = kla_mem(domain, reward)
 
         time = zeros(1,6);
 
-        v_n = v_i();        
         v_f = @(s) 3*ones(1,size(s,2)); %arbitrarily initialize all state values to 3
 
         g_mat = cell2mat(arrayfun(@(w)circshift([gamma.^(0:T-1), zeros(1,W-1)],w-1), 1:W, 'UniformOutput',false)');
@@ -26,33 +25,17 @@ function [policy, time] = kla_mem(domain, reward)
         init_recycle = 4;
         init_start   = 30;
 
-        X = sparse(v_n, v_p()); %basii functions values
-        Y = sparse(v_n, 1    ); %last  visitation value
-        K = sparse(v_n, 1    ); %total visitation count
-        J = sparse(v_n, 1    ); %last  visitation iter
+        Z = containers.Map('KeyType','double','ValueType','any');
+        X = containers.Map('KeyType','double','ValueType','any');
 
-        %one for every value_basii updated for entire life of program (BAKF)
-        epsilon = sparse(v_n, 1);
-        beta    = sparse(v_n, 1);
-        var     = sparse(v_n, 1);
-        sig_sq  = sparse(v_n, 1);
-        alpha   = sparse(v_n, 1);
-        eta     = sparse(v_n, 1);
-        lambda  = sparse(v_n, 1);
-                    
     time(1) = toc(start);
 
     for n = 1:N
 
         start = tic;
-            SE     = sqrt(lambda.*sig_sq);
-            max_SE = max([SE(K>=3);0]);
 
-            BI     = beta;
-            avg_BI = mean([BI(K>=3);0]);
-            
-            init_state_bias          = @(i) BI(i) + (BI(i) == 0) * avg_BI;
-            init_state_error         = @(i) SE(i) + (SE(i) == 0) * max_SE;
+            init_state_bias          = @(i) BI(Z,i);
+            init_state_error         = @(i) SE(Z,i);
             confidence_interval      = @(i) full( init_state_bias(i) + 2* init_state_error(i));
             init_state_indexes       = @(s) v_i(t_d(s, a_f(s)));
             init_confidence_interval = @(s) confidence_interval(init_state_indexes(s));
@@ -60,7 +43,7 @@ function [policy, time] = kla_mem(domain, reward)
             if mod(n,init_recycle) == 1
                 init_states = arrayfun(@(m) s_1(), 1:init_start, 'UniformOutput', false);
             end
-            
+
             init_s = init_states(randi(numel(init_states), 1, M));
             init_C = cellfun(init_confidence_interval, init_s, 'UniformOutput',false);
 
@@ -100,14 +83,18 @@ function [policy, time] = kla_mem(domain, reward)
                 for w = 1:W
                     i = v_i(t_m{m}{w});
                     y = g_mat(w,:) * t_r';
-                    k = K(i);
 
-                    if k > 0
+                    if isKey(Z,i)
+
+                        z = Z(i);
+
+                        [k, Y, beta, var, alpha, eta, lambda] = deal(z(1),z(2),z(3),z(4),z(6),z(7),z(8));
+
                         %these step size calculations taken from Pg. 446-447 in
                         %Approximate Dynamic Programming by Powell in 2011
-                        e = Y(i) - y;
+                        epsilon = Y - y;
 
-                        if(e == 0 && k > 2)
+                        if(epsilon == 0 && k > 2)
                             %for some reason I keep getting 0 error in my
                             %estimate, even after four iterations. This in turn
                             %causes my estimate of my estimators bias (b)
@@ -116,59 +103,41 @@ function [policy, time] = kla_mem(domain, reward)
                             %to combat this I'll add a small perturbation
                             %with zero mean. That way the bias will be
                             %small but still existant
-                            e = .5*(.5 - rand);
+                            epsilon = 1/2*(rand-1/2);
                         end
 
-                        b = (1-eta(i))*beta(i) + eta(i)*(e  );
-                        v = (1-eta(i))*var (i) + eta(i)*(e^2);
-                        s = (v - b^2)/(1+lambda(i));
+                        beta   = (1-eta)*beta + eta*(epsilon);
+                        var    = (1-eta)*var  + eta*(epsilon^2);
+                        sig_sq = (var - beta^2)/(1+lambda);
 
                         if(k > 2)
-                            assert(~( (s/v) > 10000 || any(isnan([e, b, v, s, s/v])) || any(isinf([e, b, v, s, s/v])) ))
+                            BAKF_state = [epsilon, beta, var, sig_sq, sig_sq/var];                            
+                            assert( ~( (sig_sq/var) > 10000 || any(isnan(BAKF_state)) || any(isinf(BAKF_state)) ) )
                         end
 
-                        epsilon(i) = e;
-                        beta   (i) = b;
-                        var    (i) = v;
-                        sig_sq (i) = s;
+                        lambda = lambda*(1-alpha)^2 + alpha^2;
+                        Y      = (1-alpha)*Y + alpha*y;
 
-                        Y(i) = (1-alpha(i))*Y(i) + alpha(i)*y;
-                        K(i) = k + 1;
-                        J(i) = 1/3*J(i) + 2/3*n;
-
-                        l = ((1-alpha(i))^2)*lambda(i) + alpha(i)^2;
-
-                        if (k <= 2)
-                            a = 1/(k+1);
+                        if (k < 3)
+                            alpha = 1/(k+1);
                         else
-                            a = 1 - (s/v);
+                            alpha = 1 - (sig_sq/var);
                         end
 
                         if(k == 1)
-                            e = 1;
+                            eta = 1;
                         else
-                            e = eta(i)/(1+eta(i)-.05);
+                            eta = eta/(.95+eta);
                         end
 
-                        assert(~( any(1.0001 < [a,e]) || any(isnan([a, e, l])) || any(isinf([a, e, l]))));
+                        assert(~( any(1.0001 < [alpha,eta]) || any(isnan([alpha, eta, lambda])) || any(isinf([alpha, eta, lambda]))));
 
-                        alpha (i) = a;
-                        eta   (i) = e;
-                        lambda(i) = l;
-
+                        Z(i) = [k+1, Y, beta, var, sig_sq, alpha, eta, lambda];
                     else
-                        Y(  i) = y;
-                        K(  i) = 1;
-                        J(  i) = n;
-                        X(i,:) = v_p(t_m{m}{w})';
-
-                        %this is the "initialization" step from the algorithm
-                        epsilon(i) = 0; % we don't use for a few iterations
-                        beta   (i) = 0; % we don't use for a few iterations
-                        var    (i) = 0; % we don't use for a few iterations
-                        alpha  (i) = 1;
-                        eta    (i) = 1;
-                        lambda (i) = 0; % we don't use for a few iterations
+                        %this is the "initialization" step from the algorithm; we don't use many of these for a few iterations.
+                              %[k, Y, beta, var, sig_sq, alpha, eta, lambda]
+                        Z(i) = [1, y,    0,   0,      0,     1,   1,      0];
+                        X(i) = v_p(t_m{m}{w})';
                     end
                 end
             end
@@ -176,8 +145,8 @@ function [policy, time] = kla_mem(domain, reward)
 
         start = tic;
 
-            x = full(X(K > 0, :));
-            y = full(Y(K > 0   ));
+            x = cell2mat(values(X)');
+            y = cellfun(@(z) z(2), values(Z))';
 
             %https://www.mathworks.com/help/stats/fitrsvm.html#busljl4-BoxConstraint
             if iqr(y) < .0001
@@ -195,4 +164,23 @@ function [policy, time] = kla_mem(domain, reward)
     start = tic;
         policy = @(s) best_action_from_state(s, a_f(s), t_d, v_f);
     time(6) = time(6) + toc(start);
+end
+
+function se = SE(Z,i)
+    if isKey(Z,i)
+        z = Z(i);
+        se = sqrt(z(8)*z(5));
+    else
+        se = max([cellfun(@(z) (z(1)>=3)*sqrt(z(8)*z(5)), values(Z)), 0]);
+    end
+end
+
+function se = BI(Z,i)
+    
+    if isKey(Z,i)
+        z = Z(i);
+        se = z(3);
+    else
+        se = mean([cellfun(@(z) (z(1)>=3)*z(3), values(Z)) 0]);
+    end
 end
