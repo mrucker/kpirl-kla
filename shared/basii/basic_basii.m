@@ -109,7 +109,7 @@ end
 
 function subv = ind2subv(siz,ndx)
     
-    [out{1:length(siz)}] = ind2sub(siz,ndx); 
+    [out{1:length(siz)}] = ind2sub(flip(siz),ndx); 
     
     subv = cell2mat(out') .* (ndx > 0);
 end
