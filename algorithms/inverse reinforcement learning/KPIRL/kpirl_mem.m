@@ -1,69 +1,89 @@
 function [reward_function, time_measurements] = kpirl_mem(domain)
 
     a_tic = tic;
-        [E_t          ] = feval([domain '_trajectories']);
-        [r_l, r_i, r_p] = feval([domain '_reward_basii']);
-        [parameters   ] = feval([domain '_parameters']);
+        [E_t       ] = feval([domain '_expert_trajectories']);
+        [r_i, r_p  ] = feval([domain '_reward_basii']);
+        [parameters] = feval([domain '_parameters']);
 
         epsilon = parameters.epsilon;
         gamma   = parameters.gamma;
         kernel  = parameters.kernel;
 
-        r_n = r_i();
-        r_p = r_p(r_l());
-        r_e = @(s) double((1:r_n)' == r_i(r_l(s)));
+        X = containers.Map('KeyType','double','ValueType','any');
 
-        E = expectation_from_trajectories(E_t, r_e, gamma);
+        s_E = calculate_visitation(E_t, gamma, r_i);
+        X   = cat_hashtable(X, keys(s_E), num2cell(r_p(keys(s_E)),1));
 
-        rs = {};
-        ss = {};
-        sb = {};
-        ts = {};
+        r_f = {};
+        s_e = {};
+        s_b = {};
+        t_s = {};
 
         i = 0;
-
-        while true
+        
+        while 1
             i = i + 1;
-            
+
             tic_id = tic;
                 if i == 1
-                    rs{i} = rand(1,r_n);
-                    ts{i} = Inf;
+                    r_w    = rand(r_p(),1);
+                    r_f{i} = @(s) r_w'*r_p(s);
+                    t_s{i} = Inf;
                 else
-                    nz    = (E ~= 0) | (sb{i-1} ~= 0);
-                    rr    = kernel(r_p(:,nz),r_p      );
-                    rt    = kernel(r_p(:,nz),r_p(:,nz));
 
-                    rs{i} = (E(nz)-sb{i-1}(nz))'*rr;
-                    ts{i} = sqrt(E(nz)'*rt*E(nz) + sb{i-1}(nz)'*rt*sb{i-1}(nz) - 2*E(nz)'*rt*sb{i-1}(nz));
+                    r_w    = cell2mat(values(sub_hashtables(s_E, s_b{i-1})))';
+                    r_x    = cell2mat(values(X));
+
+                    r_f{i} = @(s) r_w'*kernel(r_x, r_p(s));
+
+                    t_g    = kernel(cell2mat(values(X)), cell2mat(values(X)));
+                    t_E    = cell2mat(values(pad_hashtable(s_E     , keys(X), 0)))';
+                    t_b    = cell2mat(values(pad_hashtable(s_b{i-1}, keys(X), 0)))';
+                    t_s{i} = sqrt(t_E'*t_g*t_E + t_b'*t_g*t_b - 2*t_E'*t_g*t_b);
                 end
 
-                ss{i} = feval([domain, '_expectations'], @(s) rs{i}(r_i(r_l(s))));
+                s_t    = feval([domain, '_reward_trajectories'], r_f{i});
+                s_e{i} = calculate_visitation(s_t, gamma, r_i);
+                X      = cat_hashtable(X, keys(s_e{i}), num2cell(r_p(keys(s_e{i})),1));
 
                 if i == 1
-                    sb{i} = ss{i};
+                    s_b{i} = s_e{i};
                 else
-                    nz    = (E ~= 0) | (sb{i-1} ~= 0) | (ss{i} ~= 0);
-                    rb    = kernel(r_p(:,nz), r_p(:,nz));
+                    s_k  = keys(X);
+                    s_g  = kernel(cell2mat(values(X)), cell2mat(values(X)));
 
-                    sn    = (ss{i}(nz)-sb{i-1}(nz))'*rb*(    E(nz)-sb{i-1}(nz));
-                    sd    = (ss{i}(nz)-sb{i-1}(nz))'*rb*(ss{i}(nz)-sb{i-1}(nz));
-                    sb{i} = sb{i-1} + (sn/sd) * (ss{i}-sb{i-1});
+                    s_1 = sub_hashtables(s_e{i},s_b{i-1});
+                    s_2 = sub_hashtables(   s_E,s_b{i-1});
+                    s_3 = s_b{i-1};
+
+                    s_1  = cell2mat(values(pad_hashtable(s_1, s_k, 0)))';
+                    s_2  = cell2mat(values(pad_hashtable(s_2, s_k, 0)))';
+                    s_3  = cell2mat(values(pad_hashtable(s_3, s_k, 0)))';
+
+                    s_n    = s_1'*s_g*s_2;
+                    s_d    = s_1'*s_g*s_1;
+                    s_v    = s_3 + (s_n/s_d) * s_1;
+
+                    s_b{i} = containers.Map(s_k, num2cell(s_v'));
                 end
             time_measurements = toc(tic_id);
 
             if ~exist('silent', 'var')
-                fprintf('Completed IRL iteration, i=%03d, t=%8.6f, time=%06.3f\n',[i,ts{i},time_measurements]);
+                fprintf('Completed IRL algorithm, i=%03d, t=%8.6f, time=%06.3f\n',[i,t_s{i},time_measurements]);
             end
-            
-            if  (abs(ts{i}-ts{i-1}) <= epsilon) || (ts{i} <= epsilon)
+
+            if  (i > 1) && (abs(t_s{i}-t_s{i-1}) <= epsilon) || (t_s{i} <= epsilon)
                 break;
             end
         end
 
-        sm = cell2mat(ss);
-        nz = (E ~= 0) | any(sm ~= 0,2);
-        rg = kernel(r_p(:,nz), r_p(:,nz));
+        for i = 1:numel(s_e)
+        end
+        
+        t_E = cell2mat(values(pad_hashtable(s_E, keys(X), 0)))';
+        t_m = cell2mat(cellfun(@(s) { cell2mat(values(pad_hashtable(s,keys(X),0)))' }, s_e));
+        t_g = kernel(cell2mat(values(X)), cell2mat(values(X)));
+        t_d = t_E-t_m;
 
         %Abbeel and Ng suggested solving a convex optimization problem and choosing
         %the ss with the largest coefficient. This approach didn't seem to have a big
@@ -71,9 +91,67 @@ function [reward_function, time_measurements] = kpirl_mem(domain)
         %external solvers like CVX. Therefore, we use this method to make this code
         %more accessible to new developers. If you are an advanced user and want to use
         %the convex optimization approach then you need to replace this line.
-        [~,m_i] = min(diag((E(nz)-sm(nz,:))'*rg*(E(nz)-sm(nz,:))));
+        [~,m_i] = min(diag(t_d'*t_g*t_d));
 
-        reward_function = rs{m_i};
+        reward_function = r_f{m_i};
     time_measurements = toc(a_tic);
 
+end
+
+function visitation_hashtable = calculate_visitation(trajectories, gamma, r_i)
+
+    visitation_hashtable = containers.Map('KeyType','double','ValueType','any');
+
+    for m = 1:numel(trajectories)
+        for t = 1:size(trajectories{m},2)
+
+            if iscell(trajectories{m})
+                key = r_i(trajectories{m}{t});
+            else
+                key = r_i(trajectories{m}(:,t));
+            end
+
+            if ~isKey(visitation_hashtable, key)
+                visitation_hashtable(key) = 0;
+            end
+            
+            visitation_hashtable(key) = visitation_hashtable(key) + gamma^(t-1);
+            
+        end
+    end
+
+    for key = keys(visitation_hashtable)
+        visitation_hashtable(key{1}) = visitation_hashtable(key{1}) / numel(trajectories);
+    end
+end
+
+function padded_hashtable = pad_hashtable(hashtable, keys, value)
+    padded_hashtable = cat_hashtable(hashtable, keys, repmat(value,1,numel(keys)));
+end
+
+function subbed_hashtable = sub_hashtables(hashtable1, hashtable2)
+    subbed_hashtable = containers.Map('KeyType','double','ValueType','any');
+    
+    for key = [keys(hashtable1), keys(hashtable2)]
+        
+        if isKey(hashtable1,key)
+            val1 = hashtable1(key{1});
+        else
+            val1 = 0;
+        end
+        
+        if isKey(hashtable2,key)
+            val2 = hashtable2(key{1});
+        else
+            val2 = 0;
+        end
+        
+        subbed_hashtable(key{1}) = val1 - val2;
+    end
+end
+
+function catted_hashtable = cat_hashtable(hashtable, keys, values)
+    new_hashtable = containers.Map(keys, values);
+    
+    catted_hashtable = [new_hashtable; hashtable];
 end

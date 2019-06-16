@@ -9,7 +9,6 @@ function trajectories = krand_reward_trajectories(reward)
     steps   = parameters.steps;
     samples = parameters.samples;
 
-    policy      = kla_spd(domain, reward);
-    
+    policy       = kla_mem(domain, reward);
     trajectories = trajectories_from_simulations(policy, t_b, s_1, samples, steps);
 end

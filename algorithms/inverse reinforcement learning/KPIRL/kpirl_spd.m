@@ -27,7 +27,7 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
 
             tic_id = tic;
                 if i == 1
-                    r_v    = rand(1,r_n);
+                    r_v    = rand(size(r_p,1),1)'*r_p;
                     r_f{i} = @(s) r_v(r_i(s));
                     t_s{i} = Inf;
                 else
@@ -39,8 +39,8 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
                     t_s{i} = sqrt(s_E(n_z)'*t_g*s_E(n_z) + s_b{i-1}(n_z)'*t_g*s_b{i-1}(n_z) - 2*s_E(n_z)'*t_g*s_b{i-1}(n_z));
                 end
 
-                r_t    = feval([domain, '_reward_trajectories'], r_f{i});
-                s_e{i} = expectation_from_trajectories(r_t, r_e, gamma);
+                s_t    = feval([domain, '_reward_trajectories'], r_f{i});
+                s_e{i} = expectation_from_trajectories(s_t, r_e, gamma);
 
                 if i == 1
                     s_b{i} = s_e{i};
@@ -59,7 +59,7 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
 
             if  (i > 1) && (abs(t_s{i}-t_s{i-1}) <= epsilon) || (t_s{i} <= epsilon)
                 break;
-            end
+            end            
         end
 
         s_m = cell2mat(s_e);

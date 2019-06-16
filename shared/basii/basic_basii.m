@@ -47,6 +47,11 @@ function [b_i, b_p] = basic_basii(partitions, state2levels, level2features)
     end
 
     function levels = indexes2levels(indexes)
+        
+        if iscell(indexes)
+            indexes = cell2mat(indexes);
+        end
+        
         cum               = indexes - cumsum(n_combos_per_partition') + n_combos_per_partition';
         valid_cum         = (cum > 0) & (cum <= n_combos_per_partition');
         partition_indexes = cum .* valid_cum;
@@ -71,11 +76,26 @@ function [b_i, b_p] = basic_basii(partitions, state2levels, level2features)
 end
 
 function is = is_states(in)
-    is = size(in,1) > 1 || iscell(in) || isstruct(in);
+
+    if iscell(in) && ~isstruct(in{1}) && size(in{1},1) == 1
+        is = false;
+    elseif ~iscell(in) && ~isstruct(in) && size(in,1) == 1
+        is = false;
+    else
+        is = true;
+    end
+
 end
 
 function is = is_indexes(in)
-    is = size(in,1) == 1 && ~iscell(in) && isnumeric(in) && all(floor(in) == in);
+
+    if iscell(in) && size(in{1},1) == 1 && size(in{1},2) == 1
+        is = true;
+    elseif size(in,1) == 1
+        is = true;
+    else
+        is = false;
+    end
 end
 
 function partition_index_matrix = create_partition_index_matrix(partitions)
@@ -108,8 +128,8 @@ function output = statesfun(func, states)
 end
 
 function subv = ind2subv(siz,ndx)
-    
+
     [out{1:length(siz)}] = ind2sub(flip(siz),ndx); 
-    
-    subv = cell2mat(out') .* (ndx > 0);
+
+    subv = flip(cell2mat(out'),1) .* (ndx > 0);
 end
