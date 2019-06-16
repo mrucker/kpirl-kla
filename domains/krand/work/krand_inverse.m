@@ -29,5 +29,4 @@ for i = 1:trajectory_count
 end
 
 header = {'row', 'col', 'time', 'trajectory', 'step'};
-states = [header; num2cell(states)];
-writecell(states, 'trajectory.csv');
+writetable(cell2table([header; num2cell(states)]), 'trajectory.csv');
