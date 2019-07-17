@@ -3,7 +3,7 @@ function [policy, time] = kla_spd(domain, reward)
     gcp; %this is here to force the parallel pool to begin before we start timing
 
     start = tic;
-        [v_i, v_p  ] = feval([domain '_value_basii']);
+        [v_i, v_p  ] = feval([domain '_value_basis']);
         [s_1       ] = feval([domain '_random']);
         [a_f       ] = feval([domain '_actions']);
         [t_d, t_s  ] = feval([domain '_transitions']);

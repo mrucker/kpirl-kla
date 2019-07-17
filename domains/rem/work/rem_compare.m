@@ -5,14 +5,16 @@ clear; close all; run(fullfile(fileparts(which(mfilename)), '..', '..', '..', 'q
 
 domain = 'rem';
 
-eval_rewds = 4;
+rng(1)
+
+eval_rewds = 1;
 eval_gamma = 1;
 eval_steps = 10;
 eval_samps = 400;
 
 daps = {
-    'kla_spd T=1 W=3;', 'kla_spd', struct('v_basii', '1a', 'N', 20, 'M', 090, 'T', 1 , 'W', 3, 'gamma', 1);
-    'kla_mem T=1 W=3;', 'kla_mem', struct('v_basii', '1a', 'N', 20, 'M', 090, 'T', 1 , 'W', 3, 'gamma', 1);    
+    'kla_spd T=1 W=3;', 'kla_spd', struct('v_basis', '1a', 'N', 20, 'M', 090, 'T', 1 , 'W', 3, 'gamma', 1);
+    'kla_mem T=1 W=3;', 'kla_mem', struct('v_basis', '1a', 'N', 20, 'M', 090, 'T', 1 , 'W', 3, 'gamma', 1);    
 };
 
 algorithm_parameter_compare(domain, daps, @random_linear_reward, eval_rewds, eval_samps, eval_steps, eval_gamma)

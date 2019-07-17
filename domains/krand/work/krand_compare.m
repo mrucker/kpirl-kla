@@ -5,15 +5,19 @@ clear; close all; run(fullfile(fileparts(which(mfilename)), '..', '..', '..', 'q
 
 domain = 'krand';
 
-eval_rewds = 100; %How many times it runs KLA
-eval_gamma = 1;    %Gamma associated with value function (how much we discount each successive reward)
-eval_steps = 200;  %How many states does the algorithm generate to see how good the value function is?
-eval_samps = 75;  %Making this many trajectories
+rng(1)
+
+eval_rewds = 1;  %How many times it runs KLA
+eval_gamma = 1;  %Gamma associated with value function (how much we discount each successive reward)
+eval_steps = 20; %How many states does the algorithm generate to see how good the value function is?
+eval_samps = 10; %Making this many trajectories
+
+daps = {};
 
  for n = [20 30]
      for m = [40]
          for t = [25]
-             daps(end+1, 1:3) = {sprintf('n=%d,m=%d,t=%d', [n,m,t])', 'kla_mem', struct('v_basii', '1a', 'N', n, 'M', m, 'T', t , 'W', 5, 'gamma', .9)};
+             daps(end+1, 1:3) = {sprintf('n=%d,m=%d,t=%d', [n,m,t])', 'kla_mem', struct('v_basis', '1a', 'N', n, 'M', m, 'T', t , 'W', 5, 'gamma', .9)};
          end
      end
  end

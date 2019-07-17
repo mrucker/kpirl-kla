@@ -3,8 +3,8 @@ function bl = bin_levels(val, min_val, max_val, bins)
     %fastest
     bs = bins/(max_val-min_val);
     bl = ceil(bs*(val-min_val));
-    bl = max (bl, 1   );
-    bl = min (bl, bins);
+    bl = max (bl, 1   , 'includenan');
+    bl = min (bl, bins, 'includenan');
     
     %%second fastest
     %bl = min(ceil((vals+.01)/bin_s), bin_n);

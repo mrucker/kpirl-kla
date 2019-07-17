@@ -1,4 +1,4 @@
-function phi = huge_value_basii_klspi(state, actions, dic_data, para); persistent t_d v_i v_p;
+function phi = huge_value_basis_klspi(state, actions, dic_data, para); persistent t_d v_i v_p;
 
     if(isempty(t_d))
         [t_d] = huge_transitions();

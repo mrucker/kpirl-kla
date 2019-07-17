@@ -11,7 +11,7 @@ end
 function d = default_params()
     d = struct(...
          'rand_ns', 10     ...
-        ,'epsilon',.001    ... //when to exit kpirl
+        ,'epsilon', .001   ... //when to exit kpirl
         ,'gamma'  , 0.9    ...
         ,'steps'  ,  10    ... 
         ,'samples', 100    ...
@@ -19,7 +19,7 @@ function d = default_params()
         ,'M'      ,  90    ... //trajectory samples on each policy iteration in KLA
         ,'T'      ,  04    ... //trajectory length for each sample in KLA
         ,'W'      ,  04    ... //
-        ,'v_basii', '1a'   ... //
+        ,'v_basis', '1a'   ... //
         ,'kernel' , k_dot()... //the kernel function used in kpirl
     );
 end

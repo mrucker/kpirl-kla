@@ -11,7 +11,7 @@ KLA is an RL algorithm created specifically to be used with KPIRL in large state
 
 * Matlab
 	* Statistics and Machine Learning Toolbox (for `pdist` in k_norm.m)
-	* Parallel Computing Toolbox (for `parfor` in kla.m )
+	* Parallel Computing Toolbox (for `parfor` in kla.m and trajectories_from_simulations.m)
 	
 ## Directory Structure
 

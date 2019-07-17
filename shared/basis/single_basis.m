@@ -1,4 +1,4 @@
-function [v_l, v_i, v_p] = single_basii()
+function [v_l, v_i, v_p] = single_basis()
 
     v_l = @states2levels;
     v_p = @levels2phis;
