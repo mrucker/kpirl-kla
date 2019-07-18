@@ -2,7 +2,7 @@ clear; close all; run(fullfile(fileparts(which(mfilename)), '..', '..', '..', 'q
 
 domain = 'huge';
 
-rng(2)
+rng(4)
 
 eval_rewds = 1;
 eval_gamma = .9;

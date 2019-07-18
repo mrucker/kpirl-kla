@@ -3,8 +3,9 @@ function [b_i, b_p] = multi_basis(partitions, state2feature, feature2level, leve
     if ~iscell(partitions)
         partitions = {partitions};
     end
+    
+    feature2basis = make_feature2basis();
 
-    n_features             = sum(cellfun(@numel, partitions));
     n_combos_per_partition = cellfun(@prod , partitions);
     partition_index_matrix = create_partition_index_matrix(partitions);
 
@@ -20,7 +21,7 @@ function [b_i, b_p] = multi_basis(partitions, state2feature, feature2level, leve
         if nargin == 0
             index = sum(cellfun(@prod, partitions));
         else
-            index = level2index(features2level(states2feature(input)));
+            index = states2index(input);
         end
     end
 
@@ -30,41 +31,38 @@ function [b_i, b_p] = multi_basis(partitions, state2feature, feature2level, leve
         if nargin == 0
             basis = numel(levels2basis(index2level(1)));
         elseif is_state(input)
-            basis = levels2basis(features2level(states2feature(input)));
+            basis = states2basis(input);
         else
             basis = levels2basis(index2level(input));
         end
     end
 
+    function f = states2basis(states)
+        features = states2feature(states);
+                
+        f = cell2mat(rowfuns(feature2basis, features));
+    end
+
+    function f = states2index(states)
+        features = states2feature(states);
+        f = level2index(features2level(features));
+    end
+
     function f = states2feature(states)
-        if(numel(state2feature) == 1)
-            f = statesfun(state2feature{1}, states);
-        else
-            f = cell2mat(cellfun(@(s2f) { statesfun(s2f, states) }, state2feature));
-        end
-        
-        assert(all(any(~isnan(f),1)), 'bad features');
+        f = cell2mat(cellfun(@(s2f) { statesfun(s2f, states) }, state2feature));
+
+        assert(~any(all(isnan(f),1)), 'bad features');
     end
 
     function l = features2level(features)
-        if(numel(feature2level) == 1)
-            l = feature2level{1}(features);
-        else
-            l = cell2mat(arrayfun(@(i) { feature2level{i}(features(i,:)) }, 1:n_features)');
-        end
-        
-        l(isnan(l)) = 0;
-        
-        assert(all(any(l~=0,1)), 'bad levels');
-        assert(all(l(:)>=0)    , 'bad levels');
+        l = nan2zero(cell2mat(rowfuns(feature2level, features)));
+
+        assert(~any(all(l==0,1)), 'bad levels');
+        assert( all(all(l>=0,1)), 'bad levels');
     end
 
     function b = levels2basis(levels)
-        if(numel(level2basis) == 1)
-            b = level2basis{1}(levels);
-        else
-            b = cell2mat(arrayfun(@(i) { level2basis{i}(levels(i,:)) }, 1:n_features)'); 
-        end
+        b = cell2mat(rowfuns(level2basis, levels));
     end
 
     function l = index2level(index)
@@ -86,6 +84,28 @@ function [b_i, b_p] = multi_basis(partitions, state2feature, feature2level, leve
         assert(all(sum(current_partition,1)==1), 'bad partitions')
 
         i = 1 + sum((partition_indexes + n_combos_cum_sum) .* current_partition,1);
+    end
+    
+    function f = make_feature2basis()
+        n_feature2basis = max(numel(feature2level), numel(level2basis));
+        f               = cell(n_feature2basis,1);
+    
+        for i = 1:n_feature2basis
+
+            if numel(feature2level) == 1
+                f2l = feature2level{1};
+            else
+                f2l = feature2level{i};
+            end
+            
+            if numel(level2basis) == 1
+                l2b = level2basis{1};
+            else
+                l2b = level2basis{i};
+            end
+            
+            f{i} = @(feature) l2b(nan2zero(f2l(feature)));
+        end
     end
 end
 
@@ -131,9 +151,30 @@ function partition_index_matrix = create_partition_index_matrix(partitions)
     end
 end
 
+function output = nan2zero(A)
+    output=A;
+    output(isnan(output)) = 0;
+end
+
+function output = rowfuns(funcs, rows)
+    n_funcs = size(funcs,1);
+
+    output = cell(n_funcs,1);
+
+    if n_funcs == 1
+        output = {funcs{1}(rows)};
+    else
+        for i = 1:n_funcs
+            output{i} = funcs{i}(rows(i,:));
+        end
+    end
+
+end
+
 function output = statesfun(func, states)
-    if iscell(states)
-        output = cell2mat(cellfun(func, states, 'UniformOutput',false));
+    
+    if iscell(states) || isstruct(states)
+        output = cell2mat(cellfun(func, states, 'UniformOutput', false));
     elseif isstruct(states)
         output = cell2mat(arrayfun(func, states, 'UniformOutput', false));
     else
@@ -143,8 +184,6 @@ end
 
 function subv = ind2subv(siz,index)
     %https://homepages.inf.ed.ac.uk/imurray2/code/imurray-matlab/ind2subv.m
-    
     [out{1:length(siz)}] = ind2sub(flip(siz),index); 
-
     subv = flip(cell2mat(out'),1) .* (index > 0);
 end
