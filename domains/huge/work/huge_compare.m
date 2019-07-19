@@ -1,5 +1,8 @@
 clear; close all; run(fullfile(fileparts(which(mfilename)), '..', '..', '..', 'qs_paths.m'));
 
+%WARNING: reducing eval_rewds will make the expected average estimate of V less precise making performance comparisons more suspect
+%WARNING: reducing eval_samps will make each individual estimate of V less precise making performance comparisons more suspect
+
 domain = 'huge';
 
 rng(4)
@@ -7,7 +10,7 @@ rng(4)
 eval_rewds = 1;
 eval_gamma = .9;
 eval_steps = 10;
-eval_samps = 500; %warning: reducing this will make the estimate of V more imprecise -- making performance comparisons more suspect
+eval_samps = 500;
 
 daps = {
     %'kla_spd  1a' , 'kla_spd'  ,struct('v_basis', '1a');

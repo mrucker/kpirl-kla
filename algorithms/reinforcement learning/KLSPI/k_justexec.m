@@ -24,9 +24,6 @@ function [steps, totdrew, toturew] = justexec(initial_state, simulator, ...
 % undiscounted reward collected during the episode. 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%  
-  
-  %%% Initialize the random number generator to a random state
-  rand('state', sum(100*clock));
 
   %%% Initialize variables
   totdrew = 0;

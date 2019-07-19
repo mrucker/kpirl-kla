@@ -173,7 +173,7 @@ end
 
 function output = statesfun(func, states)
     
-    if iscell(states) || isstruct(states)
+    if iscell(states)
         output = cell2mat(cellfun(func, states, 'UniformOutput', false));
     elseif isstruct(states)
         output = cell2mat(arrayfun(func, states, 'UniformOutput', false));

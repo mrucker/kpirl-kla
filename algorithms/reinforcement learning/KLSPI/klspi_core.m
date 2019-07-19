@@ -2,9 +2,6 @@ function [policy, all_policies, Dic_t, para] = klspi_core(domain, algorithm, max
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-%%% Initialize the random number generator to a random state
-rand('state', sum(100*clock));
-
 if nargin<8
     initialize_policy = [domain '_initialize_policy'];
     policy = feval(initialize_policy, 0.0, discount, basis);

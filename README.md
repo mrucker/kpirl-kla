@@ -29,38 +29,51 @@ KLA is an RL algorithm created specifically to be used with KPIRL in large state
 		* _algos_ - contains the necessary function implementations for the various algorithms
 		* _work_ - catch all folder for domain specific work/research (no standardization here)
 * _shared_ - a collection of utility functions that can be used across domains
-	* _kernel_ - implementations of popular kernel methods that can be interchanged for KPIRL
+	* _kernel_ - implementations of popular kernel methods that can be used with KPIRL
+	* _basis_ - utility functions to turn features into the basis forms required by the algorithms
 	
 ## Quick Start
 
-Two example files have been provided in the root directory for a "quick start". These files use the "huge" domain, but could easily be used with any domain. The files are executable "out-of-the-box". Further documentation is provided in-line within the files.
+Two example files have been provided in the root directory for a "quick start". These files use the "huge" domain, but could easily be used with any domain. The files should be executable "out-of-the-box". Further documentation is provided in-line within the files.
 
 * _qs_compare.m_ - compares the performance of three different RL algorithms in the "huge" domain. To compare performance a number of random reward functions are generated, then a policy is learned for each of these functions using the RL algorithms. Using the learned policies a number of random episodes are generated. Each episode's value is calculated, and the expected value for each RL algorithm is output for comparison.
 
 * _qs_inverse.m_ - uses kpirl on the "huge" domain to calculate the reward function.
 
-* _qs_paths.m_ - adds all required paths to Matlab until the end of the current session
+* _qs_paths.m_ - adds all required paths to Matlab for the duration of the current session
 
 ## Algorithm Functions
 
 ### KPIRL Functions
+	
+	* <domain>_reward_basis
+		* Input:
+			* there is no input for this function
+		* Output:
+			* r_i -- a function that can:
+				* take no input and return the number of basis combinations
+				* take a matrix of states and return a row vector of the basis index for each state
+				* take a cell array of states and return a row vector of the basis index for each state
+			* r_p -- a function that can:
+				* take no input and return the number of basis features
+				* take a matrix of states or basis indexes and return a matrix of basis features
+				* take a cell array of states or basis indexes and return a matrix of basis features
+		* examples:
+			* given a state _s_ the following predicate is always true `r_p(_s_) == r_p(r_i(_s_))`
+			* to get all potential basis permutations one can do `r_p(1:r_i())`
+			* to get a random basis permutation one can do `r_p(randi(r_i()))`
+			* to pre-allocate a basis matrix for _n_ states one could do `zeros(r_p(), _n_)`
 
-	* <domain>_expectations
+			
+	* <domain>_reward_trajectories
 		* Input:
 			* reward -- a function which takes a state and returns a reward value (i.e. @(state) => reward value). The function should be able to take a set of states (represented by a matrix or cell array, [s_1, s_2, s_3 ...]) and return a row vector of rewards ([r_1, r_2, r_3]).
 		* Output:
-			* expectation -- a column vector whose size equals the number of distinct reward function basii sets for the proposed IRL reward function (this is not necessarily the number of states), and whose rows contain the percentage of time each row basii is visited when following the given reward. For example, if one is learning a reward function for tic-tac-toe, the number of states is 19,683. One set of basii would a dummy variable for every single state. In this case the returned column vector would have 19,683 elements representing the percentage of time in each state when optimally pursuing the passed in reward. Another potential set of basii might simply be the number of spaces filled with the agent's pieces. In this case there would be six basii representations (0-5 marks, or five if one wanted to exclude the zero basii), and the returned expectation column would approximately be 1/6 for each basii since each basii is visited determinstically each game (with some slight variation depending on how quickly games are won or lost and if one goes first or second).
-	
-	* <domain>_reward_basii
-		* Output: 
-			* r_i -- a function that takes a matrix or cell array of state(s) and returns a row vector containing the basii index for the state(s)
-			* r_p -- a matrix whose columns contain all reward basii representations. 
-		* Notes:
-			* The basii representation for a given state can be retrieved by combining the returns (i.e. reward_basii_for_state = r_p(:,r_i(state)) ).
-			
-	* <domain>_trajectories
+			* trajectories -- a cell array of optimal trajectories when following the given reward function. Trajectories can be represented as either a matrix, whose column vectors are states or as a cell array themselves. (i.e., trajectories = {trajectory_1, trajectory_2, ...} and trajectory_1 = <[s_1, s_2, ...] | {s_1, s_2, ...}>). In order to get an accurate understanding of how the reward function effects behavior the trajectories should be generated using randomly selected initial state within the MDP.
+
+	* <domain>_expert_trajectories
 		* Output:
-			* trajectories -- a cell array of expert trajectories. Trajectories can be represented as either a matrix, whose column vectors are states or as a cell array themselves. (i.e., trajectories = {trajectory_1, trajectory_2, ...} and trajectory_1 = <[s_1, s_2, ...] | {s_1, s_2, ...}>)
+			* trajectories -- a cell array of observed expert trajectories. Trajectories can be represented as either a matrix, whose column vectors are states or as a cell array themselves. (i.e., trajectories = {trajectory_1, trajectory_2, ...} and trajectory_1 = <[s_1, s_2, ...] | {s_1, s_2, ...}>)
 		
 	* <domain>_parameters
 		* Input:
@@ -73,7 +86,7 @@ Two example files have been provided in the root directory for a "quick start". 
 	* \<domain\>_actions
 	* \<domain\>_random
 	* \<domain\>_transitions
-	* \<domain\>_value_basii
+	* \<domain\>_value_basis
 	* \<domain\>_parameters
 
 ### LSPI Functions
@@ -83,4 +96,4 @@ Two example files have been provided in the root directory for a "quick start". 
 ### KLSPI Functions
 	
 	* All the standard LSPI functions (see above referenced README)
-	* \<domain\>_value_basii_klspi
+	* \<domain\>_value_basis_klspi

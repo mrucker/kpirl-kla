@@ -45,7 +45,6 @@ function [v_i, v_p] = krand_reward_basis()
          v = states.hwy_maxsp;
          v(isnan(v)) = 0;
 
-         v = bin_levels(v, 0, 150, n_levels(3))';
     end
 
     function v = building_type(states)
@@ -61,7 +60,7 @@ function [v_i, v_p] = krand_reward_basis()
          posix_time             = states.time; %WARNING: this is correct as two lines, otherwise you get a crazy error
          time_of_day_in_seconds = seconds(timeofday(datetime(posix_time,'ConvertFrom','posixtime')));
          time_of_day_as_percent = time_of_day_in_seconds/seconds_in_day;
-         
+
          v = time_of_day_as_percent;
     end
 

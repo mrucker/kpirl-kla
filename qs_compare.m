@@ -1,6 +1,6 @@
 clear; close all; qs_paths;
 
-%WARNING: reducing eval_rwds will  make the expected average estimate of V less precise making performance comparisons more suspect
+%WARNING: reducing eval_rewds will make the expected average estimate of V less precise making performance comparisons more suspect
 %WARNING: reducing eval_samps will make each individual estimate of V less precise making performance comparisons more suspect
 
 domain = 'huge';

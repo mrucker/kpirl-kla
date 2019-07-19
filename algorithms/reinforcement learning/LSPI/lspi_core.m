@@ -93,10 +93,6 @@ function [policy, all_policies] = lspi_core(domain, algorithm, maxiterations, ..
 %                iteration, including the initial policy. 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
-  
-  %%% Initialize the random number generator to a random state
-  rand('state', sum(100*clock));
 
   
   

@@ -25,9 +25,6 @@ function [new_results, totdrew, toturew] = execute(initial_state, ...
 % discounted and undiscounted reward.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
-  %%% Initialize the random number generator to a random state
-  rand('state', sum(100*clock));
 
   %%% Initialize storage for new samples 
   empty_result.state = feval(simulator);
