@@ -5,7 +5,7 @@ function [policy, time] = klspi(domain, reward); global R;
     a_start = tic;
         R = reward;
 
-        clear [domain '_value_basii_klspi'];
+        clear [domain '_value_basis_klspi'];
         clear [domain '_simulator'];
 
         [parameters] = feval([domain '_parameters']);
@@ -16,7 +16,7 @@ function [policy, time] = klspi(domain, reward); global R;
         maxepisodes = parameters.M;
         maxsteps    = parameters.T;
         discount    = parameters.gamma;
-        basis       = [domain '_value_basii_klspi'];
+        basis       = [domain '_value_basis_klspi'];
         eval_alg    = 5; % 1->lsq; 2->lsqfast; 3->lsqbe; 4->lsqbefast; 5->klsq;
 
         policy = feval([domain '_initialize_policy'], 0.0, discount, basis);

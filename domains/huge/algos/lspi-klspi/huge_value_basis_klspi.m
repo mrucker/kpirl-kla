@@ -5,7 +5,9 @@ function phi = huge_value_basis_klspi(state, actions, dic_data, para); persisten
     end
 
     if(isempty(v_p))        
-        [v_i, v_p] = huge_value_basii();
+        [v_i, v_p] = huge_value_basis();
+        
+        v_p = v_p(1:v_i()); % all basis permuations
     end
     
     if(nargin == 0)

@@ -5,12 +5,14 @@ function phi = huge_value_basis_lspi(state, actions, ~, ~); persistent t_d v_i v
     end
 
     if(isempty(v_p))
-        [v_i, v_p] = huge_value_basii();
+        [v_i, v_p] = huge_value_basis();
 
-        %v_p = full_radial_basis_features(v_p());
-        %v_p = full_2nd_order_polynomial_features(v_p());
-        v_p = full_3rd_order_polynomial_features(v_p());
-        %v_p = full_2nd_order_polynomial_features(full_radial_basis_features(v_p()));
+        v_p = v_p(1:v_i()); %all basis
+        
+        %v_p = full_radial_basis(v_p);
+        %v_p = full_2nd_order_polynomial_basis(v_p);
+        v_p = full_3rd_order_polynomial_basis(v_p);
+        %v_p = full_2nd_order_polynomial_basis(full_radial_basis_features(v_p));
     end
     
     if(nargin == 0)
@@ -34,7 +36,7 @@ function phi = huge_value_basis_lspi(state, actions, ~, ~); persistent t_d v_i v
     end
 end
 
-function v_p = full_radial_basis_features(v_p)
+function v_p = full_radial_basis(v_p)
     LEVELS_N = [3 3 3 3 3 3 1 1 1 6];
     LEVELS_S = [1/2 1/2 1/2 1/2 1/2 1/2 .001 .001 .001 2/5];
 
@@ -48,7 +50,7 @@ function v_p = full_radial_basis_features(v_p)
     v_p = exp(-v_p);
 end
 
-function v_p = full_2nd_order_polynomial_features(v_p)
+function v_p = full_2nd_order_polynomial_basis(v_p)
 
     first_order_feature_count = size(v_p,1);
     
@@ -60,7 +62,7 @@ function v_p = full_2nd_order_polynomial_features(v_p)
     end
 end
 
-function v_p = full_3rd_order_polynomial_features(v_p)
+function v_p = full_3rd_order_polynomial_basis(v_p)
 
     first_order_feature_count = size(v_p,1);
     

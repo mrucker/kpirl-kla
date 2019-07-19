@@ -6,7 +6,7 @@ function [policy, time] = lspi(domain, reward); global R;
 
         R = reward;
 
-        clear [domain '_value_basii_lspi'];
+        clear [domain '_value_basis_lspi'];
         clear [domain '_simulator'];
 
         [parameters] = feval([domain '_parameters']);
@@ -17,7 +17,7 @@ function [policy, time] = lspi(domain, reward); global R;
         maxepisodes = parameters.M;
         maxsteps    = parameters.T;
         discount    = parameters.gamma;
-        basis       = [domain '_value_basii_lspi'];
+        basis       = [domain '_value_basis_lspi'];
         eval_alg    = 2;% 1->lsq; 2->lsqfast; 3->lsqbe; 4->lsqbefast;
 
         policy = feval([domain '_initialize_policy'], 0.0, discount, basis);
