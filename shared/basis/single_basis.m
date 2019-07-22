@@ -1,22 +1,22 @@
-function [v_l, v_i, v_p] = single_basis()
+function [b_i, b_p] = single_basis()
 
-    v_l = @states2levels;
-    v_p = @levels2phis;
-    v_i = @levels2indexes;
+    b_i = @input2index;    
+    b_p = @input2basis;
+    
 
-    function levels = states2levels(~)
+    function levels = input2index(input)
         if nargin == 0
             levels = 1;
         else
-            levels = 1;
+            levels = ones(1, size(input,2));
         end
     end
 
-    function phis = levels2phis(~)
-        phis = 1;
-    end
-
-    function indexes = levels2indexes(~)
-        indexes = 1;
+    function basis = input2basis(input)
+        if nargin == 0
+            basis = 1;
+        else
+            basis = ones(1, size(input,2));
+        end
     end
 end

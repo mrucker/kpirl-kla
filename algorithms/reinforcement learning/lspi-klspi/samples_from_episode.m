@@ -1,12 +1,19 @@
-function [new_results, totdrew, toturew] = k_execute(initial_state, ...
-						  simulator, ...
-						  policy, maxsteps, Dic, para)
+function [new_results, totdrew, toturew] = samples_from_episode(initial_state, simulator, policy, n_steps)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Copyright 2000-2002 
+%
+% Michail G. Lagoudakis (mgl@cs.duke.edu)
+% Ronald Parr (parr@cs.duke.edu)
+%
+% Department of Computer Science
+% Box 90129
+% Duke University, NC 27708
 % 
 %
-% [new_results, totdrew, toturew] = execute(initial_state, simulator,
-%                                           policy, maxsteps)
+% [new_results, totdrew, toturew] = samples_from_episode(initial_state, 
+%                                           simulator, policy, maxsteps)
 %
 % Executes one episode (of at most "maxsteps" steps) on the
 % "simulator" starting at the "initial_state" and using the "policy"
@@ -24,7 +31,7 @@ function [new_results, totdrew, toturew] = k_execute(initial_state, ...
   empty_result.nextstate = empty_result.state;
   empty_result.absorb = 0;
   
-  results = repmat(empty_result, 1, maxsteps);
+  results = repmat(empty_result, 1, n_steps);
   
   
   %%% Initialize variables
@@ -38,12 +45,12 @@ function [new_results, totdrew, toturew] = k_execute(initial_state, ...
 
   
   %%% Run the episode
-  while ( (steps < maxsteps) & (~endsim) )
+  while ( (steps < n_steps) && (~endsim) )
 
     steps = steps + 1;
 
     %%% Select action 
-    action = k_policy_function(policy, state, Dic, para);
+    action = policy_function(policy, state);
 
     %%% Simulate
     [nextstate, reward, endsim] = feval(simulator, state, action);

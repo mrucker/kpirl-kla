@@ -1,7 +1,7 @@
 clear; close all; run(fullfile(fileparts(which(mfilename)), '..', '..', '..', 'qs_paths.m'));
 
-%WARNING: reducing eval_rewds will make the expected average estimate of V less precise making performance comparisons more suspect
-%WARNING: reducing eval_samps will make each individual estimate of V less precise making performance comparisons more suspect
+%WARNING: reducing eval_rewds will make the estimate of E[V | DAP   ] less precise making performance comparisons more suspect
+%WARNING: reducing eval_samps will make the estimate of E[V | DAP, R] less precise making performance comparisons more suspect
 
 domain = 'huge';
 

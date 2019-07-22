@@ -1,4 +1,4 @@
-function [w, A, b] = lsq(samples, policy, new_policy)
+function new_policy = lsqbe_mem(samples, policy, new_policy)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -10,20 +10,18 @@ function [w, A, b] = lsq(samples, policy, new_policy)
 % Department of Computer Science
 % Box 90129
 % Duke University, NC 27708
+% 
 %
-%
-% [w, A, b] = lsq(samples, policy, new_policy)
+% new_policy = lsqbe_mem(samples, policy, new_policy)
 %
 % Evaluates the "policy" using the set of "samples", that is, it
 % learns a set of weights for the basis specified in new_policy to
 % form the approximate Q-value of the "policy" and the improved
-% "new_policy". The approximation is the fixed point of the Bellman
-% equation.
+% "new_policy". The approximation minimizes the bellman error.
 %
-% Returns the learned weights w and the matrices A and b of the
-% linear system Aw=b. 
+% Returns the new policy with weights set to w of Aw=b.
 %
-% See also lsqfast.m for a faster (batch) implementation. 
+% See also lsqbe_spd.m for a faster implementation.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
@@ -32,9 +30,7 @@ function [w, A, b] = lsq(samples, policy, new_policy)
   howmany = length(samples);
   k = feval(new_policy.basis);
   A = zeros(k, k);
-  b = zeros(k, 1);
-  mytime = cputime;
-  
+  b = zeros(k, 1);  
   
   %%% Loop through the samples 
   for i=1:howmany
@@ -53,36 +49,20 @@ function [w, A, b] = lsq(samples, policy, new_policy)
     else
       nextphi = zeros(k, 1);
     end
-  
-    
+
     %%% Update the matrices A and b
-    A = A + phi * (phi - new_policy.discount * nextphi)';
-    b = b + phi * samples(i).reward;
+    A = A + (phi - new_policy.discount * nextphi) * (phi - new_policy.discount * nextphi)';
+    b = b + (phi - new_policy.discount * nextphi) * samples(i).reward;
     
   end
 
-  phi_time = cputime - mytime;
-  disp(['CPU time to form A and b : ' num2str(phi_time)]);
-  mytime = cputime;
-  
-  %%% Solve the system to find w
-  rankA = rank(A);
-  
-  rank_time = cputime - mytime;
-  disp(['CPU time to find the rank of A : ' num2str(phi_time)]);
-  mytime = cputime;
-  
-  disp(['Rank of matrix A : ' num2str(rankA)]);
-  if rankA==k
-    disp('A is a full rank matrix!!!');
+  if rank(A)==k
     w = A\b;
   else
-    disp(['WARNING: A is lower rank!!! Should be ' num2str(k)]);
     w = pinv(A)*b;
   end
   
-  solve_time = cputime - mytime;
-  disp(['CPU time to solve Aw=b : ' num2str(solve_time)]);
+  new_policy.weights = w;
   
   return
   

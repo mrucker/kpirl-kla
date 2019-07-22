@@ -1,9 +1,18 @@
-function new_samples = k_collect_samples(domain, maxepisodes, maxsteps, policy) 	
+function new_samples = samples_from_episodes(domain, n_episodes, n_steps, policy) 	
   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
+% Copyright 2000-2002 
 %
-% new_samples = collect_samples(domain, maxepisodes, maxsteps, policy)
+% Michail G. Lagoudakis (mgl@cs.duke.edu)
+% Ronald Parr (parr@cs.duke.edu)
+%
+% Department of Computer Science
+% Box 90129
+% Duke University, NC 27708
+%
+%
+% new_samples = samples_from_episodes(domain, n_episodes, n_steps, policy)
 %
 % Collects samples from the "domain" using the "policy" by running at
 % most "maxepisodes" episodes each of which is at most "maxsteps"
@@ -57,16 +66,8 @@ function new_samples = k_collect_samples(domain, maxepisodes, maxsteps, policy)
 
 
   %%% Initialize some variables
-  simulator = [domain '_simulator'];
-  initialize_policy = [domain '_initialize_policy'];
-  initialize_state = [domain '_initialize_state'];
-  
-  
-  %%% Initialize a purely random policy (if one is not provided)
-  if nargin<7
-    policy = feval(initialize_policy, 1.0, 0.0, @fake_basis);
-  end
-  
+  simulator         = [domain '_simulator'];
+  initialize_state  = [domain '_initialize_state'];  
 
   %%% Initialize storage for new samples 
   empty_result.state = feval(simulator);
@@ -75,8 +76,7 @@ function new_samples = k_collect_samples(domain, maxepisodes, maxsteps, policy)
   empty_result.nextstate = empty_result.state;
   empty_result.absorb = 0;
   
-  samples = repmat(empty_result, 1, maxepisodes*maxsteps);
-  
+  samples = repmat(empty_result, 1, n_episodes*n_steps);
   
   %%% Initialize variables
   nextslot = 1;
@@ -88,18 +88,17 @@ function new_samples = k_collect_samples(domain, maxepisodes, maxsteps, policy)
   
   
   %%% Main loop
-  while (episodes < maxepisodes)
+  while (episodes < n_episodes)
     
     %%% Select initial state
     initial_state = feval(initialize_state, simulator); 
-    
-    
+
     %%% Run one episode (up to the max number of steps)
-    epi_samples = execute(initial_state, simulator, policy, maxsteps);
+    epi_samples = samples_from_episode(initial_state, simulator, policy, n_steps);
     
     
     %%% Store the new samples
-    if length(epi_samples) > 0
+    if ~isempty(epi_samples)
       oldslot = nextslot; 
       nextslot = oldslot + length(epi_samples);
       samples(oldslot:nextslot-1) = epi_samples;

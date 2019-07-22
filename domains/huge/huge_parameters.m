@@ -10,17 +10,19 @@ end
 
 function d = default_params()
     d = struct(...
-         'rand_ns', 10     ...
-        ,'epsilon', .001   ... //when to exit kpirl
-        ,'gamma'  , 0.9    ...
-        ,'steps'  ,  10    ... 
-        ,'samples', 100    ...
-        ,'N'      ,  30    ... //policy iterations in KLA
-        ,'M'      ,  90    ... //trajectory samples on each policy iteration in KLA
-        ,'T'      ,  04    ... //trajectory length for each sample in KLA
-        ,'W'      ,  04    ... //
-        ,'v_basis', '1a'   ... //
-        ,'kernel' , k_dot()... //the kernel function used in kpirl
+         'rand_ns'  , 10     ...
+        ,'epsilon'  , .001   ... % when to exit kpirl, lspi and klspi
+        ,'gamma'    , 0.9    ...
+        ,'steps'    ,  10    ... 
+        ,'samples'  , 100    ...
+        ,'N'        ,  30    ... % policy iterations in kla, lspi and klspi
+        ,'M'        ,  90    ... % episode count in kla, lspi and klspi
+        ,'T'        ,  04    ... % episode length in kla, lspi and klspi
+        ,'W'        ,  04    ... % 
+        ,'v_basis'  , '1a'   ... % the basis for value function approximation in kla, lspi, klspi
+        ,'kernel'   , k_dot()... % the kernel function used in kpirl and klspi
+        ,'mu'       , 0.3    ... % the decision criteria used in klspi ald analysis
+        ,'transform', ident()... % the transform applied to the basis in lspi
     );
 end
 
