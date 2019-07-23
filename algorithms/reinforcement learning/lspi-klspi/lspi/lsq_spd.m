@@ -38,7 +38,7 @@ function new_policy = lsq_spd(samples, policy, new_policy)
   basis_function = new_policy.basis;
 
   %%% Loop through the samples 
-  parfor i=1:howmany
+  for i=1:howmany
 
     Phihat(i,:) = feval(basis_function, samples(i).state, samples(i).action);
     Rhat(i)     = samples(i).reward;
@@ -47,9 +47,9 @@ function new_policy = lsq_spd(samples, policy, new_policy)
     if ~samples(i).absorb
       %%% Compute the policy and the corresponding basis at the next state 
       nextaction    = policy_function(policy, samples(i).nextstate);
-      PiPhihat(i,:) = feval(basis_function, samples(i).nextstate, nextaction)';
+      PiPhihat(i,:) = feval(basis_function, samples(i).nextstate, nextaction);
     else
-      PiPhihat(i,:) = zeros(k, 1);
+      PiPhihat(i,:) = zeros(1, k);
     end
 
   end

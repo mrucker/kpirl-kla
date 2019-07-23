@@ -46,11 +46,10 @@ function new_policy = lsqbe_spd(samples, policy, new_policy)
     %%% Make sure the nextstate is not an absorbing state
     if ~samples(i).absorb
       %%% Compute the policy and the corresponding basis at the next state 
-      nextaction = policy_function(policy, samples(i).nextstate);
-      nextphi = feval(basis_function, samples(i).nextstate, nextaction);
-      PiPhihat(i,:) = nextphi';
+      nextaction    = policy_function(policy, samples(i).nextstate);
+      PiPhihat(i,:) = feval(basis_function, samples(i).nextstate, nextaction);
     else
-      PiPhihat(i,:) = zeros(k, 1);
+      PiPhihat(i,:) = zeros(1, k);
     end
     
   end

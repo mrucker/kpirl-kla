@@ -37,17 +37,16 @@ function new_policy = lsqbe_mem(samples, policy, new_policy)
     
     %%% Compute the basis for the current state and action
     phi = feval(new_policy.basis, samples(i).state, samples(i).action);
-    
-    
+
     %%% Make sure the nextstate is not an absorbing state
     if ~samples(i).absorb
       
       %%% Compute the policy and the corresponding basis at the next state 
       nextaction = policy_function(policy, samples(i).nextstate);
-      nextphi = feval(new_policy.basis, samples(i).nextstate, nextaction);
+      nextphi    = feval(new_policy.basis, samples(i).nextstate, nextaction);
       
     else
-      nextphi = zeros(k, 1);
+      nextphi = zeros(1, k);
     end
 
     %%% Update the matrices A and b

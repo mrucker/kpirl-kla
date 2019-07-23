@@ -16,6 +16,6 @@ function phi = huge_value_basis_lspi(state, actions); persistent t_d v_i v_p;
     end
 
     if(nargin==2)
-        phi = v_p(:,v_i(t_d(state, actions)));
+        phi = v_p(:,v_i(t_d(state, actions)))';
     end
 end

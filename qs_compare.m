@@ -6,7 +6,7 @@ clear; close all; qs_paths;
 domain = 'huge';
 
 %evaluation parameters for the below `daps`
-eval_rewds = 10;
+eval_rewds = 1;
 eval_gamma = .9;
 eval_steps = 10;
 eval_samps = 200;
