@@ -1,4 +1,4 @@
-function [policy, all_policies] = policy_iteration(domain, algorithm, policy, max_iter, max_epis, max_steps, epsilon)
+function [policy, all_policies] = policy_iteration(domain, algorithm, policy, max_iter, max_epis, max_steps, epsilon, resample)
 
   all_policies{1} = policy;
 
@@ -35,6 +35,10 @@ function [policy, all_policies] = policy_iteration(domain, algorithm, policy, ma
     %%% Store the current policy
     all_policies{iteration+1}      = policy;
     all_policies{iteration+1}.time = toc(i_start);
+    
+    if resample
+        samples = samples_from_episodes(domain, max_epis, max_steps, policy);
+    end
 
   end
   

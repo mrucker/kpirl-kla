@@ -23,6 +23,7 @@ function d = default_params()
         ,'kernel'   , k_dot()... % the kernel function used in kpirl and klspi
         ,'mu'       , 0.3    ... % the decision criteria used in klspi ald analysis
         ,'transform', ident()... % the transform applied to the basis in lspi
+        ,'resample' , false  ... % whether lspi-klspi should resample each policy iteration
     );
 end
 

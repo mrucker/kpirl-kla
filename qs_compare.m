@@ -6,7 +6,7 @@ clear; close all; qs_paths;
 domain = 'huge';
 
 %evaluation parameters for the below `daps`
-eval_rewds = 2;
+eval_rewds = 10;
 eval_gamma = .9;
 eval_steps = 10;
 eval_samps = 200;
@@ -14,19 +14,19 @@ eval_samps = 200;
 %'D'escription, 'A'lgorithm, 'P'arameters (DAP)
 daps = {
     %generate a policy using kla_spd and basis '1b' (aka, shared/single_basis) which gives a policy of random actions.
-    %'random' , 'kla_spd' , struct('N', 01, 'M', 01 , 'T', 01, 'v_basis', '1b', 'W', 01                                         );
+    'random' , 'kla_spd' , struct('N', 01, 'M', 01 , 'T', 01, 'v_basis', '1b', 'W', 01                                                       );
 
     %generate a policy using kla_spd and basis '1a' (this kla implementation decreases computation by increasing memory use)
-    %'kla_spd' , 'kla_spd', struct('N', 10, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 04                                         );
+    'kla_spd' , 'kla_spd', struct('N', 10, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 04                                                       );
 
     %generate a policy using kla_mem and basis '1a' (this kla implementation decreases memory use by increasing computation)
-    %'kla_mem' , 'kla_mem', struct('N', 10, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 04                                         );
+    'kla_mem' , 'kla_mem', struct('N', 10, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 04                                                       );
 
     %generate a policy using lspi and basis '1a' with a third order polynomial transform applied to the basis 
-    %'lspi '   , 'lspi'   , struct('N', 10, 'M', 100, 'T', 32, 'v_basis', '1a', 'transform', polynomial(3)                      );
+    'lspi '   , 'lspi'   , struct('N', 10, 'M', 100, 'T', 32, 'v_basis', '1a', 'resample', true, 'transform', polynomial(3)                   );
 
     %generate a policy using klspi and basis '1a' with the provided kernel function
-    'klspi'   , 'klspi'  , struct('N', 10, 'M', 100, 'T', 15, 'v_basis', '1a', 'kernel', k_gaussian(k_norm(),0.5), 'mu', 0.3   );
+    'klspi'   , 'klspi'  , struct('N', 10, 'M', 100, 'T', 15, 'v_basis', '1a', 'resample', true, 'kernel', k_gaussian(k_norm(),0.5), 'mu', 0.3);
 };
 
 algorithm_parameter_compare(domain, daps, @random_linear_reward, eval_rewds, eval_samps, eval_steps, eval_gamma)

@@ -20,12 +20,14 @@ function [policy, time] = klspi(domain, reward); global R;
         epsilon   = parameters.epsilon;
         discount  = parameters.gamma;
         mu        = parameters.mu;
+        resample  = parameters.resample;
         basis     = basis_func;
+        
 
         policy   = feval(polic_func, basis, discount);
         eval_alg = @(samples, policy, new_policy) klsq_spd(samples, policy, new_policy, mu);
 
-        [~, all_policies] = policy_iteration(domain, eval_alg, policy, max_iter, max_epis, max_steps, epsilon);
+        [~, all_policies] = policy_iteration(domain, eval_alg, policy, max_iter, max_epis, max_steps, epsilon, resample);
 
         end_policy = all_policies{end};
 

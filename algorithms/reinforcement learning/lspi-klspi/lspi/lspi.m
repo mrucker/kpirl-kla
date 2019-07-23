@@ -18,13 +18,14 @@ function [policy, time] = lspi(domain, reward); global R;
         max_epis  = parameters.M;
         max_steps = parameters.T;
         epsilon   = parameters.epsilon;
+        resample  = parameters.resample;
         basis     = basis_func;
         discount  = parameters.gamma;
 
         eval_alg = @lsq_spd;
         policy   = feval(polic_func, basis, discount);
 
-        [~, all_policies] = policy_iteration(domain, eval_alg, policy, max_iter, max_epis, max_steps, epsilon);
+        [~, all_policies] = policy_iteration(domain, eval_alg, policy, max_iter, max_epis, max_steps, epsilon, resample);
 
         policy = @(s) policy_function(all_policies{end}, s);
 

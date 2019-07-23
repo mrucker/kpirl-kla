@@ -10,7 +10,7 @@ function new_policy = klsq_spd(samples, policy, new_policy, mu)
 
     basis_function = new_policy.basis;
 
-    for i=1:howmany
+    parfor i=1:howmany
 
         k_hat(i,:) = feval(basis_function, samples(i).state, samples(i).action, exemplars);
         r_hat(i)   = samples(i).reward;
