@@ -1,5 +1,4 @@
-% A wrapper that conforms KLSPI to the RL interface
-% The original klspi function is now called kslpi_core
+% A wrapper that conforms LSPI to the RL interface
 function [policy, time] = lspi(domain, reward); global R;
 
     a_start = tic;

@@ -1,2 +1,0 @@
-Finish detailing how to implement algorithm functions in readme
-Add better documentation to the "example" files in the root directory

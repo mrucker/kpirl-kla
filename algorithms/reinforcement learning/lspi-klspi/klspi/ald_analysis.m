@@ -1,27 +1,27 @@
-function [Dic_t, Dic_dim] = ald_analysis(samples, policy, mu)
+function exemplars = ald_analysis(samples, policy, mu)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-    sampleNumber = length(samples);   % number of data samples  
-    Dic_dim      = 1;
+    n_samples   = length(samples);   % number of data samples  
 
-    Dic_t= feval(policy.basis, samples(1).state, samples(1).action)';
+    exemplars   = feval(policy.basis, samples(1).state, samples(1).action);
+    n_exemplars = size(exemplars,1);
 
-    k_tt=feval(policy.basis, samples(1).state, samples(1).action, Dic_t); 
+    k_tt=feval(policy.basis, samples(1).state, samples(1).action, exemplars); 
 
-    K_Inv=zeros(Dic_dim, Dic_dim);
+    K_Inv=zeros(n_exemplars, n_exemplars);
     K_Inv(1,1)=1.0/k_tt;
 
     K_t=zeros(1,1);
 
-    for i=1:sampleNumber
+    for i=1:n_samples
 
         state=samples(i).state;
-        action=samples(i).action;              
+        action=samples(i).action;
 
-        current_feature=feval(policy.basis, state, action)';
+        current_feature=feval(policy.basis, state, action);
 
-        k_t = feval(policy.basis, state, action, Dic_t);
+        k_t = feval(policy.basis, state, action, exemplars);
         k_tt= feval(policy.basis, state, action, current_feature);
 
         c_t = K_Inv*k_t;
@@ -30,8 +30,8 @@ function [Dic_t, Dic_dim] = ald_analysis(samples, policy, mu)
         %note, the author's paper doesn't indicate that the abs of d_t should be used
         if  mu <= abs(d_t)
 
-            Dic_dim = Dic_dim+1;            
-            Dic_t   = vertcat(Dic_t, current_feature);            
+            exemplars   = vertcat(exemplars, current_feature);
+            n_exemplars = size(exemplars,1);
 
             %% K_Inv(t)=[ K_Inv(t-1)+a_t*a_t'/delta,  -a_t/delta ]
             %%          [   -a_t'/delta ,                 1/delta]
@@ -39,9 +39,9 @@ function [Dic_t, Dic_dim] = ald_analysis(samples, policy, mu)
 
             temp=-c_t/d_t;
 
-            K_Inv= update_matrix( K_Inv, temp, temp, 1/d_t, Dic_dim-1, Dic_dim-1, Dic_dim, Dic_dim);
-            %% Update K_t= [K_(t-1),  k_t; k_t',  1]            
-            K_t  = update_matrix(K_t, k_t, k_t, 1, Dic_dim-1,Dic_dim-1, Dic_dim, Dic_dim);
+            K_Inv= update_matrix( K_Inv, temp, temp, 1/d_t, n_exemplars-1, n_exemplars-1, n_exemplars, n_exemplars);
+            %% Update K_t= [K_(t-1),  k_t; k_t',  1]
+            K_t  = update_matrix(K_t, k_t, k_t, 1, n_exemplars-1,n_exemplars-1, n_exemplars, n_exemplars);
         end  %% End of if-else 
     end  %% End of for 
 end

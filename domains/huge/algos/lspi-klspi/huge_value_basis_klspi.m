@@ -9,7 +9,7 @@ function phi = huge_value_basis_klspi(state, actions, exemplars); persistent t_d
     end
     
     if(nargin==2)
-        phi = v_p(t_d(state, actions));
+        phi = v_p(t_d(state, actions))';
     end
 
     if(nargin == 3)
