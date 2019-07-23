@@ -53,6 +53,10 @@ function [policy, time] = kla_mem(domain, reward)
         start = tic;
             parfor m = 1:M
 
+                %because we're in a multi-thread environment we need to 
+                %re-init our algorithm's parameters so we can use them here
+                feval([domain '_parameters'], parameters);
+                
                 s_t = init_s{m};
 
                 for t = 1:T+W-1

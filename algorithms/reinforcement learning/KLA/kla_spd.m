@@ -15,7 +15,7 @@ function [policy, time] = kla_spd(domain, reward)
         W     = parameters.W;
         gamma = parameters.gamma;
 
-        time = zeros(1,5);
+        time = zeros(1,6);
 
         v_n = v_i();
         v_p = v_p(1:v_n);
@@ -57,9 +57,15 @@ function [policy, time] = kla_spd(domain, reward)
             init_s  = init_states(randi(size(init_states,2), 1, M));
 
             t_m = arrayfun(@(i) cell (1,T+W-1), 1:M, 'UniformOutput', false);
+        time(2) = time(2) + toc(start);
 
+        start = tic;
             parfor m = 1:M
 
+                %because we're in a multi-thread environment we need to 
+                %re-init our algorithm's parameters so we can use them here
+                feval([domain '_parameters'], parameters);
+                
                 s_t = init_s{m};
 
                 for t = 1:T+W-1
@@ -83,7 +89,7 @@ function [policy, time] = kla_spd(domain, reward)
 
             init_states = horzcat(init_states, t_s(horzcat(t_m{:})));
 
-        time(2) = time(2) + toc(start);
+        time(3) = time(3) + toc(start);
 
         start = tic;
             for m = 1:M
@@ -162,7 +168,7 @@ function [policy, time] = kla_spd(domain, reward)
                     end
                 end
             end
-        time(3) = time(3) + toc(start);
+        time(4) = time(4) + toc(start);
 
         start = tic;
 
@@ -180,10 +186,10 @@ function [policy, time] = kla_spd(domain, reward)
             v_v = predict(v_m, v_p')';
             v_f = @(s) v_v(v_i(s));
 
-        time(4) = time(4) + toc(start);
+        time(5) = time(5) + toc(start);
     end
 
     start = tic;
         policy = @(s) best_action_from_state(s, a_f(s), t_d, v_f);
-    time(5) = time(5) + toc(start);
+    time(6) = time(6) + toc(start);
 end

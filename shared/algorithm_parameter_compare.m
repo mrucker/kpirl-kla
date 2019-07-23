@@ -1,26 +1,29 @@
 function algorithm_parameter_compare(domain, daps, rwd_func_generator, eval_rewds, eval_samps, eval_steps, eval_gamma)
 
-    [s_1     ] = feval([domain '_random']);
-    [~,~, t_b] = feval([domain '_transitions']);
-    [r_i, r_p] = feval([domain '_reward_basis']);
-
-    rwds = arrayfun(@(i) rwd_func_generator(r_i,r_p), 1:eval_rewds, 'UniformOutput', false)';
-
     for ai = 1:size(daps,1)
 
+        desc = daps{ai,1};
+        algo = daps{ai,2};
+        parm = daps{ai,3};
+        
+        feval([domain '_parameters'], parm, true);
+        
+        [s_1     ] = feval([domain '_random']);
+        [~,~, t_b] = feval([domain '_transitions']);
+        [r_i, r_p] = feval([domain '_reward_basis']);
+        
         [avg_v, var_v] = deal(0,NaN);
         [avg_t, var_t] = deal(0,NaN);
 
-        for ri = 1:size(rwds,1)
+        rng(1)
+        rwds = arrayfun(@(i) { rwd_func_generator(r_i,r_p) }, 1:eval_rewds);
+        rng('shuffle')
+        
+        for ri = 1:numel(rwds)
 
-            desc = daps{ai,1};
-            algo = daps{ai,2};
-            parm = daps{ai,3};
-            rewd = rwds{ri,1};
+            rewd = rwds{ri};
 
-            feval([domain '_parameters'], parm);
-
-            [policy, t] = feval(algo, domain, rewd);
+            [policy, t] = algo(domain, rewd);
             [trajects ] = trajectories_from_simulations(policy, t_b, s_1, eval_samps, eval_steps);
             [v        ] = expectation_from_trajectories(trajects, rewd, eval_gamma);
 
@@ -52,7 +55,7 @@ end
 
 function p_results(desc, avg_t, avg_v, SE_t, SE_v)
     fprintf('%s'               , desc );
-    fprintf('\t avg_T = %5.2f;', avg_t);
+    fprintf('\t avg_T = %6.2f;', avg_t);
     fprintf('\t SE_T = %7.3f;' , SE_t );
     fprintf('\t avg_V = %7.3f;', avg_v);
     fprintf('\t SE_V = %7.3f;' , SE_v );

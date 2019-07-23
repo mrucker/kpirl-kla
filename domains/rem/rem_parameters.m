@@ -1,10 +1,12 @@
-function p_out = rem_parameters(p_in); persistent parameters;
+function p_out = rem_parameters(p_in, force); persistent parameters;
 
-    if(nargin == 1)
-        parameters = p_in;
+    if((nargin == 2 && force) || (nargin == 1 && isempty(parameters)))
+        parameters = fill_default_params(p_in, default_params());
+    elseif(nargin == 0 && isempty(parameters))
+        parameters = fill_default_params(struct(), default_params());
     end
 
-    p_out = fill_default_params(parameters, default_params());
+    p_out = parameters;
 
 end
 

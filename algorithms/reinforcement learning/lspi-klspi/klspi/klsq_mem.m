@@ -1,4 +1,4 @@
-function new_policy = klsq_mem(samples, policy, new_policy, mu)
+function new_policy = klsq_mem(~, samples, policy, new_policy, mu)
 
     exemplars = ald_analysis(samples, new_policy, mu);
 
@@ -30,8 +30,9 @@ function new_policy = klsq_mem(samples, policy, new_policy, mu)
         w = pinv(A)*b;
     end
 
-    new_policy.weights = w;
+    new_policy.weights   = w;
     new_policy.exemplars = exemplars;
+    new_policy.explore   = 0;
 
     return
 end

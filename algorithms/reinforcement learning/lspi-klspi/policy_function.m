@@ -9,13 +9,13 @@ function [action] = policy_function(policy, state)
     
     %%% Find first all actions with maximum Q-value
 
-    if isfield(policy, 'examplars')
-        phis = feval(policy.basis, state, valid_actions, policy.examplars);
+    if isfield(policy, 'exemplars')
+        phis = feval(policy.basis, state, valid_actions, policy.exemplars);
     else
         phis = feval(policy.basis, state, valid_actions);
     end
     
-    q_all = phis' * policy.weights;    
+    q_all = phis * policy.weights;    
     q_max = max(q_all);
     i_max = find(q_all == q_max);
     

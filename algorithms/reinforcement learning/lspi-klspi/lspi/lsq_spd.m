@@ -1,4 +1,4 @@
-function new_policy = lsq_spd(samples, policy, new_policy)
+function new_policy = lsq_spd(domain, samples, policy, new_policy)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -36,10 +36,17 @@ function new_policy = lsq_spd(samples, policy, new_policy)
   PiPhihat = zeros(howmany,k);
 
   basis_function = new_policy.basis;
+  param_function = [domain '_parameters'];
 
+  parameters = feval(param_function);
+  
   %%% Loop through the samples 
-  for i=1:howmany
-
+  parfor i=1:howmany
+      
+    %because we're in a multi-thread environment we need to 
+    %re-init our algorithm's parameters so we can use them here
+    feval(param_function, parameters);
+      
     Phihat(i,:) = feval(basis_function, samples(i).state, samples(i).action);
     Rhat(i)     = samples(i).reward;
 
@@ -65,5 +72,6 @@ function new_policy = lsq_spd(samples, policy, new_policy)
   end
 
   new_policy.weights = w;
+  new_policy.explore = 0;
 
   return

@@ -1,4 +1,4 @@
-function new_policy = lsq_mem(samples, policy, new_policy)
+function new_policy = lsq_mem(~, samples, policy, new_policy)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -60,6 +60,7 @@ function new_policy = lsq_mem(samples, policy, new_policy)
   end
 
   new_policy.weights = w;
+  new_policy.explore = 0;
   
   return
   

@@ -64,56 +64,33 @@ function new_samples = samples_from_episodes(domain, n_episodes, n_steps, policy
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
   %%% Initialize some variables
   simulator         = [domain '_simulator'];
   initialize_state  = [domain '_initialize_state'];  
 
-  %%% Initialize storage for new samples 
-  empty_result.state = feval(simulator);
-  empty_result.action = 0;
-  empty_result.reward = 0.0;
-  empty_result.nextstate = empty_result.state;
-  empty_result.absorb = 0;
-  
-  samples = repmat(empty_result, 1, n_episodes*n_steps);
-  
   %%% Initialize variables
-  nextslot = 1;
-  episodes = 0;
-  
-  
+  samples_by_episodes = cell(1,n_episodes);
+
   %%% Initialize simulator
   feval(simulator);
   
+  parameters = feval([domain '_parameters']);
   
   %%% Main loop
-  while (episodes < n_episodes)
+  parfor i = 1:n_episodes
+      
+    %because we're in a multi-thread environment we need to 
+    %reinit our parameters so we can use them in this context
+    feval([domain '_parameters'], parameters);
     
     %%% Select initial state
     initial_state = feval(initialize_state, simulator); 
-
+    
     %%% Run one episode (up to the max number of steps)
-    epi_samples = samples_from_episode(initial_state, simulator, policy, n_steps);
-    
-    
-    %%% Store the new samples
-    if ~isempty(epi_samples)
-      oldslot = nextslot; 
-      nextslot = oldslot + length(epi_samples);
-      samples(oldslot:nextslot-1) = epi_samples;
-    end
-    
-    
-    %%% Next episode
-    episodes = episodes + 1;
-    
+    samples_by_episodes{i} = samples_from_episode(initial_state, simulator, policy, n_steps);
   end
-  
-  
+
   %%% Return the new samples
-  new_samples = samples(1:nextslot-1);
-  clear samples
-  
+  new_samples = cell2mat(samples_by_episodes);
   
   return

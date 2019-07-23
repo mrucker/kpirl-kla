@@ -21,7 +21,7 @@ function [policy, all_policies] = policy_iteration(domain, algorithm, policy, ma
 
     %%% Evaluate the current policy (and implicitly improve)
     %%% There are several options here - choose one    
-    policy = algorithm(samples, all_policies{iteration}, policy);
+    policy = algorithm(domain, samples, all_policies{iteration}, policy);
 
     %%% Compute the distance between the current and the previous policy
     if(~isfield(all_policies{iteration}, 'weights'))

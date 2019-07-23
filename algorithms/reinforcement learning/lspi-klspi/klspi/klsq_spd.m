@@ -1,4 +1,4 @@
-function new_policy = klsq_spd(samples, policy, new_policy, mu)
+function new_policy = klsq_spd(domain, samples, policy, new_policy, mu)
 
     exemplars = ald_analysis(samples, new_policy, mu);
 
@@ -9,8 +9,15 @@ function new_policy = klsq_spd(samples, policy, new_policy, mu)
     k_hat_next = zeros(howmany, k);
 
     basis_function = new_policy.basis;
+    param_function = [domain '_parameters'];
+
+    parameters = feval(param_function);
 
     parfor i=1:howmany
+        
+        %because we're in a multi-thread environment we need to 
+        %re-init our algorithm's parameters so we can use them here
+        feval(param_function, parameters);
 
         k_hat(i,:) = feval(basis_function, samples(i).state, samples(i).action, exemplars);
         r_hat(i)   = samples(i).reward;
@@ -32,8 +39,9 @@ function new_policy = klsq_spd(samples, policy, new_policy, mu)
         w = pinv(A)*b;
     end
 
-    new_policy.weights = w;
+    new_policy.weights   = w;
     new_policy.exemplars = exemplars;
+    new_policy.explore   = 0;
 
     return
 end

@@ -33,6 +33,7 @@ function [new_results, totdrew, toturew] = samples_from_episode(initial_state, s
   
   results = repmat(empty_result, 1, n_steps);
   
+  reward = policy.reward;
   
   %%% Initialize variables
   totdrew = 0;
@@ -42,7 +43,6 @@ function [new_results, totdrew, toturew] = samples_from_episode(initial_state, s
   
   %%% Set initial state
   state = feval(simulator, initial_state);
-
   
   %%% Run the episode
   while ( (steps < n_steps) && (~endsim) )
@@ -53,18 +53,18 @@ function [new_results, totdrew, toturew] = samples_from_episode(initial_state, s
     action = policy_function(policy, state);
 
     %%% Simulate
-    [nextstate, reward, endsim] = feval(simulator, state, action);
+    [nextstate, endsim] = feval(simulator, state, action);
     
     %%% Record sample
-    results(steps).state = state;
-    results(steps).action = action;
-    results(steps).reward = reward;
+    results(steps).state     = state;
+    results(steps).action    = action;
+    results(steps).reward    = policy.reward(state);
     results(steps).nextstate = nextstate;
-    results(steps).absorb = endsim;
+    results(steps).absorb    = endsim;
     
     %%% Update the total reward(s)
-    totdrew = totdrew + (policy.discount)^(steps-1) * reward;
-    toturew = toturew + reward;
+    totdrew = totdrew + (policy.discount)^(steps-1) * results(steps).reward;
+    toturew = toturew + results(steps).reward;
 
     %%% Continue
     state = nextstate;

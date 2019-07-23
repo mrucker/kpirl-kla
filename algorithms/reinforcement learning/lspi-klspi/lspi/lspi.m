@@ -1,9 +1,7 @@
 % A wrapper that conforms LSPI to the RL interface
-function [policy, time] = lspi(domain, reward); global R;
+function [policy, time] = lspi(domain, reward)
 
     a_start = tic;
-
-        R = reward;
 
         clear([domain '_value_basis_lspi']);
         clear([domain '_simulator']);
@@ -23,7 +21,7 @@ function [policy, time] = lspi(domain, reward); global R;
         discount  = parameters.gamma;
 
         eval_alg = @lsq_spd;
-        policy   = feval(polic_func, basis, discount);
+        policy   = feval(polic_func, basis, discount, reward);
 
         [~, all_policies] = policy_iteration(domain, eval_alg, policy, max_iter, max_epis, max_steps, epsilon, resample);
 

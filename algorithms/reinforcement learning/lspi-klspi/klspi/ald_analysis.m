@@ -24,8 +24,8 @@ function exemplars = ald_analysis(samples, policy, mu)
         k_t = feval(policy.basis, state, action, exemplars);
         k_tt= feval(policy.basis, state, action, current_feature);
 
-        c_t = K_Inv*k_t;
-        d_t = k_tt-transpose(k_t)*c_t;
+        c_t = K_Inv*k_t';
+        d_t = k_tt-k_t*c_t;
 
         %note, the author's paper doesn't indicate that the abs of d_t should be used
         if  mu <= abs(d_t)

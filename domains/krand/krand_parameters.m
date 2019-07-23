@@ -1,40 +1,25 @@
-function p_out = krand_parameters(p_in); persistent parameters;
+function p_out = krand_parameters(p_in, force); persistent parameters;
 
-    if(nargin == 1)
+    if((nargin == 2 && force) || (nargin == 1 && isempty(parameters)))
          if isfield(parameters,'grid_world')
             p_in.grid_world      = parameters.grid_world;
             p_in.grid_world_size = parameters.grid_world_size;
          end
-
-%          if isfield(parameters,'buff_vals')
-%             p_in.buff_vals      = parameters.buff_vals;
-%             p_in.buff_vals_size = parameters.buff_vals_size;
-%         end
-
-        parameters = p_in;
+        parameters = fill_default_params(p_in, default_params());
+    elseif(nargin == 0 && isempty(parameters))
+        parameters = fill_default_params(struct(), default_params());
     end
 
     if ~isfield(parameters,'grid_world')
         grid_world = (fullfile(fileparts(which(mfilename)), 'data', 'allowed3.csv'));
         grid_world = readtable(grid_world);
         grid_world = grid_world(:,3:6);  %Rail type, street type, street maxspeed, building type
-        %grid_world = table2struct(grid_world);
 
         parameters.grid_world      = grid_world;
         parameters.grid_world_size = sqrt(size(grid_world, 1));
     end
 
-%     if ~isfield(parameters,'buff_vals')
-%         buff_vals = (fullfile(fileparts(which(mfilename)), 'data', 'krand_bufferedstates.csv'));
-%         buff_vals = readtable(buff_vals);
-%         buff_vals = buff_vals(:,2:5);  %Rail type, street type, street maxspeed, building type
-%         buff_vals = table2struct(buff_vals);
-% 
-%         parameters.buff_vals      = buff_vals;
-%         parameters.buff_vals_size = sqrt(size(buff_vals, 1));
-%     end
-
-    p_out = fill_default_params(parameters, default_params());
+    p_out = parameters;
 
 end
 
