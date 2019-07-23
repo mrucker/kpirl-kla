@@ -21,45 +21,36 @@ function new_policy = lsqbe_spd(samples, policy, new_policy)
 %
 % Returns the new policy with weights set to w of Aw=b.
 %
+% NOTE: this function can be made nearly twice as fast by caching
+%       the features from the state/action pairs when not resampling
+%
 % See also lsqbe_mem.m for slower (incremental) implementation.
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
-  
-  persistent Phihat;
-  persistent Rhat;  
-  
+
   %%% Initialize variables
-  howmany = length(samples);
-  k = feval(new_policy.basis);
+  howmany  = length(samples);
+  k        = feval(new_policy.basis);
   PiPhihat = zeros(howmany,k);
-  
-  %%% Precompute Phihat and Rhat for all subsequent iterations
-  if isempty(Phihat) || isempty(Rhat)
+  Phihat   = zeros(howmany,k);
+  Rhat     = zeros(howmany,1);
 
-    Phihat = zeros(howmany,k);
-    Rhat = zeros(howmany,1);
+  basis_function = new_policy.basis;
 
-    for i=1:howmany
-      phi = feval(new_policy.basis, samples(i).state, samples(i).action);
-      Phihat(i,:) = phi';
-      Rhat(i) = samples(i).reward;
-    end
-
-  end
-  
-  
   %%% Loop through the samples 
-  for i=1:howmany
+  parfor i=1:howmany
+
+    Phihat(i,:) = feval(basis_function, samples(i).state, samples(i).action);
+    Rhat(i)     = samples(i).reward;
     
     %%% Make sure the nextstate is not an absorbing state
     if ~samples(i).absorb
-      
       %%% Compute the policy and the corresponding basis at the next state 
       nextaction = policy_function(policy, samples(i).nextstate);
-      nextphi = feval(new_policy.basis, samples(i).nextstate, nextaction);
+      nextphi = feval(basis_function, samples(i).nextstate, nextaction);
       PiPhihat(i,:) = nextphi';
-      
+    else
+      PiPhihat(i,:) = zeros(k, 1);
     end
     
   end

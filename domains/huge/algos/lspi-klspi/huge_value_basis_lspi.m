@@ -6,7 +6,7 @@ function phi = huge_value_basis_lspi(state, actions); persistent t_d v_i v_p;
 
     if(isempty(v_p))
         [parameters] = huge_parameters();
-        [v_i, v_p  ] = huge_value_basis();        
+        [v_i, v_p  ] = huge_value_basis();
 
         v_p = parameters.transform(v_p(1:v_i()));
     end
@@ -19,4 +19,3 @@ function phi = huge_value_basis_lspi(state, actions); persistent t_d v_i v_p;
         phi = v_p(:,v_i(t_d(state, actions)));
     end
 end
-

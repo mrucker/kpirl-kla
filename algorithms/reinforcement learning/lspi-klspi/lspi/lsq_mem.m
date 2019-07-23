@@ -25,39 +25,34 @@ function new_policy = lsq_mem(samples, policy, new_policy)
 % See also lsq_spd.m for a faster (batch) implementation. 
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
-  
+
   %%% Initialize variables
   howmany = length(samples);
-  k = feval(new_policy.basis);
-  A = zeros(k, k);
-  b = zeros(k, 1);  
-  
+  k       = feval(new_policy.basis);
+  A       = zeros(k, k);
+  b       = zeros(k, 1);  
+
   %%% Loop through the samples 
   for i=1:howmany
-    
+
     %%% Compute the basis for the current state and action
     phi = feval(new_policy.basis, samples(i).state, samples(i).action);
-    
-    
+
     %%% Make sure the nextstate is not an absorbing state
     if ~samples(i).absorb
-      
       %%% Compute the policy and the corresponding basis at the next state 
       nextaction = policy_function(policy, samples(i).nextstate);
-      nextphi = feval(new_policy.basis, samples(i).nextstate, nextaction);
-      
+      nextphi    = feval(new_policy.basis, samples(i).nextstate, nextaction);
     else
       nextphi = zeros(k, 1);
     end
-  
-    
+
     %%% Update the matrices A and b
     A = A + phi * (phi - new_policy.discount * nextphi)';
     b = b + phi * samples(i).reward;
-    
+
   end
-      
+
   if rank(A)==k
     w = A\b;
   else

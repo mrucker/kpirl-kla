@@ -3,7 +3,7 @@ function algorithm_parameter_compare(domain, daps, rwd_func_generator, eval_rewd
     [s_1     ] = feval([domain '_random']);
     [~,~, t_b] = feval([domain '_transitions']);
     [r_i, r_p] = feval([domain '_reward_basis']);
-    
+
     rwds = arrayfun(@(i) rwd_func_generator(r_i,r_p), 1:eval_rewds, 'UniformOutput', false)';
 
     for ai = 1:size(daps,1)

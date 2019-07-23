@@ -11,7 +11,7 @@ function [policy, time] = lspi(domain, reward); global R;
         param_func = [domain '_parameters'];
         basis_func = [domain '_value_basis_lspi'];
         polic_func = [domain '_initialize_policy'];
-        
+
         parameters = feval(param_func);
 
         max_iter  = parameters.N;

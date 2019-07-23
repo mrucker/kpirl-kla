@@ -1,5 +1,5 @@
 function new_policy = lsq_spd(samples, policy, new_policy)
-  
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Copyright 2000-2002 
@@ -10,7 +10,6 @@ function new_policy = lsq_spd(samples, policy, new_policy)
 % Department of Computer Science
 % Box 90129
 % Duke University, NC 27708
-% 
 %
 % new_policy = lsq_spd(samples, policy, new_policy)
 %
@@ -22,62 +21,49 @@ function new_policy = lsq_spd(samples, policy, new_policy)
 %
 % Returns the new policy with weights set to w of Aw=b.
 %
+% NOTE: this function can be made nearly twice as fast by caching
+%       the features from the state/action pairs when not resampling
+%
 % See also lsq_mem.m for a slower (incremental) implementation. 
-%  
+%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
-  
-  persistent Phihat;
-  persistent Rhat;
-  
-  
+
   %%% Initialize variables
-  howmany = length(samples);
-  k = feval(new_policy.basis);
+  howmany  = length(samples);
+  k        = feval(new_policy.basis);
+  Rhat     = zeros(howmany,1);
+  Phihat   = zeros(howmany,k);
   PiPhihat = zeros(howmany,k);
-  
-  %%% Precompute Phihat and Rhat for all subsequent iterations
-  if isempty(Phihat) || isempty(Rhat)
-    
-    Phihat = zeros(howmany,k);
-    Rhat   = zeros(howmany,1);
-    
-    for i=1:howmany
-      phi = feval(new_policy.basis, samples(i).state, samples(i).action);
-      Phihat(i,:) = phi';
-      Rhat(i) = samples(i).reward;
-    end
-    
-  end
-  
+
   basis_function = new_policy.basis;
-  
+
   %%% Loop through the samples 
   parfor i=1:howmany
-    
+
+    Phihat(i,:) = feval(basis_function, samples(i).state, samples(i).action);
+    Rhat(i)     = samples(i).reward;
+
     %%% Make sure the nextstate is not an absorbing state
     if ~samples(i).absorb
-      
       %%% Compute the policy and the corresponding basis at the next state 
-      nextaction = policy_function(policy, samples(i).nextstate);
-      nextphi = feval(basis_function, samples(i).nextstate, nextaction);
-      PiPhihat(i,:) = nextphi';
-      
+      nextaction    = policy_function(policy, samples(i).nextstate);
+      PiPhihat(i,:) = feval(basis_function, samples(i).nextstate, nextaction)';
+    else
+      PiPhihat(i,:) = zeros(k, 1);
     end
-    
+
   end
-    
+
   %%% Compute the matrices A and b
   A = Phihat' * (Phihat - new_policy.discount * PiPhihat);
   b = Phihat' * Rhat;
-    
-  if rank(A)==k
+
+  if rank(A) == k
     w = A\b;
   else
     w = pinv(A)*b;
   end
-  
+
   new_policy.weights = w;
-  
+
   return
-  

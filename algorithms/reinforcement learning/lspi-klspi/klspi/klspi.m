@@ -11,7 +11,7 @@ function [policy, time] = klspi(domain, reward); global R;
         param_func = [domain '_parameters'];
         basis_func = [domain '_value_basis_klspi'];
         polic_func = [domain '_initialize_policy'];
-        
+
         parameters = feval(param_func);
 
         max_iter  = parameters.N;
@@ -21,9 +21,9 @@ function [policy, time] = klspi(domain, reward); global R;
         discount  = parameters.gamma;
         mu        = parameters.mu;
         basis     = basis_func;
-        
-        policy   = feval(polic_func, basis, discount);        
-        eval_alg = @(samples, policy, new_policy) klsq_mem(samples, policy, new_policy, mu);
+
+        policy   = feval(polic_func, basis, discount);
+        eval_alg = @(samples, policy, new_policy) klsq_spd(samples, policy, new_policy, mu);
 
         [~, all_policies] = policy_iteration(domain, eval_alg, policy, max_iter, max_epis, max_steps, epsilon);
 
