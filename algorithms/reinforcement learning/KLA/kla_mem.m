@@ -19,11 +19,7 @@ function [policy, time] = kla_mem(domain, reward)
 
         v_f = @(s) 3*ones(1,size(s,2)); %arbitrarily initialize all state values to 3
 
-        g_mat = cell2mat(arrayfun(@(w)circshift([gamma.^(0:T-1), zeros(1,W-1)],w-1), 1:W, 'UniformOutput',false)');
-
-        %these variables manage the approximate "on-policy" sampling distribution
-        init_recycle = 4;
-        init_start   = 30;
+        g_mat = cell2mat(arrayfun(@(w) { [zeros(1,w) gamma.^(0:T-1) zeros(1,W-w)] }, 0:W)');
 
         Z = containers.Map('KeyType','double','ValueType','any');
         X = containers.Map('KeyType','double','ValueType','any');
@@ -36,30 +32,22 @@ function [policy, time] = kla_mem(domain, reward)
 
             init_state_bias          = @(i) BI(Z,i);
             init_state_error         = @(i) SE(Z,i);
-            confidence_interval      = @(i) full( init_state_bias(i) + 2* init_state_error(i));
+            confidence_interval      = @(i) init_state_bias(i) + 2*init_state_error(i);
             init_state_indexes       = @(s) v_i(t_d(s, a_f(s)));
             init_confidence_interval = @(s) confidence_interval(init_state_indexes(s));
 
-            if mod(n,init_recycle) == 1
-                init_states = arrayfun(@(m) s_1(), 1:init_start, 'UniformOutput', false);
-            end
-
-            init_s = init_states(randi(numel(init_states), 1, M));
+            init_s  = arrayfun(@(m) { s_1() }, 1:M);
             init_C = cellfun(init_confidence_interval, init_s, 'UniformOutput',false);
 
-            t_m = arrayfun(@(i) cell (1,T+W-1), 1:M, 'UniformOutput', false);
+            t_m = arrayfun(@(i) cell (1,T+W), 1:M, 'UniformOutput', false);
         time(2) = time(2) + toc(start);
 
         start = tic;
             parfor m = 1:M
 
-                %because we're in a multi-thread environment we need to 
-                %re-init our algorithm's parameters so we can use them here
-                feval([domain '_parameters'], parameters);
-                
                 s_t = init_s{m};
 
-                for t = 1:T+W-1
+                for t = 1:T+W
 
                     post_s_as = t_d(s_t, a_f(s_t));
                     post_v_vs = v_f(post_s_as);
@@ -77,14 +65,12 @@ function [policy, time] = kla_mem(domain, reward)
                 end
             end
 
-            init_states = horzcat(init_states, t_s(horzcat(t_m{:})));
-
         time(3) = time(3) + toc(start);
 
         start = tic;
             for m = 1:M
                 t_r = reward(t_s(t_m{m}));
-                for w = 1:W
+                for w = 1:W+1
                     i = v_i(t_m{m}{w});
                     y = g_mat(w,:) * t_r';
 
@@ -180,7 +166,7 @@ function se = SE(Z,i)
 end
 
 function se = BI(Z,i)
-    
+
     if isKey(Z,i)
         z = Z(i);
         se = z(3);

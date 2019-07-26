@@ -74,18 +74,10 @@ function new_samples = samples_from_episodes(domain, n_episodes, n_steps, policy
   %%% Initialize simulator
   feval(simulator);
   
-  parameters = feval([domain '_parameters']);
-  
   %%% Main loop
-  parfor i = 1:n_episodes
-      
-    %because we're in a multi-thread environment we need to 
-    %reinit our parameters so we can use them in this context
-    feval([domain '_parameters'], parameters);
-    
+  parfor i = 1:n_episodes      
     %%% Select initial state
-    initial_state = feval(initialize_state, simulator); 
-    
+    initial_state = feval(initialize_state, simulator);
     %%% Run one episode (up to the max number of steps)
     samples_by_episodes{i} = samples_from_episode(initial_state, simulator, policy, n_steps);
   end

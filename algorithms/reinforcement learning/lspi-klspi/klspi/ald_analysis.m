@@ -4,10 +4,10 @@ function exemplars = ald_analysis(samples, policy, mu)
 
     n_samples   = length(samples);   % number of data samples  
 
-    exemplars   = feval(policy.basis, samples(1).state, samples(1).action);
+    exemplars   = policy.basis(samples(1).state, samples(1).action);
     n_exemplars = size(exemplars,1);
 
-    k_tt=feval(policy.basis, samples(1).state, samples(1).action, exemplars); 
+    k_tt=policy.basis(samples(1).state, samples(1).action, exemplars); 
 
     K_Inv=zeros(n_exemplars, n_exemplars);
     K_Inv(1,1)=1.0/k_tt;
@@ -19,10 +19,10 @@ function exemplars = ald_analysis(samples, policy, mu)
         state=samples(i).state;
         action=samples(i).action;
 
-        current_feature=feval(policy.basis, state, action);
+        current_feature=policy.basis(state, action);
 
-        k_t = feval(policy.basis, state, action, exemplars);
-        k_tt= feval(policy.basis, state, action, current_feature);
+        k_t = policy.basis(state, action, exemplars);
+        k_tt= policy.basis(state, action, current_feature);
 
         c_t = K_Inv*k_t';
         d_t = k_tt-k_t*c_t;

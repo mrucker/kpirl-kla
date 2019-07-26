@@ -1,24 +1,20 @@
-function phi = huge_value_basis_klspi(state, actions, exemplars); persistent t_d v_p kernel;
+function state2basis = huge_value_basis_klspi()
 
-    if(isempty(t_d))
-        [t_d] = huge_transitions();
-    end
-
-    if(isempty(v_p))        
-        [~, v_p] = huge_value_basis();
-    end
+    [t_d       ] = huge_transitions();
+    [~, v_p  ] = huge_value_basis();
+    [parameters] = huge_parameters();
     
-    if(isempty(kernel))
-        params = huge_parameters();
-        kernel = @params.kernel;
-    end
-    
-    if(nargin==2)
-        phi = v_p(t_d(state, actions))';
-    end
+    kernel = @parameters.kernel;
 
-    if(nargin == 3)
-        
-        phi = kernel(v_p(t_d(state, actions)), exemplars');        
+    state2basis = @state2basis_closure;
+    
+    function phi = state2basis_closure(state, actions, exemplars)
+        if(nargin == 2)
+            phi = v_p(t_d(state, actions))';
+        end
+
+        if(nargin == 3)
+            phi = kernel(v_p(t_d(state, actions)), exemplars');        
+        end
     end
 end

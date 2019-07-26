@@ -1,4 +1,4 @@
-function new_policy = klsq_mem(~, samples, policy, new_policy, mu)
+function new_policy = klsq_mem(samples, policy, new_policy, mu)
 
     exemplars = ald_analysis(samples, new_policy, mu);
 
@@ -7,20 +7,17 @@ function new_policy = klsq_mem(~, samples, policy, new_policy, mu)
     b=zeros(size(exemplars,1), 1);
     A=zeros(size(exemplars,1), size(exemplars,1));
 
-    basis_f = new_policy.basis;
-    gamma_t = new_policy.discount;
-
     for i=1:howmany
-        k_hat=feval(basis_f, samples(i).state, samples(i).action, exemplars);
+        k_hat=new_policy.basis(samples(i).state, samples(i).action, exemplars);
 
         if ~samples(i).absorb
             nextaction=policy_function(policy, samples(i).nextstate);
-            k_hat_next=feval(policy.basis, samples(i).nextstate, nextaction, exemplars);
+            k_hat_next=new_policy.basis(samples(i).nextstate, nextaction, exemplars);
         else
             k_hat_next = zeros(size(exemplars,1),1);
         end
 
-        A=A+k_hat*(k_hat'-gamma_t*k_hat_next');
+        A=A+k_hat*(k_hat'-new_policy.discount*k_hat_next');
         b=b+samples(i).reward*k_hat;
     end
 

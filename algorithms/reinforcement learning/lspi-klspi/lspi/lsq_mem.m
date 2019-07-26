@@ -1,4 +1,4 @@
-function new_policy = lsq_mem(~, samples, policy, new_policy)
+function new_policy = lsq_mem(samples, policy, new_policy)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -28,7 +28,7 @@ function new_policy = lsq_mem(~, samples, policy, new_policy)
 
   %%% Initialize variables
   howmany = length(samples);
-  k       = feval(new_policy.basis);
+  k       = new_policy.basis();
   A       = zeros(k, k);
   b       = zeros(k, 1);  
 
@@ -36,13 +36,13 @@ function new_policy = lsq_mem(~, samples, policy, new_policy)
   for i=1:howmany
 
     %%% Compute the basis for the current state and action
-    phi = feval(new_policy.basis, samples(i).state, samples(i).action);
+    phi = new_policy.basis(samples(i).state, samples(i).action);
 
     %%% Make sure the nextstate is not an absorbing state
     if ~samples(i).absorb
       %%% Compute the policy and the corresponding basis at the next state 
       nextaction = policy_function(policy, samples(i).nextstate);
-      nextphi    = feval(new_policy.basis, samples(i).nextstate, nextaction);
+      nextphi    = new_policy.basis(samples(i).nextstate, nextaction);
     else
       nextphi = zeros(k, 1);
     end

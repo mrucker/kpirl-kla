@@ -1,4 +1,4 @@
-function new_policy = lsqbe_spd(domain, samples, policy, new_policy)
+function new_policy = lsqbe_spd(samples, policy, new_policy)
   
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -30,31 +30,22 @@ function new_policy = lsqbe_spd(domain, samples, policy, new_policy)
 
   %%% Initialize variables
   howmany  = length(samples);
-  k        = feval(new_policy.basis);
+  k        = new_policy.basis();
   PiPhihat = zeros(howmany,k);
   Phihat   = zeros(howmany,k);
   Rhat     = zeros(howmany,1);
 
-  basis_function = new_policy.basis;
-  param_function = [domain '_parameters'];
-
-  parameters = feval(param_function);
-
   %%% Loop through the samples 
   parfor i=1:howmany
-
-    %because we're in a multi-thread environment we need to 
-    %re-init our algorithm's parameters so we can use them here
-    feval(param_function, parameters);
       
-    Phihat(i,:) = feval(basis_function, samples(i).state, samples(i).action);
+    Phihat(i,:) = new_policy.basis(samples(i).state, samples(i).action);
     Rhat(i)     = samples(i).reward;
     
     %%% Make sure the nextstate is not an absorbing state
     if ~samples(i).absorb
       %%% Compute the policy and the corresponding basis at the next state 
       nextaction    = policy_function(policy, samples(i).nextstate);
-      PiPhihat(i,:) = feval(basis_function, samples(i).nextstate, nextaction);
+      PiPhihat(i,:) = new_policy.basis(samples(i).nextstate, nextaction);
     else
       PiPhihat(i,:) = zeros(1, k);
     end

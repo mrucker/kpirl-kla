@@ -33,8 +33,6 @@ function [new_results, totdrew, toturew] = samples_from_episode(initial_state, s
   
   results = repmat(empty_result, 1, n_steps);
   
-  reward = policy.reward;
-  
   %%% Initialize variables
   totdrew = 0;
   toturew = 0;
