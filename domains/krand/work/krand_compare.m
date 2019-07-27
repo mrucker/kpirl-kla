@@ -10,19 +10,25 @@ n_samps = 64;
 n_steps = 10;
   gamma = .9;
 
-rewards = random_linear_reward(domain, n_rewds);
-metrics = { policy_time()  policy_value(domain, n_samps, n_steps, gamma) };
-summary = { avg() SEM() med() };
-outputs = { summaries_to_screen() };
+rewards    = random_linear_reward(domain, n_rewds);
+attributes = { policy_time() policy_value(domain, n_samps, n_steps, gamma) };
+statistics = { avg() SEM() med() };
+outputs    = { statistics_to_screen() };
 
-daps = {};
+ns = [20 30];
+ms = 40;
+ts = 25;
 
-for n = [20 30]
-     for m = 40
-         for t = 25
-             daps(1:3,end+1) = {sprintf('n=%d,m=%d,t=%d', [n,m,t])'; @kla_mem; struct('v_basis', '1a', 'N', n, 'M', m, 'T', t , 'W', 5, 'gamma', .9)};
+daps = cell(3,numel(ns)*numel(ms)*numel(ts));
+i    = 0;
+
+for n = ns
+     for m = ms
+         for t = ts
+             i = i+1;
+             daps(:,i) = {sprintf('n=%d,m=%d,t=%d', [n,m,t])'; @kla_mem; struct('v_basis', '1a', 'N', n, 'M', m, 'T', t , 'W', 5, 'gamma', .9)};
          end
      end
  end
 
-reinforcement_compare(domain, daps, rewards, metrics, summary, outputs);
+reinforcement_compare(domain, daps, rewards, attributes, statistics, outputs);

@@ -10,10 +10,10 @@ n_samps = 64;
 n_steps = 10;
   gamma = .9;
 
-rewards = random_linear_reward(domain, n_rewds);
-metrics = { policy_time()  policy_value(domain, n_samps, n_steps, gamma) };
-summary = { avg() SEM() med() };
-outputs = { summaries_to_screen() };
+rewards    = random_linear_reward(domain, n_rewds);
+attributes = { policy_time() policy_value(domain, n_samps, n_steps, gamma) };
+statistics = { avg() SEM() med() };
+outputs    = { statistics_to_screen() };
 
 algorithms = {
     %generate a policy using kla_spd and basis '1b' (aka, shared/single_basis) which gives a policy of random actions.
@@ -34,7 +34,6 @@ algorithms = {
 
 a = tic;
 
-reinforcement_compare(domain, algorithms, rewards, metrics, summary, outputs);
+reinforcement_compare(domain, algorithms, rewards, attributes, statistics, outputs);
 
 toc(a);
-
