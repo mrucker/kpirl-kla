@@ -21,22 +21,5 @@ function disp_statistics(attribute_names, ~, statistic_names, statistic_values)
 end
 
 function disp_parameters(parameters)
-    fields       = fieldnames(parameters);
-    field_values = strings(1, numel(fields));
-
-    for i = 1:numel(fields)
-        field = fields{i};
-        value = parameters.(field);
-        field_values(i) = sprintf('%s=%s', field, val2str(value));
-    end
-
-    fprintf(' { %s }', join(field_values, ", "));
-end
-
-function str = val2str(val)
-    if (isa(val, 'function_handle'))
-        str = func2str(val);
-    else
-        str = string(val);
-    end
+    fprintf(' %s', struct2string(parameters));
 end

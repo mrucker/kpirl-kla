@@ -6,20 +6,20 @@ function reinforcement_compare(domain, daps, rewards, attributes, statistics, ou
         algorithm   = dap{2};
         parameters  = dap{3};
 
-        metric_names  = cellfun(@(metric) metric(), attributes');
-        metric_values = zeros(numel(rewards),numel(attributes));
+        attribute_names  = cellfun(@(attribute) attribute(), attributes');
+        attribute_values = zeros(numel(rewards),numel(attributes));
 
         parfor i = 1:numel(rewards)
             feval([domain '_parameters'], parameters, true);
-            [policy, time] = algorithm(domain, rewards{i});
-            metric_values(i,:) = cellfun(@(metric) metric(rewards{i},policy,time), attributes');
+            [policy, time, policies, times] = algorithm(domain, rewards{i});
+            attribute_values(i,:) = cellfun(@(attribute) attribute(rewards{i},rewards,policy,policies,time,times), attributes');
         end
 
-        summary_names  = cellfun(@(summary) summary(), statistics);
-        summary_values = cellfun(@(summary) {summary(metric_values)}, statistics);
+        statistic_names  = cellfun(@(statistic) statistic(), statistics);
+        statistic_values = cellfun(@(statistic) {statistic(attribute_values)}, statistics);
 
         for i = 1:numel(outputs)
-            outputs{i}(description, parameters, metric_names, metric_values, summary_names, summary_values);
+            outputs{i}(description, parameters, attribute_names, attribute_values, statistic_names, statistic_values);
         end
 
     end

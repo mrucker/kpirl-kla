@@ -2,7 +2,7 @@ function f = policy_value(domain, n_episodes, n_steps, gamma)
 
     f = @policy_value_closure;
    
-    function v = policy_value_closure(reward,policy,~)        
+    function v = policy_value_closure(reward, ~, policy, ~, ~, ~)        
         
         if nargin == 0
             v = "V";
