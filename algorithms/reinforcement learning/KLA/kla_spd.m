@@ -1,4 +1,4 @@
-function [policy, time] = kla_spd(domain, reward)
+function [policy, time, policies, times] = kla_spd(domain, reward)
 
     gcp; %this is here to force the parallel pool to begin before we start timing
 
@@ -15,7 +15,9 @@ function [policy, time] = kla_spd(domain, reward)
         W     = parameters.W;
         gamma = parameters.gamma;
 
-        time = zeros(1,6);
+        time     = zeros(5,1);
+        policies = cell(1,N);
+        times    = zeros(5,N);
 
         v_n = v_i();
         v_p = v_p(1:v_n);
@@ -170,11 +172,13 @@ function [policy, time] = kla_spd(domain, reward)
             v_m = fitrsvm(x',y','KernelFunction','rbf', 'BoxConstraint', box_constraint, 'Solver', 'SMO', 'Standardize',true);
             v_v = predict(v_m, v_p')';
             v_f = @(s) v_v(v_i(s));
-
+                        
         time(5) = time(5) + toc(start);
+        
+        policies{n} = @(s) best_action_from_state(s, a_f(s), t_d, v_f);
+        times(:,n)  = time;
     end
 
-    start = tic;
-        policy = @(s) best_action_from_state(s, a_f(s), t_d, v_f);
-    time(6) = time(6) + toc(start);
+    policy = policies{end};
+    time   = times(:,end);
 end
