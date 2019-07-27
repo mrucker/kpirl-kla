@@ -34,6 +34,6 @@ algorithms = {
 
 a = tic;
 
-analyze_policies(domain, algorithms, 10, rewards, attributes, statistics, outputs);
+analyze_policy(domain, algorithms, 10, rewards, attributes, statistics, outputs);
 
 toc(a);
