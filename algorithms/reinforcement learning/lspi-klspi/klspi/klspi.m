@@ -22,7 +22,7 @@ function [policy, time, policies, times] = klspi(domain, reward)
     policy   = feval(polic_func, basis, discount, reward);
     eval_alg = @(samples, policy, new_policy) klsq_spd(samples, policy, new_policy, mu);
 
-    [~, all_policies] = policy_iteration(domain, eval_alg, policy, max_iter, max_epis, max_steps, epsilon, resample);
+    [~, all_policies] = iterate_policies(domain, eval_alg, policy, max_iter, max_epis, max_steps, epsilon, resample);
 
     policy = @(s) policy_function(all_policies{end}, s);
     time   = all_policies{end}.time;

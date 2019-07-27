@@ -21,7 +21,7 @@ function [policy, time, policies, times] = lspi(domain, reward)
     eval_alg = @lsq_spd;
     policy   = feval(polic_func, basis, discount, reward);
 
-    [~, all_policies] = policy_iteration(domain, eval_alg, policy, max_iter, max_epis, max_steps, epsilon, resample);
+    [~, all_policies] = iterate_policies(domain, eval_alg, policy, max_iter, max_epis, max_steps, epsilon, resample);
 
     policy = @(s) policy_function(all_policies{end}, s);
     time   = all_policies{end}.time;
