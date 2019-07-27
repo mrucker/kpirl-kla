@@ -34,6 +34,6 @@ daps = {
 
 a = tic;
 
-reinforcement_compare(domain, daps, rewards, attributes, statistics, outputs);
+analyze_policy(domain, daps, rewards, attributes, statistics, outputs);
 
 toc(a);

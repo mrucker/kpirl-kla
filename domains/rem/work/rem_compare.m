@@ -17,4 +17,4 @@ daps = {
     'kla_mem T=1 W=3;', @kla_mem, struct('v_basis', '1a', 'N', 20, 'M', 090, 'T', 1 , 'W', 3, 'gamma', 1);    
 }';
 
-reinforcement_compare(domain, daps, rewards, attributes, statistics, outputs);
+analyze_policy(domain, daps, rewards, attributes, statistics, outputs);

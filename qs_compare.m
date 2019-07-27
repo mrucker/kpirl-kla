@@ -17,7 +17,7 @@ outputs    = { statistics_to_screen() };
 
 algorithms = {
     %generate a policy using kla_spd and basis '1b' (aka, shared/single_basis) which gives a policy of random actions.
-    'random'  , @kla_spd, struct('N', 01, 'M', 01 , 'T', 01, 'v_basis', '1b', 'W', 00);
+    'random'  , @kla_spd, struct('N', 10, 'M', 01 , 'T', 01, 'v_basis', '1b', 'W', 00);
 
     %generate a policy using kla_spd and basis '1a' (this kla implementation decreases computation by increasing memory use)
     'kla_spd' , @kla_spd, struct('N', 10, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 03);
@@ -34,6 +34,6 @@ algorithms = {
 
 a = tic;
 
-reinforcement_compare(domain, algorithms, rewards, attributes, statistics, outputs);
+analyze_policies(domain, algorithms, 10, rewards, attributes, statistics, outputs);
 
 toc(a);
