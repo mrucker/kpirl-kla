@@ -1,4 +1,4 @@
-function analyze_policies(domain, daps, n_policies, rewards, attributes, statistics, outputs)
+function analyze_policies(domain, daps, rewards, attributes, statistics, outputs)
 
     for dap = daps
 
@@ -7,22 +7,26 @@ function analyze_policies(domain, daps, n_policies, rewards, attributes, statist
         parameters  = dap{3};
 
         attribute_names = cellfun(@(attribute) attribute(), attributes');
-        statistic_names = cellfun(@(statistic) statistic(), statistics);
-        
-        policies_attributes = zeros(n_policies, numel(rewards),numel(attributes));
+        statistic_names = cellfun(@(statistic) statistic(), statistics); 
+
+        policies_attributes = cell(1, numel(rewards)) ;
 
         parfor r = 1:numel(rewards)
             feval([domain '_parameters'], parameters, true);
 
             [~, ~, policies, times] = algorithm(domain, rewards{r});
 
-            for p = 1:n_policies
+            policies_attributes{r} = zeros(numel(policies), numel(attributes))
+
+            for p = 1:numel(policies)
                 calculate = @(attribute) attribute(rewards{r}, rewards, policies{p}, policies, times(:,p), times);
-                policies_attributes(p,r,:) = cellfun(calculate, attributes');
+                policies_attributes{r}(p,:) = cellfun(calculate, attributes');
             end
         end
 
-        for p = 1:n_policies
+        policies_attributes = permute(cat(3, policies_attributes{:}), [1 3 2]);
+
+        for p = 1:size(policies_attributes,1)
             policy_attributes = squeeze(policies_attributes(p,:,:));
             policy_statistics = cellfun(@(statistic) {statistic(policy_attributes)}, statistics);
 
