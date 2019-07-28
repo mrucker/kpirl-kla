@@ -7,7 +7,7 @@ function [policy, all_policies] = iterate_policies(domain, algorithm, policy, ma
     old_policy = policy;
 
     %%% policy iteration loop
-    while ( (iteration <= max_iter) && (distance > epsilon) )
+    while ( (iteration < max_iter) && (distance > epsilon) )
 
         i_start = tic;
 
