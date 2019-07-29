@@ -15,7 +15,7 @@ for i = 1:100
     rewards    = random_linear_reward(domain, n_rewds, @(n) [1 - 2 * rand(1,n-1) 0]);
     attributes = { policy_iteration_index() policy_value(domain, n_samps, n_steps, gamma) policy_time() };
     statistics = { };
-    outputs    = { attributes_to_file("test.csv") };
+    outputs    = { attributes_to_file("kla.csv") };
 
     daps = {
         %generate a policy using kla_spd and basis '1b' (aka, shared/single_basis) which gives a policy of random actions.
