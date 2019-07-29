@@ -5,6 +5,8 @@ function analyze_policies(domain, daps, rewards, attributes, statistics, outputs
         description = dap{1};
         algorithm   = dap{2};
         parameters  = dap{3};
+        
+        disp(description);
 
         attribute_names = cellfun(@(attribute) attribute(), attributes');
         statistic_names = cellfun(@(statistic) statistic(), statistics); 
@@ -12,6 +14,9 @@ function analyze_policies(domain, daps, rewards, attributes, statistics, outputs
         policies_attributes = cell(1, numel(rewards)) ;
 
         parfor r = 1:numel(rewards)
+            
+            disp(r);
+            
             feval([domain '_parameters'], parameters, true);
 
             [~, ~, policies, times] = algorithm(domain, rewards{r});
