@@ -17,13 +17,13 @@ outputs    = { statistics_to_screen() };
 
 daps = {
     %generate a policy using kla_spd and basis '1b' (aka, shared/single_basis) which gives a policy of random actions.
-    'random'  , @kla_spd, struct('N', 10, 'M', 01 , 'T', 01, 'v_basis', '1b', 'W', 00);
+    %'random'  , @kla_spd, struct('N', 10, 'M', 01 , 'T', 01, 'v_basis', '1b', 'W', 00);
 
     %generate a policy using kla_spd and basis '1a' (this kla implementation decreases computation by increasing memory use)
-    'kla_spd' , @kla_spd, struct('N', 10, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 00);
+    'kla_spd' , @kla_spd, struct('N', 10, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 03);
 
     %generate a policy using kla_mem and basis '1a' (this kla implementation decreases memory use by increasing computation)
-    %'kla_mem' , @kla_mem, struct('N', 10, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 03);
+    'kla_mem' , @kla_mem, struct('N', 10, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 03);
 
     %generate a policy using lspi and basis '1a' with a third order polynomial transform applied to the basis 
     %'lspi '   , @lspi   , struct('N', 20, 'M', 75, 'T', 20, 'v_basis', '1a', 'resample', true, 'transform', polynomial(3));

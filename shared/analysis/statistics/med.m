@@ -6,7 +6,7 @@ function f = med()
         if(nargin == 0)
             f = "med";
         else
-            f = median(metrics);
+            f = median(metrics,1);
         end
     end
 end

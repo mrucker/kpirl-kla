@@ -42,19 +42,15 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
     for n = 1:N
 
         start = tic;
-            SE      = sqrt(lambda.*sig_sq);
-            SE(K<3) = max([SE(K>=3),0]);
-
-            BI      = beta;
-            BI(K<3) = mean([BI(K>=3),0]);
-
+        
+            explore = get_explore_function(parameters, sqrt(lambda.*sig_sq), beta, K);
             init_s  = arrayfun(@(m) { s_1() }, 1:M);
 
             t_m = repmat({cell(1,T+W)}, 1,M);
         time(2) = time(2) + toc(start);
 
         start = tic;
-            parfor m = 1:M
+            for m = 1:M
 
                 s_t = init_s{m};
 
@@ -64,8 +60,7 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
                     post_v_vs = v_f(post_s_as);
 
                     if(t == 1)
-                        post_v_is = v_i(post_s_as);
-                        post_v_vs = post_v_vs + BI(post_v_is) + 2 * SE(post_v_is);
+                        post_v_vs = post_v_vs + explore(v_i(post_s_as));
                     end
 
                     % rather than selecting a random action of highest value we just pick the first one
@@ -181,4 +176,22 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
 
     policy = policies{end};
     time   = times(:,end);
+end
+
+function f = get_explore_function(parameters, SE, BI, K)
+
+    if isfield(parameters,'explore')
+        explore = parameters.explore;
+    else
+        explore = 1;
+    end
+
+    if explore == 0 || all(K<3)
+        f = @(v_is) 0;
+    else
+        SE(K<3) = max (SE(K>=3));
+        BI(K<3) = mean(BI(K>=3));
+
+        f = @(v_is) BI(v_is) + 2 * SE(v_is);    
+    end
 end

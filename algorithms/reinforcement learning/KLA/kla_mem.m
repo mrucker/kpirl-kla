@@ -31,17 +31,10 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
     for n = 1:N
 
         start = tic;
-
-            init_state_bias          = @(i) BI(Z,i);
-            init_state_error         = @(i) SE(Z,i);
-            confidence_interval      = @(i) init_state_bias(i) + 2*init_state_error(i);
-            init_state_indexes       = @(s) v_i(t_d(s, a_f(s)));
-            init_confidence_interval = @(s) confidence_interval(init_state_indexes(s));
-
             init_s  = arrayfun(@(m) { s_1() }, 1:M);
-            init_C = cellfun(init_confidence_interval, init_s, 'UniformOutput',false);
+            explore = get_explore_function(parameters, Z);
 
-            t_m = arrayfun(@(i) cell (1,T+W), 1:M, 'UniformOutput', false);
+            t_m = arrayfun(@(i) { cell(1,T+W) }, 1:M);
         time(2) = time(2) + toc(start);
 
         start = tic;
@@ -55,7 +48,7 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
                     post_v_vs = v_f(post_s_as);
 
                     if(t == 1)
-                        post_v_vs = post_v_vs + init_C{m}';
+                        post_v_vs = post_v_vs + explore(v_i(post_s_as));
                     end
 
                     % rather than selecting a random action of highest value we just pick the first one
@@ -160,21 +153,42 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
     time   = times(:,end);
 end
 
-function se = SE(Z,i)
-    if isKey(Z,i)
-        z = Z(i);
-        se = sqrt(z(8)*z(5));
+function f = get_explore_function(parameters, Z)
+
+    if isfield(parameters,'explore')
+        explore_type = parameters.explore;
     else
-        se = max([cellfun(@(z) (z(1)>=3)*sqrt(z(8)*z(5)), values(Z)), 0]);
+        explore_type = 1;
     end
-end
 
-function se = BI(Z,i)
+    GT = cellfun(@(z) z(1)>=3        , values(Z));
+    SE = cellfun(@(z) sqrt(z(8)*z(5)), values(Z));
+    BI = cellfun(@(z) z(3)           , values(Z));
 
-    if isKey(Z,i)
-        z = Z(i);
-        se = z(3);
-    else
-        se = mean([cellfun(@(z) (z(1)>=3)*z(3), values(Z)) 0]);
+    max_SE = max (SE(GT));
+    avg_BI = mean(BI(GT));
+
+    function c = zero_explore(~)
+        c = 0;
+    end
+
+    function c = standard_explore(i)
+        if isKey(Z,i)
+            z = Z(i);
+        else
+            z = 0;
+        end
+
+        if(z(1) >= 3)
+            c = sqrt(z(8)*z(5));
+        else
+            c = avg_BI + 2 * max_SE;
+        end
+    end
+
+    if (explore_type == 0 || ~any(GT))
+        f = @zero_explore;
+    else 
+        f = @standard_explore;
     end
 end

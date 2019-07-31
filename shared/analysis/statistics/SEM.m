@@ -6,7 +6,7 @@ function f = SEM()
         if(nargin == 0)
             f = "SEM";
         else
-            f = sqrt(var(metrics)/size(metrics,1));
+            f = sqrt(var(metrics,0,1)/size(metrics,1));
         end
     end
 end

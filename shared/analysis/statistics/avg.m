@@ -6,7 +6,7 @@ function f = avg()
         if(nargin == 0)
             f = "avg";
         else
-            f = mean(metrics);
+            f = mean(metrics,1);
         end
     end
 end

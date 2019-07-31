@@ -5,7 +5,7 @@ clear; close all; run(fullfile(fileparts(which(mfilename)), '..', '..', '..', 'q
 
 domain = 'huge';
 
-for i = 1:100
+for i = 1:200
 
     n_rewds = 4;
     n_samps = 64;
@@ -18,17 +18,13 @@ for i = 1:100
     outputs    = { attributes_to_file("kla.csv") };
 
     daps = {
-        %generate a policy using kla_spd and basis '1b' (aka, shared/single_basis) which gives a policy of random actions.
-        'random'  , @kla_spd, struct('N', 30, 'M', 01 , 'T', 01, 'v_basis', '1b', 'W', 00);
-
-        %generate a policy using kla_spd and basis '1a' (this kla implementation decreases computation by increasing memory use)
-        'kla'     , @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 00);
-
-        %generate a policy using lspi and basis '1a' with a third order polynomial transform applied to the basis 
-        'lspi'    , @lspi   , struct('N', 30, 'M', 75, 'T', 20, 'v_basis', '1a', 'resample', true, 'transform', polynomial(3));
-
-        %generate a policy using klspi and basis '1a' with the provided kernel function
-        'klspi'   , @klspi  , struct('N', 30, 'M', 90, 'T', 07, 'v_basis', '1a', 'resample', true, 'kernel', k_gaussian(k_norm(),0.5), 'mu', 0.3);
+        %'random'           , @kla_spd, struct('N', 30, 'M', 01 , 'T', 01, 'v_basis', '1b', 'W', 00);
+        'kla-explore=0-W=0', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 00, 'explore', 0);
+        'kla-explore=0-W=1', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 01, 'explore', 0);
+        'kla-explore=0-W=2', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 02, 'explore', 0);
+        'kla-explore=1-W=0', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 00, 'explore', 1);
+        'kla-explore=1-W=1', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 01, 'explore', 1);
+        'kla-explore=1-W=2', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 02, 'explore', 1);
     }';
 
     disp(i);

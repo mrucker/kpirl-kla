@@ -25,6 +25,7 @@ function d = default_params()
         ,'mu'       , 0.3    ... % the decision criteria used in klspi ald analysis
         ,'transform', ident()... % the transform applied to the basis in lspi
         ,'resample' , false  ... % whether lspi-klspi should resample each policy iteration
+        ,'explore'  , 1      ... % sets the explore-exploit method in kla
     );
 end
 
