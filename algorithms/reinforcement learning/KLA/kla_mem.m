@@ -144,7 +144,7 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
             v_f = @(s) predict(v_m, v_p(s)')';
 
         time(5) = time(5) + toc(start);
-        
+
         policies{n} = @(s) best_action_from_state(s, a_f(s), t_d, v_f);
         times(:,n)  = time;
     end
