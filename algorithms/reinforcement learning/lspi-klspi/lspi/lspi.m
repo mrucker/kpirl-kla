@@ -8,20 +8,21 @@ function [policy, time, policies, times] = lspi(domain, reward)
     basis_func = [domain '_value_basis_lspi'];
     polic_func = [domain '_initialize_policy'];
 
-    parameters = feval(param_func);
+    params = feval(param_func);
+    basis  = feval(basis_func);
 
-    max_iter  = parameters.N;
-    max_epis  = parameters.M;
-    max_steps = parameters.T;
-    epsilon   = parameters.epsilon;
-    resample  = parameters.resample;
-    basis     = basis_func;
-    discount  = parameters.gamma;
+    max_iter  = params.N;
+    max_epis  = params.M;
+    max_steps = params.T;
+    epsilon   = params.epsilon;
+    resample  = params.resample;
+
+    discount  = params.gamma;
 
     eval_alg = @lsq_spd;
-    policy   = feval(polic_func, basis, discount, reward);
+    policy   = feval(polic_func, struct('explore',1, 'discount',discount, 'reward',reward, 'basis',basis));
 
-    [~, all_policies] = iterate_policies(domain, eval_alg, policy, max_iter, max_epis, max_steps, epsilon, resample);
+    [~, all_policies] = lspi_klspi_core(domain, eval_alg, policy, max_iter, max_epis, max_steps, epsilon, resample);
 
     policy = @(s) policy_function(all_policies{end}, s);
     time   = all_policies{end}.time;

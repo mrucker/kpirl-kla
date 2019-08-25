@@ -10,7 +10,8 @@ function [action] = policy_function(policy, state)
     %%% Find first all actions with maximum Q-value
 
     if isfield(policy, 'exemplars')
-        phis = policy.basis(state, valid_actions, policy.exemplars);
+        phis = policy.basis(state, valid_actions);
+        phis = policy.simil(phis, policy.exemplars);
     else
         phis = policy.basis(state, valid_actions);
     end

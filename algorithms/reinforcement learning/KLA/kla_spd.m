@@ -78,7 +78,13 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
                 t_r = reward(t_s(t_m{m}));
                 for w = 1:W+1
                     i = v_i(t_m{m}{w});
-                    y = g_mat(w,:) * t_r';
+
+                    if isfield(parameters,'bootstrap') && parameters.bootstrap
+                        y = t_r(w) + gamma*v_f(t_m{m}{w+1});
+                    else
+                        y = g_mat(w,:) * t_r';
+                    end
+
                     k = K(i);
 
                     if ~isnan(Y(i))

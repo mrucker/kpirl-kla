@@ -1,37 +1,39 @@
 function exemplars = ald_analysis(samples, policy, mu)
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    state  = samples(1).state;
+    action = samples(1).action;
+    
+    current_features = policy.basis(state, action);
 
-    n_samples   = length(samples);   % number of data samples  
+    k_tt=policy.simil(current_features, current_features); 
 
-    exemplars   = policy.basis(samples(1).state, samples(1).action);
-    n_exemplars = size(exemplars,1);
+    K_Inv      = zeros(1, 1);
+    K_Inv(1,1) = 1.0/k_tt;
 
-    k_tt=policy.basis(samples(1).state, samples(1).action, exemplars); 
-
-    K_Inv=zeros(n_exemplars, n_exemplars);
-    K_Inv(1,1)=1.0/k_tt;
-
+    exemplars   = current_features;
+    n_exemplars = 1;
+    
     K_t=zeros(1,1);
 
-    for i=1:n_samples
+    for i=1:length(samples)
 
         state=samples(i).state;
         action=samples(i).action;
 
-        current_feature=policy.basis(state, action);
+        current_features = policy.basis(state, action);
 
-        k_t = policy.basis(state, action, exemplars);
-        k_tt= policy.basis(state, action, current_feature);
+        k_t = policy.simil(current_features, exemplars);
+        k_tt= policy.simil(current_features, current_features);
 
         c_t = K_Inv*k_t';
         d_t = k_tt-k_t*c_t;
 
         %note, the author's paper doesn't indicate that the abs of d_t should be used
+        %I've simply kept it as is because this is what the author did in their code
         if  mu <= abs(d_t)
 
-            exemplars   = vertcat(exemplars, current_feature);
-            n_exemplars = size(exemplars,1);
+            exemplars   = vertcat(exemplars, current_features);
+            n_exemplars = n_exemplars + 1;
 
             %% K_Inv(t)=[ K_Inv(t-1)+a_t*a_t'/delta,  -a_t/delta ]
             %%          [   -a_t'/delta ,                 1/delta]

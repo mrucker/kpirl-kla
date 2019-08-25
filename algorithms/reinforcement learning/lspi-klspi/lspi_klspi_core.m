@@ -1,4 +1,4 @@
-function [policy, all_policies] = iterate_policies(domain, algorithm, policy, max_iter, max_epis, max_steps, epsilon, resample)
+function [policy, all_policies] = lspi_klspi_core(domain, algorithm, policy, max_iter, max_epis, max_steps, epsilon, resample)
 
     iteration = 0;
     distance  = inf;
