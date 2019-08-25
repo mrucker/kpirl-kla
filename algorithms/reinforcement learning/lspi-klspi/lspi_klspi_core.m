@@ -13,6 +13,9 @@ function [policy, all_policies] = lspi_klspi_core(domain, algorithm, policy, max
 
         if ~exist('samples', 'var') || resample
             samples = samples_from_episodes(domain, max_epis, max_steps, old_policy);
+        else
+            update
+            create
         end
 
         %%% Update and print the number of iterations

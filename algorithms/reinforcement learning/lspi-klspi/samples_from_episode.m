@@ -40,7 +40,7 @@ function [new_results, totdrew, toturew] = samples_from_episode(initial_state, s
   endsim = 0;
   
   %%% Set initial state
-  state = feval(simulator, initial_state);
+  state = initial_state;
   
   %%% Run the episode
   while ( (steps < n_steps) && (~endsim) )

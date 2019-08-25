@@ -4,9 +4,9 @@ function [policy, time, policies, times] = klspi(domain, reward)
     clear([domain '_value_basis_klspi']);
     clear([domain '_simulator']);
 
+    polic_func = [domain '_policy'];
     param_func = [domain '_parameters'];
     basis_func = [domain '_value_basis_klspi'];
-    polic_func = [domain '_initialize_policy'];
 
     [params      ] = feval(param_func);
     [basis, simil] = feval(basis_func);
@@ -19,7 +19,13 @@ function [policy, time, policies, times] = klspi(domain, reward)
     mu        = params.mu;
     resample  = params.resample;
 
-    policy   = feval(polic_func, struct('explore',1, 'discount',discount, 'reward',reward, 'basis',basis, 'simil',simil));
+    policy          = feval(polic_func);
+    policy.explore  = 1;
+    policy.discount = discount;
+    policy.reward   = reward;
+    policy.basis    = basis;
+    policy.simil    = simil;
+    
     eval_alg = @(samples, policy, new_policy) klsq_spd(samples, policy, new_policy, mu);
 
     [~, all_policies] = lspi_klspi_core(domain, eval_alg, policy, max_iter, max_epis, max_steps, epsilon, resample);

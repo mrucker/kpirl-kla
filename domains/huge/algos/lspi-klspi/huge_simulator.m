@@ -12,11 +12,6 @@ function [nextstate, absorb] = huge_simulator(state, action); persistent t_b s_1
         nextstate = s_1();
         absorb    = 0;
     end
-        
-    if(nargin==1)
-        nextstate = state;
-        absorb    = 0;
-    end
 
     if(nargin==2)        
         nextstate = t_b(state, action);
