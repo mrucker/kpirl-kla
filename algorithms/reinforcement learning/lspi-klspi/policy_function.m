@@ -1,9 +1,10 @@
-function action = policy_function(policy, state)
+function [action, basis] = policy_function(policy, state)
 
     actions = policy.actions(state);
 
     if (rand < policy.explore)
         action = actions(:,randi(size(actions,2)));
+        basis  = policy.basis(state, action);
     else
         if isfield(policy, 'exemplars')
             basis = policy.basis(state, actions);
@@ -13,12 +14,13 @@ function action = policy_function(policy, state)
             phis  = basis;
         end
 
-        q_all = phis * policy.weights;    
+        q_all = phis * policy.weights;
         q_max = max(q_all);
         i_max = find(q_all == q_max);
 
         random_index_of_max_q = i_max(randi(length(i_max)));
 
-        action  = actions(:,random_index_of_max_q);
+        action = actions(:,random_index_of_max_q);
+        basis  = basis(random_index_of_max_q,:);
     end
 end

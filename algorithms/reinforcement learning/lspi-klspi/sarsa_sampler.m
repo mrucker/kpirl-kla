@@ -39,18 +39,16 @@ function episode_samples = create_episode_samples(simulator, policy, max_steps)
     steps  = 0;
     endsim = 0;
 
-    [state ] = feval(simulator);
-    [action] = policy_function(policy, state);
-    [basis ]  = policy.basis(state, action);
-    
+    [state        ] = feval(simulator);
+    [action, basis] = policy_function(policy, state);
+
     while ( (steps < max_steps) && (~endsim) )
 
         steps = steps + 1;
 
-        [nextstate, endsim] = feval(simulator, state, action);
-        [nextaction       ] = policy_function(policy, nextstate);
-        [nextbasis        ] = policy.basis(nextstate, nextaction);
-        [reward           ] = policy.reward(state);
+        [nextstate, endsim    ] = feval(simulator, state, action);
+        [nextaction, nextbasis] = policy_function(policy, nextstate);
+        [reward               ] = policy.reward(state);
 
         episode_samples(steps).state      = state;
         episode_samples(steps).action     = action;

@@ -29,10 +29,17 @@ function analyze_policies(domain, daps, rewards, attributes, statistics, outputs
             end
         end
 
-        policies_attributes = permute(cat(3, policies_attributes{:}), [1 3 2]);
+        if numel(rewards) == 1
+            temp_attributes        = zeros(size(policies_attributes{1},1), 1, size(policies_attributes{1},2));
+            temp_attributes(:,1,:) = policies_attributes{1};
+            policies_attributes    = temp_attributes;
+        else
+            %transform into policies x rewds x attributes
+            policies_attributes = permute(cat(3, policies_attributes{:}), [1 3 2]);
+        end
 
         for p = 1:size(policies_attributes,1)
-            policy_attributes = squeeze(policies_attributes(p,:,:));
+            policy_attributes = reshape(policies_attributes(p,:,:), [numel(rewards), numel(attributes)]);
             policy_statistics = cellfun(@(statistic) {statistic(policy_attributes)}, statistics);
 
             for i = 1:numel(outputs)
