@@ -9,7 +9,7 @@ function new_policy = klsq_spd(samples, policy, new_policy, mu)
     k_hat_next = zeros(howmany, k);
 
     basis = new_policy.basis;
-    simil = new_policy.simil;
+    affin = new_policy.affin;
 
     parfor i=1:howmany
 
@@ -24,8 +24,8 @@ function new_policy = klsq_spd(samples, policy, new_policy, mu)
         end
     end
 
-    k_hat      = simil(k_hat     , exemplars);
-    k_hat_next = simil(k_hat_next, exemplars);
+    k_hat      = affin(k_hat     , exemplars);
+    k_hat_next = affin(k_hat_next, exemplars);
 
     A = k_hat' * (k_hat - new_policy.discount * k_hat_next);
     b = k_hat' * r_hat;

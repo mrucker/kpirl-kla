@@ -5,7 +5,7 @@ function exemplars = ald_analysis(samples, policy, mu)
     
     current_features = policy.basis(state, action);
 
-    k_tt=policy.simil(current_features, current_features); 
+    k_tt=policy.affin(current_features, current_features); 
 
     K_Inv      = zeros(1, 1);
     K_Inv(1,1) = 1.0/k_tt;
@@ -22,8 +22,8 @@ function exemplars = ald_analysis(samples, policy, mu)
 
         current_features = policy.basis(state, action);
 
-        k_t = policy.simil(current_features, exemplars);
-        k_tt= policy.simil(current_features, current_features);
+        k_t = policy.affin(current_features, exemplars);
+        k_tt= policy.affin(current_features, current_features);
 
         c_t = K_Inv*k_t';
         d_t = k_tt-k_t*c_t;

@@ -1,4 +1,8 @@
 function policy = huge_policy()
-    policy.explore = 1;
-    policy.actions = huge_actions();
+
+    params = huge_parameters();
+
+    policy.explore  = 1;
+    policy.discount = params.gamma;
+    policy.actions  = huge_actions();
 end

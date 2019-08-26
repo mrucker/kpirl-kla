@@ -36,7 +36,6 @@ daps = {
     %'klspi'   , @klspi  , struct('N', 45, 'M', 90, 'T', 07, 'v_basis', '1a', 'resample', true, 'kernel', k_gaussian(k_norm(),0.5), 'mu', 0.3);
 }';
 
-
 a = tic;
 
 analyze_policy(domain, daps, rewards, attributes, statistics, outputs);

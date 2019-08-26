@@ -1,15 +1,17 @@
 % A wrapper that conforms LSPI to the RL interface
 function [policy, time, policies, times] = lspi(domain, reward)
 
-    clear([domain '_value_basis_lspi']);
-    clear([domain '_simulator']);
-
     polic_func = [domain '_policy'];
+    simul_func = [domain '_simulator'];
     param_func = [domain '_parameters'];
     basis_func = [domain '_value_basis_lspi'];
+    
+    clear(basis_func);
+    clear(simul_func);
 
-    params = feval(param_func);
-    basis  = feval(basis_func);
+    [policy   ] = feval(polic_func);
+    [params   ] = feval(param_func);
+    [basis    ] = feval(basis_func);
 
     max_iter  = params.N;
     max_epis  = params.M;
@@ -17,18 +19,13 @@ function [policy, time, policies, times] = lspi(domain, reward)
     epsilon   = params.epsilon;
     resample  = params.resample;
 
-    discount  = params.gamma;
-    
-    policy          = feval(polic_func);
-    policy.explore  = 1;
-    policy.discount = discount;
     policy.reward   = reward;
     policy.basis    = basis;
-    
+
+    sampler  = sarsa_sampler(simul_func, policy, max_epis, max_steps, resample);
     eval_alg = @lsq_spd;
 
-
-    [~, all_policies] = lspi_klspi_core(domain, eval_alg, policy, max_iter, max_epis, max_steps, epsilon, resample);
+    [~, all_policies] = lspi_klspi_core(sampler, eval_alg, policy, max_iter, epsilon);
 
     policy = @(s) policy_function(all_policies{end}, s);
     time   = all_policies{end}.time;

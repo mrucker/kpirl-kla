@@ -1,4 +1,4 @@
-function [policy, all_policies] = lspi_klspi_core(domain, algorithm, policy, max_iter, max_epis, max_steps, epsilon, resample)
+function [policy, all_policies] = lspi_klspi_core(sampler, eval_alg, policy, max_iter, epsilon)
 
     iteration = 0;
     distance  = inf;
@@ -10,13 +10,8 @@ function [policy, all_policies] = lspi_klspi_core(domain, algorithm, policy, max
     while ( (iteration < max_iter) && (distance > epsilon) )
 
         i_start = tic;
-
-        if ~exist('samples', 'var') || resample
-            samples = samples_from_episodes(domain, max_epis, max_steps, old_policy);
-        else
-            update
-            create
-        end
+        
+        samples = sampler(old_policy);
 
         %%% Update and print the number of iterations
         iteration = iteration + 1;
@@ -27,7 +22,7 @@ function [policy, all_policies] = lspi_klspi_core(domain, algorithm, policy, max
 
         %%% Evaluate the current policy (and implicitly improve)
         %%% There are several options here - choose one    
-        new_policy = algorithm(samples, old_policy, new_policy);
+        new_policy = eval_alg(samples, old_policy, new_policy);
 
         %%% Compute the distance between the current and the previous policy
         if(~isfield(old_policy, 'weights') || ~isfield(new_policy, 'weights'))
