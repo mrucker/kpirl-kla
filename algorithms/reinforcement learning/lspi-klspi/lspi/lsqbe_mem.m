@@ -1,69 +1,27 @@
-function new_policy = lsqbe_mem(samples, policy, new_policy)
+function new_policy = lsqbe_mem(samples, new_policy)  
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% Copyright 2000-2002 
-%
-% Michail G. Lagoudakis (mgl@cs.duke.edu)
-% Ronald Parr (parr@cs.duke.edu)
-%
-% Department of Computer Science
-% Box 90129
-% Duke University, NC 27708
-% 
-%
-% new_policy = lsqbe_mem(samples, policy, new_policy)
-%
-% Evaluates the "policy" using the set of "samples", that is, it
-% learns a set of weights for the basis specified in new_policy to
-% form the approximate Q-value of the "policy" and the improved
-% "new_policy". The approximation minimizes the bellman error.
-%
-% Returns the new policy with weights set to w of Aw=b.
-%
-% See also lsqbe_spd.m for a faster implementation.
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  
-  
-  %%% Initialize variables
-  
-  howmany = length(samples);
-  k       = new_policy.basis();
-  A       = zeros(k, k);
-  b       = zeros(k, 1);  
-  
-  %%% Loop through the samples 
-  for i=1:howmany
-    
-    %%% Compute the basis for the current state and action
-    phi = new_policy.basis(samples(i).state, samples(i).action);
+    k = new_policy.basis();
+    A = zeros(k, k);
+    b = zeros(k, 1);  
 
-    %%% Make sure the nextstate is not an absorbing state
-    if ~samples(i).absorb
-      
-      %%% Compute the policy and the corresponding basis at the next state 
-      nextaction = policy_function(policy, samples(i).nextstate);
-      nextphi    = new_policy.basis(samples(i).nextstate, nextaction);
-      
-    else
-      nextphi = zeros(1, k);
+    for i=1:length(samples)
+
+        phi     = samples(i).nextbasis;
+        nextphi = samples(i).nextbasis * ~samples(i).absorb;
+
+        A = A + (phi - new_policy.discount * nextphi) * (phi - new_policy.discount * nextphi)';
+        b = b + (phi - new_policy.discount * nextphi) * samples(i).reward;
+
     end
 
-    %%% Update the matrices A and b
-    A = A + (phi - new_policy.discount * nextphi) * (phi - new_policy.discount * nextphi)';
-    b = b + (phi - new_policy.discount * nextphi) * samples(i).reward;
-    
-  end
+    if rank(A) == size(A,1)
+        w = A\b;
+    else
+        w = pinv(A)*b;
+    end
 
-  if rank(A)==k
-    w = A\b;
-  else
-    w = pinv(A)*b;
-  end
-  
-  new_policy.weights = w;
-  new_policy.explore = 0;
-  
-  return
+    new_policy.weights = w;
+    new_policy.explore = 0;
+
+end
   

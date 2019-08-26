@@ -25,7 +25,7 @@ function [policy, time, policies, times] = klspi(domain, reward)
     policy.affin    = affin;
  
     sampler  = sarsa_sampler(simul_func, policy, max_epis, max_steps, resample);
-    eval_alg = @(samples, policy, new_policy) klsq_spd(samples, policy, new_policy, mu);
+    eval_alg = @(samples, new_policy) klsq_spd(samples, new_policy, mu);
 
     [~, all_policies] = lspi_klspi_core(sampler, eval_alg, policy, max_iter, epsilon);
 

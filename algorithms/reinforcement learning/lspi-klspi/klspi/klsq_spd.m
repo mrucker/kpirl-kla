@@ -1,36 +1,19 @@
-function new_policy = klsq_spd(samples, policy, new_policy, mu)
+function new_policy = klsq_spd(samples, new_policy, mu)
 
     exemplars = ald_analysis(samples, new_policy, mu);
 
-    howmany    = length(samples);
-    k          = size(exemplars,2);
-    r_hat      = zeros(howmany, 1);
-    k_hat      = zeros(howmany, k);
-    k_hat_next = zeros(howmany, k);
+    R_hat             = cell2mat(arrayfun(@(sample) {sample.reward   }, samples'));
+    K_hat             = cell2mat(arrayfun(@(sample) {sample.basis    }, samples'));
+    K_hat_next        = cell2mat(arrayfun(@(sample) {sample.nextbasis}, samples'));
+    K_hat_next_absorb = cell2mat(arrayfun(@(sample) {sample.absorb   }, samples'));
+    
+    K_hat      = new_policy.affin(K_hat     , exemplars);
+    K_hat_next = new_policy.affin(K_hat_next, exemplars) .* ~K_hat_next_absorb;
 
-    basis = new_policy.basis;
-    affin = new_policy.affin;
+    A = K_hat' * (K_hat - new_policy.discount * K_hat_next);
+    b = K_hat' * R_hat;
 
-    parfor i=1:howmany
-
-        k_hat(i,:) = basis(samples(i).state, samples(i).action);
-        r_hat(i)   = samples(i).reward;
-
-        if ~samples(i).absorb
-            nextaction      = policy_function(policy, samples(i).nextstate);
-            k_hat_next(i,:) = basis(samples(i).nextstate, nextaction);
-        else
-            k_hat_next(i,:) = zeros(1,k);
-        end
-    end
-
-    k_hat      = affin(k_hat     , exemplars);
-    k_hat_next = affin(k_hat_next, exemplars);
-
-    A = k_hat' * (k_hat - new_policy.discount * k_hat_next);
-    b = k_hat' * r_hat;
-
-    if rank(A) == k
+    if rank(A) == size(A,1)
         w = A\b;
     else
         w = pinv(A)*b;
