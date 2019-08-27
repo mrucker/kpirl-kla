@@ -37,7 +37,7 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
             init_s  = arrayfun(@(m) { s_1() }, 1:M);
             explore = get_explore_function(parameters, Z);
 
-            t_m = arrayfun(@(i) { cell(1,T+W) }, 1:M);
+            t_m = repmat({cell(1,T+W)}, 1,M);
         time(2) = time(2) + toc(start);
 
         start = tic;
@@ -61,7 +61,6 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
                     s_t       = t_s(t_m{m}{t});
                 end
             end
-
         time(3) = time(3) + toc(start);
 
         start = tic;
@@ -88,7 +87,7 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
                         if(epsilon == 0 && k > 2)
                             %for some reason I keep getting 0 error in my
                             %estimate, even after four iterations. This in turn
-                            %causes my estimate of my estimators bias (b)
+                            %causes my estimate of my estimator's bias (b)
                             %and the estimate of its variance (v) to become
                             %zero in some cases making my stepsize (a) NaN.
                             %to combat this I'll add a small perturbation

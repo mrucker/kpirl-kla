@@ -37,7 +37,6 @@ function s = huge_states_from(observations)
     states    = cell(1,numel(observations)+1);
     states{1} = zeros(11,1);
 
-    %calculates all my cursor basis, now I need to calculate touch basis
     for i = 1:numel(observations)
         o = observations{i};
         s = states{i};
@@ -46,7 +45,6 @@ function s = huge_states_from(observations)
         u  = o(1:2) - s(1:2);
         ts = o(6:end);
 
-        %states{i+1} = [adp_transition_post_decision(x,u); ts];
         states{i+1} = [td(x,u); ts];
     end
 

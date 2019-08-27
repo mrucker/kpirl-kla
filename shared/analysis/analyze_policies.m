@@ -21,7 +21,7 @@ function analyze_policies(domain, daps, rewards, attributes, statistics, outputs
 
             [~, ~, policies, times] = algorithm(domain, rewards{r});
 
-            policies_attributes{r} = zeros(numel(policies), numel(attributes))
+            policies_attributes{r} = zeros(numel(policies), numel(attributes));
 
             for p = 1:numel(policies)
                 calculate = @(attribute) attribute(rewards{r}, rewards, policies{p}, policies, times(:,p), times);

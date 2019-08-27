@@ -35,15 +35,14 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
     for n = 2:N
 
         start = tic;
-        
+            init_s  = arrayfun(@(m) { s_1() }, 1:M);    
             explore = get_explore_function(parameters, Z);
-            init_s  = arrayfun(@(m) { s_1() }, 1:M);
 
             t_m = repmat({cell(1,T+W)}, 1,M);
         time(2) = time(2) + toc(start);
 
         start = tic;
-            for m = 1:M
+            parfor m = 1:M
 
                 s_t = init_s{m};
 
@@ -69,7 +68,7 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
             for m = 1:M
                 t_r = reward(t_s(t_m{m}));
                 for w = 1:W+1
-                    a_i = v_i(t_m{m}{w});
+                    i = v_i(t_m{m}{w});
 
                     if isfield(parameters,'bootstrap') && parameters.bootstrap
                         y = t_r(w) + gamma*v_f(t_m{m}{w+1});
@@ -77,7 +76,7 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
                         y = g_mat(w,:) * t_r';
                     end
 
-                    z = Z(a_i,:);
+                    z = Z(i,:);
                     [k, Y, beta, var, alpha, eta, lambda] = deal(z(1),z(2),z(3),z(4),z(6),z(7),z(8));
 
                     if k > 0
@@ -95,7 +94,7 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
                             %to combat this I'll add a small perturbation
                             %with zero mean. That way the bias will be
                             %small but still existant
-                            epsilon = 1/2*(1/2 - rand);
+                            epsilon = 1/2*(rand-1/2);
                         end
 
                         beta   = (1-eta)*beta + eta*(epsilon);
@@ -124,12 +123,12 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
 
                         assert(~( any(1.0001 < [alpha,eta]) || any(isnan([alpha, eta, lambda])) || any(isinf([alpha, eta, lambda]))));
 
-                        Z(a_i,:) = [k+1, Y, beta, var, sig_sq, alpha, eta, lambda];
+                        Z(i,:) = [k+1, Y, beta, var, sig_sq, alpha, eta, lambda];
 
                     else
                         %this is the "initialization" step from the algorithm; we don't use many of these for a few iterations.
                                 %[k, Y, beta, var, sig_sq, alpha, eta, lambda]
-                        Z(a_i,:) = [1, y,    0,   0,      0,     1,   1,      0];
+                        Z(i,:) = [1, y,    0,   0,      0,     1,   1,      0];
                     end
                 end
             end
