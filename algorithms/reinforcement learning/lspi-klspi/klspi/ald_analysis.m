@@ -1,54 +1,50 @@
 function exemplars = ald_analysis(samples, policy, mu)
 
-    state  = samples(1).state;
-    action = samples(1).action;
-    
-    current_features = policy.basis(state, action);
+    exemplars = policy.basis(samples(1).state, samples(2).action);
 
-    k_tt=policy.affin(current_features, current_features); 
-
-    K_Inv      = zeros(1, 1);
-    K_Inv(1,1) = 1.0/k_tt;
-
-    exemplars   = current_features;
-    n_exemplars = 1;
-    
-    K_t=zeros(1,1);
+    K_t   = policy.affin(exemplars, exemplars);
+    K_Inv = K_t^-1;
 
     for i=1:length(samples)
 
-        state=samples(i).state;
-        action=samples(i).action;
+        state  = samples(i).state;
+        action = samples(i).action;
 
         current_features = policy.basis(state, action);
 
-        k_t = policy.affin(current_features, exemplars);
+        k_t = policy.affin(current_features, exemplars)';
         k_tt= policy.affin(current_features, current_features);
 
-        c_t = K_Inv*k_t';
-        d_t = k_tt-k_t*c_t;
+        c_t = K_Inv*k_t;
+        d_t = k_tt-k_t'*c_t;
 
-        %note, the author's paper doesn't indicate that the abs of d_t should be used
-        %I've simply kept it as is because this is what the author did in their code
-        if  mu <= abs(d_t)
+        %in theory K_t == policy.affin(exemplars, exemplars) and K_Inv == K_t^-1. However, because we use iterative updates
+        %to determine K_t and K_Inv each time we add an exemplar rather than recalculating then from scratch our matrices
+        %will deviate slightly from the full recalculation. Thus why we make sure no single element deviates by more than .00001.
+        %Calculating policy.affin(exemplars, exemplars)^-1 for our check is duplicate work so we usually leave it commented.
+        % assert(max(abs(policy.affin(exemplars, exemplars) - K_t), [], 'all') < .0001)
+        % assert(max(abs(K_t^-1 - K_Inv), [], 'all') < .00001)
+
+        if  mu <= d_t
+
+            %in theory d_t is the squared distance of our optimization program and so it should always be >= 0
+            %in practice though sometimes the value of d_t can be slightly < 0 due to numerical approximation
+            %if d_t is ever considerably below 0 (i.e., <= -.0001) then something is wrong with the ALD analysis
+            assert(d_t > -.0001);
 
             exemplars   = vertcat(exemplars, current_features);
-            n_exemplars = n_exemplars + 1;
-
-            %% K_Inv(t)=[ K_Inv(t-1)+a_t*a_t'/delta,  -a_t/delta ]
-            %%          [   -a_t'/delta ,                 1/delta]
-            K_Inv=K_Inv+c_t*transpose(c_t)/d_t;
+            n_exemplars = size(exemplars,1);
 
             temp=-c_t/d_t;
 
-            K_Inv= update_matrix( K_Inv, temp, temp, 1/d_t, n_exemplars-1, n_exemplars-1, n_exemplars, n_exemplars);
-            %% Update K_t= [K_(t-1),  k_t; k_t',  1]
-            K_t  = update_matrix(K_t, k_t, k_t, 1, n_exemplars-1,n_exemplars-1, n_exemplars, n_exemplars);
-        end  %% End of if-else 
-    end  %% End of for 
+            K_Inv = K_Inv+c_t*transpose(c_t)/d_t;
+            K_Inv = update_matrix( K_Inv, temp, temp, 1/d_t, n_exemplars-1, n_exemplars-1, n_exemplars, n_exemplars);           
+            K_t   = update_matrix(   K_t,  k_t,  k_t,     1, n_exemplars-1, n_exemplars-1, n_exemplars, n_exemplars);
+        end
+    end 
 end
 
-function  Mat_new  = update_matrix( A_t, a_t, b_t, c_t, row_dim1, col_dim1, row_dim2, col_dim2)
+function  Mat_new  = update_matrix(A_t, a_t, b_t, c_t, row_dim1, col_dim1, row_dim2, col_dim2)
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     Mat_new=zeros(row_dim2, col_dim2);
@@ -64,4 +60,3 @@ function  Mat_new  = update_matrix( A_t, a_t, b_t, c_t, row_dim1, col_dim1, row_
     end
 
 end
-
