@@ -8,7 +8,6 @@ function a = best_action_from_state(state, actions, post, value)
 end
 
 function i = max_i(values)
-    v = max(values);
-    i = find(values == v);
+    i = find(values == max(values));
     i = i(randi(numel(i)));
 end

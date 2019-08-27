@@ -5,9 +5,7 @@ clear; close all; run(fullfile(fileparts(which(mfilename)), '..', '..', '..', 'q
 
 domain = 'huge';
 
-rng(1);
-
-n_rewds = 1;
+n_rewds = 50;
 n_samps = 64;
 n_steps = 10;
   gamma = .9;
@@ -22,22 +20,22 @@ daps = {
     %'random'  , @kla_spd, struct('N', 10, 'M', 01 , 'T', 01, 'v_basis', '1b', 'W', 00);
 
     %generate a policy using kla_spd and basis '1a' (this kla implementation decreases computation by increasing memory use)
-    %'kla_spd' , @kla_spd, struct('N', 10, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 03);
+    'kla_spd' , @kla_spd, struct('N', 5, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 03);
 
     %generate a policy using kla_mem and basis '1a' (this kla implementation decreases memory use by increasing computation)
     %'kla_mem' , @kla_mem, struct('N', 10, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 03);
 
     %generate a policy using lspi and basis '1a' with a third order polynomial transform applied to the basis 
-    %'lspi '   , @lspi   , struct('N', 30, 'M', 90, 'T', 06, 'v_basis', '1a', 'resample', true, 'transform', polynomial(1));
+    'lspi '   , @lspi   , struct('N', 5, 'M', 90, 'T', 06, 'v_basis', '1a', 'resample', true, 'transform', polynomial(1));
     %'lspi '   , @lspi   , struct('N', 30, 'M', 90, 'T', 06, 'v_basis', '1a', 'resample', true, 'transform', polynomial(2));
     %'lspi '   , @lspi   , struct('N', 30, 'M', 90, 'T', 06, 'v_basis', '1a', 'resample', true, 'transform', polynomial(3));
 
     %generate a policy using klspi and basis '1a' with the provided kernel function
-    %'klspi'   , @klspi  , struct('N', 30, 'M', 90, 'T', 06, 'v_basis', '1a', 'resample', true, 'kernel', k_gaussian(k_norm(),0.5), 'mu', 0.3);
+    'klspi'   , @klspi  , struct('N', 5, 'M', 90, 'T', 06, 'v_basis', '1a', 'resample', true, 'kernel', k_gaussian(k_norm(),0.5), 'mu', 0.3);
 }';
 
 a = tic;
 
-analyze_policy(domain, daps, rewards, attributes, statistics, outputs);
+analyze_policies(domain, daps, rewards, attributes, statistics, outputs);
 
 toc(a);

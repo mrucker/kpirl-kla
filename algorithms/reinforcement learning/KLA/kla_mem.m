@@ -28,7 +28,10 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
 
     time(1) = toc(start);
 
-    for n = 1:N
+    policies{1} = @(s) best_action_from_state(s, a_f(s), t_d, v_f);
+    times(:,1)  = zeros(5,1);
+    
+    for n = 2:N
 
         start = tic;
             init_s  = arrayfun(@(m) { s_1() }, 1:M);
@@ -50,10 +53,9 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
                     if(t == 1)
                         post_v_vs = post_v_vs + explore(v_i(post_s_as));
                     end
-
-                    % rather than selecting a random action of highest value we just pick the first one
-                    % experimentation on the "huge" domain suggeted there was no difference in performance
-                    [~,a_i] = max(post_v_vs);
+                    
+                    a_i = find(post_v_vs == max(post_v_vs));
+                    a_i = a_i(randi(numel(a_i)));
 
                     t_m{m}{t} = post_s_as(:,a_i);
                     s_t       = t_s(t_m{m}{t});

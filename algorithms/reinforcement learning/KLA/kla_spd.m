@@ -25,11 +25,14 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
 
         v_n = v_i();
         v_p = v_p(1:v_n);
-        
+
         Z = zeros(v_n, 8);
     time(1) = toc(start);
 
-    for n = 1:N
+    policies{1} = @(s) best_action_from_state(s, a_f(s), t_d, v_f);
+    times(:,1)  = zeros(5,1);
+
+    for n = 2:N
 
         start = tic;
         
@@ -53,9 +56,8 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
                         post_v_vs = post_v_vs + explore(v_i(post_s_as));
                     end
 
-                    % rather than selecting a random action of highest value we just pick the first one
-                    % experimentation on the "huge" domain suggeted there was no difference in performance
-                    [~,a_i] = max(post_v_vs);
+                    a_i = find(post_v_vs == max(post_v_vs));
+                    a_i = a_i(randi(numel(a_i)));
 
                     t_m{m}{t} = post_s_as(:,a_i);
                     s_t       = t_s(t_m{m}{t});
@@ -67,7 +69,7 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
             for m = 1:M
                 t_r = reward(t_s(t_m{m}));
                 for w = 1:W+1
-                    i = v_i(t_m{m}{w});
+                    a_i = v_i(t_m{m}{w});
 
                     if isfield(parameters,'bootstrap') && parameters.bootstrap
                         y = t_r(w) + gamma*v_f(t_m{m}{w+1});
@@ -75,7 +77,7 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
                         y = g_mat(w,:) * t_r';
                     end
 
-                    z = Z(i,:);
+                    z = Z(a_i,:);
                     [k, Y, beta, var, alpha, eta, lambda] = deal(z(1),z(2),z(3),z(4),z(6),z(7),z(8));
 
                     if k > 0
@@ -122,12 +124,12 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
 
                         assert(~( any(1.0001 < [alpha,eta]) || any(isnan([alpha, eta, lambda])) || any(isinf([alpha, eta, lambda]))));
 
-                        Z(i,:) = [k+1, Y, beta, var, sig_sq, alpha, eta, lambda];
+                        Z(a_i,:) = [k+1, Y, beta, var, sig_sq, alpha, eta, lambda];
 
                     else
                         %this is the "initialization" step from the algorithm; we don't use many of these for a few iterations.
                                 %[k, Y, beta, var, sig_sq, alpha, eta, lambda]
-                        Z(i,:) = [1, y,    0,   0,      0,     1,   1,      0];
+                        Z(a_i,:) = [1, y,    0,   0,      0,     1,   1,      0];
                     end
                 end
             end
