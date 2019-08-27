@@ -2,8 +2,8 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
 
     gcp; %this is here to force the parallel pool to begin before we start timing
 
-        [v_i, v_p  ] = feval([domain '_value_basis']);    start = tic;
-
+    start = tic;
+        [v_i, v_p  ] = feval([domain '_value_basis']);    
         [s_1       ] = feval([domain '_random']);
         [a_f       ] = feval([domain '_actions']);
         [t_d, t_s  ] = feval([domain '_transitions']);
@@ -67,12 +67,16 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
                 t_r = reward(t_s(t_m{m}));
                 for w = 1:W+1
                     i = v_i(t_m{m}{w});
-                    y = g_mat(w,:) * t_r';
+                    
+                    if isfield(parameters,'bootstrap') && parameters.bootstrap
+                        y = t_r(w) + gamma*v_f(t_m{m}{w+1});
+                    else
+                        y = g_mat(w,:) * t_r';
+                    end
 
                     if isKey(Z,i)
 
                         z = Z(i);
-
                         [k, Y, beta, var, alpha, eta, lambda] = deal(z(1),z(2),z(3),z(4),z(6),z(7),z(8));
 
                         %these step size calculations taken from Pg. 446-447 in
@@ -96,7 +100,7 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
                         sig_sq = (var - beta^2)/(1+lambda);
 
                         if(k > 2)
-                            BAKF_state = [epsilon, beta, var, sig_sq, sig_sq/var];                            
+                            BAKF_state = [epsilon, beta, var, sig_sq, sig_sq/var];
                             assert( ~( (sig_sq/var) > 10000 || any(isnan(BAKF_state)) || any(isinf(BAKF_state)) ) )
                         end
 
@@ -173,17 +177,19 @@ function f = get_explore_function(parameters, Z)
     end
 
     function c = standard_explore(i)
-        if isKey(Z,i)
-            z = Z(i);
-        else
-            z = 0;
+        if ~iscell(i)
+            i = num2cell(i');
         end
 
-        if(z(1) >= 3)
-            c = sqrt(z(8)*z(5));
-        else
-            c = avg_BI + 2 * max_SE;
-        end
+        is_key = isKey(Z,i);
+        keys   = i(is_key);
+
+        z = zeros(numel(i),8);
+        z(is_key,:) = cell2mat(values(Z, keys));
+
+        enough_visits_for_confidence = (z(:,1) >=3);
+
+        c = (enough_visits_for_confidence .* sqrt(z(:,8).*z(:,5)) + ~enough_visits_for_confidence * (avg_BI + 2 * max_SE))'; 
     end
 
     if (explore_type == 0 || ~any(GT))

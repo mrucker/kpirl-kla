@@ -19,31 +19,21 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
         policies = cell(1,N);
         times    = zeros(5,N);
 
-        v_n = v_i();
-        v_p = v_p(1:v_n);
         v_f = @(s) 3*ones(1,size(s,2)); %arbitrarily initialize all state values to 3
 
         g_mat = cell2mat(arrayfun(@(w) { [zeros(1,w) gamma.^(0:T-1) zeros(1,W-w)] }, 0:W)');
 
-        Y = NaN  (1, v_n); %last  visitation value
-        K = zeros(1, v_n); %total visitation count
-        J = NaN  (1, v_n); %last  visitation iter
-
-        %one for every value_basii updated for entire life of program (BAKF)
-        epsilon = NaN(1, v_n);
-        beta    = NaN(1, v_n);
-        var     = NaN(1, v_n);
-        sig_sq  = NaN(1, v_n);
-        alpha   = NaN(1, v_n);
-        eta     = NaN(1, v_n);
-        lambda  = NaN(1, v_n);
+        v_n = v_i();
+        v_p = v_p(1:v_n);
+        
+        Z = zeros(v_n, 8);
     time(1) = toc(start);
 
     for n = 1:N
 
         start = tic;
         
-            explore = get_explore_function(parameters, sqrt(lambda.*sig_sq), beta, K);
+            explore = get_explore_function(parameters, Z);
             init_s  = arrayfun(@(m) { s_1() }, 1:M);
 
             t_m = repmat({cell(1,T+W)}, 1,M);
@@ -85,74 +75,59 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
                         y = g_mat(w,:) * t_r';
                     end
 
-                    k = K(i);
+                    z = Z(i,:);
+                    [k, Y, beta, var, alpha, eta, lambda] = deal(z(1),z(2),z(3),z(4),z(6),z(7),z(8));
 
-                    if ~isnan(Y(i))
+                    if k > 0
+
                         %these step size calculations taken from Pg. 446-447 in
                         %Approximate Dynamic Programming by Powell in 2011
-                        e = Y(i) - y;
+                        epsilon = Y - y;
 
-                        if(e == 0 && k > 2)
+                        if(epsilon == 0 && k > 2)
                             %for some reason I keep getting 0 error in my
                             %estimate, even after four iterations. This in turn
-                            %causes my estimate of my estimators bias (b)
+                            %causes my estimate of my estimator's bias (b)
                             %and the estimate of its variance (v) to become
                             %zero in some cases making my stepsize (a) NaN.
                             %to combat this I'll add a small perturbation
                             %with zero mean. That way the bias will be
                             %small but still existant
-                            e = .5*(.5 - rand);
+                            epsilon = 1/2*(1/2 - rand);
                         end
 
-                        b = (1-eta(i))*beta(i) + eta(i)*(e  );
-                        v = (1-eta(i))*var (i) + eta(i)*(e^2);
-                        s = (v - b^2)/(1+lambda(i));
+                        beta   = (1-eta)*beta + eta*(epsilon);
+                        var    = (1-eta)*var  + eta*(epsilon^2);
+                        sig_sq = (var - beta^2)/(1+lambda);
 
                         if(k > 2)
-                            assert(~( (s/v) > 10000 || any(isnan([e, b, v, s, s/v])) || any(isinf([e, b, v, s, s/v])) ))
+                            BAKF_state = [epsilon, beta, var, sig_sq, sig_sq/var];
+                            assert( ~( (sig_sq/var) > 10000 || any(isnan(BAKF_state)) || any(isinf(BAKF_state)) ) )
                         end
 
-                        epsilon(i) = e;
-                        beta   (i) = b;
-                        var    (i) = v;
-                        sig_sq (i) = s;
+                        lambda = lambda*(1-alpha)^2 + alpha^2;
+                        Y      = (1-alpha)*Y + alpha*y;
 
-                        Y(i) = (1-alpha(i))*Y(i) + alpha(i)*y;
-                        K(i) = k + 1;
-                        J(i) = 1/3*J(i) + 2/3*n;
-
-                        l = ((1-alpha(i))^2)*lambda(i) + alpha(i)^2;
-
-                        if (k <= 2)
-                            a = 1/(k+1);
+                        if (k < 3)
+                            alpha = 1/(k+1);
                         else
-                            a = 1 - (s/v);
+                            alpha = 1 - (sig_sq/var);
                         end
 
                         if(k == 1)
-                            e = 1;
+                            eta = 1;
                         else
-                            e = eta(i)/(1+eta(i)-.05);
+                            eta = eta/(.95+eta);
                         end
 
-                        assert(~( any(1.0001 < [a,e]) || any(isnan([a, e, l])) || any(isinf([a, e, l]))));
+                        assert(~( any(1.0001 < [alpha,eta]) || any(isnan([alpha, eta, lambda])) || any(isinf([alpha, eta, lambda]))));
 
-                        alpha (i) = a;
-                        eta   (i) = e;
-                        lambda(i) = l;
+                        Z(i,:) = [k+1, Y, beta, var, sig_sq, alpha, eta, lambda];
 
                     else
-                        Y(i) = y;
-                        K(i) = 1;
-                        J(i) = n;
-
-                        %this is the "initialization" step from the algorithm
-                        epsilon(i) = 0; % we don't use for a few iterations
-                        beta   (i) = 0; % we don't use for a few iterations
-                        var    (i) = 0; % we don't use for a few iterations
-                        alpha  (i) = 1;
-                        eta    (i) = 1;
-                        lambda (i) = 0; % we don't use for a few iterations
+                        %this is the "initialization" step from the algorithm; we don't use many of these for a few iterations.
+                                %[k, Y, beta, var, sig_sq, alpha, eta, lambda]
+                        Z(i,:) = [1, y,    0,   0,      0,     1,   1,      0];
                     end
                 end
             end
@@ -160,8 +135,8 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
 
         start = tic;
 
-            x = v_p(:, K > 0);
-            y =   Y(   K > 0);
+            x = v_p(:, Z(:,1) > 0);
+            y =   Z(Z(:,1) > 0, 2);
         
             %https://www.mathworks.com/help/stats/fitrsvm.html#busljl4-BoxConstraint
             if iqr(y) < .0001
@@ -173,7 +148,7 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
             v_m = fitrsvm(x',y','KernelFunction','rbf', 'BoxConstraint', box_constraint, 'Solver', 'SMO', 'Standardize',true);
             v_v = predict(v_m, v_p')';
             v_f = @(s) v_v(v_i(s));
-                        
+
         time(5) = time(5) + toc(start);
         
         policies{n} = @(s) best_action_from_state(s, a_f(s), t_d, v_f);
@@ -184,7 +159,11 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
     time   = times(:,end);
 end
 
-function f = get_explore_function(parameters, SE, BI, K)
+function f = get_explore_function(parameters, Z)
+
+    K  = Z(:,1)';
+    BI = Z(:,3)';
+    SE = sqrt(Z(:,8).*Z(:,5))';
 
     if isfield(parameters,'explore')
         explore = parameters.explore;

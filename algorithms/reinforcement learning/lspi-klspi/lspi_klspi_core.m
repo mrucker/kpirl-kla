@@ -1,20 +1,20 @@
 function [policy, all_policies] = lspi_klspi_core(sampler, eval_alg, policy, max_iter, epsilon)
 
-    iteration = 0;
-    distance  = inf;
+    iteration = 1;
     time      = 0;
+    distance  = inf;
+
+    all_policies{iteration}      = policy;
+    all_policies{iteration}.time = time;
 
     old_policy = policy;
 
-    %%% policy iteration loop
     while ( (iteration < max_iter) && (distance > epsilon) )
 
         i_start = tic;
-        
-        samples = sampler(old_policy);
 
-        %%% Update and print the number of iterations
         iteration = iteration + 1;
+        samples = sampler(old_policy);
 
         %%% Here you are allowed to make an changes you want to the new policy
         %%% For example, we could change the discount, basis or action fields
