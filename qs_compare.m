@@ -5,12 +5,12 @@ clear; close all; qs_paths;
 
 domain = 'huge';
 
-n_rewds = 2;
+n_rewds = 3;
 n_samps = 64;
 n_steps = 10;
   gamma = .9;
 
-rewards    = random_linear_reward(domain, n_rewds);
+rewards    = random_linear_reward(domain, n_rewds, @(n) [1 - 2 * rand(1,n-1) 0]);
 attributes = { policy_time() policy_value(domain, n_samps, n_steps, gamma) };
 statistics = { avg() SEM() med() };
 outputs    = { statistics_to_screen() };
@@ -25,11 +25,11 @@ algorithms = {
     %generate a policy using kla_mem and basis '1a' (this kla implementation decreases memory use by increasing computation)
     'kla_mem' , @kla_mem, struct('N', 10, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 03);
 
-    %generate a policy using lspi and basis '1a' with a third order polynomial transform applied to the basis 
-    'lspi '   , @lspi   , struct('N', 10, 'M', 90, 'T', 07, 'v_basis', '1a', 'resample', true, 'transform', polynomial(2));
+    %generate a policy using lspi and basis '1a' with a second order polynomial transform applied to the basis 
+    'lspi '   , @lspi   , struct('N', 10, 'M', 90, 'T', 06, 'v_basis', '1a', 'resample', true, 'transform', polynomial(2));
 
     %generate a policy using klspi and basis '1a' with the provided kernel function
-    'klspi'   , @klspi  , struct('N', 10, 'M', 90, 'T', 07, 'v_basis', '1a', 'resample', true, 'kernel', k_gaussian(k_norm(),1), 'mu', 0.3);
+    'klspi'   , @klspi  , struct('N', 10, 'M', 90, 'T', 06, 'v_basis', '1a', 'resample', true, 'kernel', k_gaussian(k_norm(),1), 'mu', 0.3);
 }';
 
 a = tic;
