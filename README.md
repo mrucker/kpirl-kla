@@ -15,7 +15,7 @@ KLA is an RL algorithm created specifically to be used with KPIRL in large state
 	
 ## Directory Structure
 
-* _algorithms_ - contains the algorithm implementationsn included in this repository (many for comparison purposes)
+* _algorithms_ - contains all algorithm implementations (many of the implemented algorithms are for comparison purposes only)
 	* _inverse reinforcement learning_
 		* _PIRL_ - Projection inverse reinforcemnt learning ([paper](https://dl.acm.org/citation.cfm?id=1015430))
 		* _KPIRL_ - Kernel projection inverse reinforcement learning
