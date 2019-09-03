@@ -15,7 +15,7 @@ function analyze_policies(domain, daps, rewards, attributes, statistics, outputs
 
         parfor r = 1:numel(rewards)
             
-            disp(r);
+            %disp(r);
             
             feval([domain '_parameters'], parameters, true);
 
