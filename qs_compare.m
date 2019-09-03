@@ -15,7 +15,8 @@ attributes = { policy_time() policy_value(domain, n_samps, n_steps, gamma) };
 statistics = { avg() SEM() med() };
 outputs    = { statistics_to_screen() };
 
-algorithms = {
+%(D)escription (A)lgorithm (P)arameters
+daps = {
     %generate a policy using kla_spd and basis '1b' (aka, shared/single_basis) which gives a policy of random actions.
     'random'  , @kla_spd, struct('N', 10, 'M', 01 , 'T', 01, 'v_basis', '1b', 'W', 00);
 
@@ -34,6 +35,6 @@ algorithms = {
 
 a = tic;
 
-analyze_policy(domain, algorithms, rewards, attributes, statistics, outputs);
+analyze_policy(domain, daps, rewards, attributes, statistics, outputs);
 
 toc(a);
