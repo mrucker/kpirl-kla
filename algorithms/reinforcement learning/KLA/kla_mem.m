@@ -190,7 +190,7 @@ function f = get_explore_function(parameters, Z)
 
         enough_visits_for_confidence = (z(:,1) >=3);
 
-        c = (enough_visits_for_confidence .* sqrt(z(:,8).*z(:,5)) + ~enough_visits_for_confidence * (avg_BI + 2 * max_SE))'; 
+        c = (enough_visits_for_confidence .* sqrt(z(:,8).*z(:,5)) + ~enough_visits_for_confidence * (-avg_BI + 2 * max_SE))'; 
     end
 
     if (explore_type == 0 || ~any(GT))

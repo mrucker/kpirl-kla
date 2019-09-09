@@ -178,6 +178,6 @@ function f = get_explore_function(parameters, Z)
         SE(K<3) = max (SE(K>=3));
         BI(K<3) = mean(BI(K>=3));
 
-        f = @(v_is) BI(v_is) + 2 * SE(v_is);    
+        f = @(v_is) -BI(v_is) + 2*SE(v_is);    
     end
 end
