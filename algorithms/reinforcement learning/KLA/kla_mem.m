@@ -76,37 +76,45 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
                     end
 
                     if ~isKey(Z,i)
-                        %this is the "initialization" step from the algorithm; we don't use many of these for a few iterations.
-                              %[k, Y, beta, var, sig_sq, alpha, eta, lambda]
-                        Z(i) = [1, y,    0,   0,      0,     1,   1,      0];
+                        Z(i) = zeros(1,7);
                         X(i) = v_p(t_m{m}{w})';
-                    else
-                        z = Z(i);
-                        [k, Y, beta, delta, alpha, nu, lambda] = deal(z(1),z(2),z(3),z(4),z(6),z(7),z(8));
-                        
-                        Y = (1-alpha)*Y + alpha*y;
-
-                        beta   = (1-nu)*beta + nu*(Y - y);
-                        delta  = (1-nu)*delta + nu*(Y - y)^2;
-                        var    = (delta - beta^2)/(1+lambda);
-                        lambda = lambda*(1-alpha)^2 + alpha^2;
-
-                        if (delta == 0)
-                            alpha = 1;
-                        elseif (k == 1 || k == 2)
-                            alpha = 1/(k+1);
-                        else
-                            alpha = 1 - (var/delta);
-                        end
-
-                        nu = nu/(.95+nu);
-
-                        assert(~any([alpha, nu, lambda] > 1));
-                        assert(~any(isnan([beta, delta, var, alpha, nu, lambda])));
-                        assert(~any(isinf([beta, delta, var, alpha, nu, lambda])))
-
-                        Z(i) = [k+1, Y, beta, delta, var, alpha, nu, lambda];
                     end
+                    
+                    z = Z(i);
+                    [k, Y, beta, delta, nu, lambda] = deal(z(1),z(2),z(3),z(4),z(6),z(7));
+                        
+                    %these step size calculations taken from Pg. 446-447 in
+                    %Approximate Dynamic Programming by Powell in 2011 and
+                    %Adaptive stepsizes for recursive estimation with applications 
+                    %in approximate dynamic programming (2006)
+
+                    k = k + 1;
+
+                    if (k == 1 || k == 2)
+                        nu = 1;
+                    else
+                        nu = nu/(.95+nu);
+                    end
+
+                    beta   = (1-nu)*beta + nu*(Y - y);
+                    delta  = (1-nu)*delta + nu*(Y - y)^2;
+                    var    = (delta - beta^2)/(1+lambda);
+
+                    if (k == 1 || k == 2 || k == 3 || delta == 0)
+                        alpha = 1/k;
+                    else
+                        alpha = 1 - (var/delta);
+                    end
+                    
+                    Y      = (1-alpha)*Y + alpha*y;
+                    lambda = lambda*(1-alpha)^2 + alpha^2;
+
+                    assert(~any([alpha, nu, lambda] > 1));
+                    assert(~any(isnan([beta, delta, var, alpha, nu, lambda])));
+                    assert(~any(isinf([beta, delta, var, alpha, nu, lambda])))
+                        
+
+                    Z(i) = [k+1, Y, beta, delta, var, nu, lambda];
                 end
             end
         time(4) = time(4) + toc(start);
@@ -145,7 +153,7 @@ function f = get_explore_function(parameters, Z)
     end
 
     GT = cellfun(@(z) z(1)>=3        , values(Z));
-    SE = cellfun(@(z) sqrt(z(8)*z(5)), values(Z));
+    SE = cellfun(@(z) sqrt(z(7)*z(5)), values(Z));
     BI = cellfun(@(z) z(3)           , values(Z));
 
     max_SE = max (SE(GT));
@@ -163,12 +171,12 @@ function f = get_explore_function(parameters, Z)
         is_key = isKey(Z,i);
         keys   = i(is_key);
 
-        z = zeros(numel(i),8);
+        z = zeros(numel(i),7);
         z(is_key,:) = cell2mat(values(Z, keys));
 
         enough_visits_for_confidence = (z(:,1) >=3);
 
-        c = (enough_visits_for_confidence .* sqrt(z(:,8).*z(:,5)) + ~enough_visits_for_confidence * (-avg_BI + 2 * max_SE))'; 
+        c = (enough_visits_for_confidence .* sqrt(z(:,7).*z(:,5)) + ~enough_visits_for_confidence * (-avg_BI + 2 * max_SE))'; 
     end
 
     if (explore_type == 0 || ~any(GT))

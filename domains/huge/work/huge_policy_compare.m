@@ -5,7 +5,9 @@ clear; close all; run(fullfile(fileparts(which(mfilename)), '..', '..', '..', 'q
 
 domain = 'huge';
 
-n_rewds = 4;
+rng(1)
+
+n_rewds = 1;
 n_samps = 64;
 n_steps = 10;
   gamma = .9;
@@ -20,7 +22,7 @@ daps = {
     %'random'  , @kla_spd, struct('N', 30, 'M', 01 , 'T', 01, 'v_basis', '1b', 'W', 00);
 
     %generate a policy using kla_spd and basis '1a' (this kla implementation decreases computation by increasing memory use)
-    'kla_spd' , @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 02, 'explore', 1, 'bootstrap', 0);
+    'kla_spd' , @kla_spd, struct('N', 5, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 02, 'explore', 1, 'bootstrap', 0);
 
     %generate a policy using kla_mem and basis '1a' (this kla implementation decreases memory use by increasing computation)
     %'kla_mem' , @kla_mem, struct('N', 30, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 02, 'explore', 1, 'bootstrap', 0);

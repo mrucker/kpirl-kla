@@ -1,4 +1,4 @@
-function [policy, time, policies, times] = kla_spd(domain, reward)
+function [policy, time, policies, times] = kla_spd_new(domain, reward)
 
     gcp; %this is here to force the parallel pool to begin before we start timing
 
@@ -26,7 +26,7 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
         v_n = v_i();
         v_p = v_p(1:v_n);
 
-        Z = zeros(v_n, 8);
+        Z = zeros(v_n, 7);
     time(1) = toc(start);
 
     policies{1} = @(s) best_action_from_state(s, a_f(s), t_d, v_f);
@@ -77,41 +77,39 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
                     end
 
                     z = Z(i,:);
-                    [k, Y, beta, delta, alpha, nu, lambda] = deal(z(1),z(2),z(3),z(4),z(6),z(7),z(8));
+                    [k, Y, beta, delta, nu, lambda] = deal(z(1),z(2),z(3),z(4),z(6),z(7));
 
                     %these step size calculations taken from Pg. 446-447 in
                     %Approximate Dynamic Programming by Powell in 2011 and
                     %Adaptive stepsizes for recursive estimation with applications 
                     %in approximate dynamic programming (2006)
-                    
-                    if k == 0
-                        %this is the "initialization" step from the algorithm; we don't use many of these for a few iterations.
-                                %[k, Y, beta, delta, var, alpha,  nu, lambda]
-                        Z(i,:) = [1, y,    0,     0,   0,     1,   1,      0];
+
+                    k = k + 1;
+
+                    if (k == 1 || k == 2)
+                        nu = 1;
                     else
-                        Y = (1-alpha)*Y + alpha*y;
-
-                        beta   = (1-nu)*beta + nu*(Y - y);
-                        delta  = (1-nu)*delta + nu*(Y - y)^2;
-                        var    = (delta - beta^2)/(1+lambda);
-                        lambda = lambda*(1-alpha)^2 + alpha^2;
-
-                        if (delta == 0)
-                            alpha = 1;
-                        elseif (k == 1 || k == 2)
-                            alpha = 1/(k+1);
-                        else
-                            alpha = 1 - (var/delta);
-                        end
-
                         nu = nu/(.95+nu);
-                        
-                        assert(~any([alpha, nu, lambda] > 1));
-                        assert(~any(isnan([beta, delta, var, alpha, nu, lambda])));
-                        assert(~any(isinf([beta, delta, var, alpha, nu, lambda])))
-
-                        Z(i,:) = [k+1, Y, beta, delta, var, alpha, nu, lambda];
                     end
+
+                    beta   = (1-nu)*beta + nu*(Y - y);
+                    delta  = (1-nu)*delta + nu*(Y - y)^2;
+                    var    = (delta - beta^2)/(1+lambda);
+
+                    if (k == 1 || k == 2 || k == 3 || delta == 0)
+                        alpha = 1/k;
+                    else
+                        alpha = 1 - (var/delta);
+                    end
+                    
+                    Y      = (1-alpha)*Y + alpha*y;
+                    lambda = lambda*(1-alpha)^2 + alpha^2;
+
+                    assert(~any([alpha, nu, lambda] > 1));
+                    assert(~any(isnan([beta, delta, var, alpha, nu, lambda])));
+                    assert(~any(isinf([beta, delta, var, alpha, nu, lambda])))
+
+                    Z(i,:) = [k, Y, beta, delta, var, nu, lambda];
                 end
             end
         time(4) = time(4) + toc(start);
@@ -146,7 +144,7 @@ function f = get_explore_function(parameters, Z)
 
     K  = Z(:,1)';
     BI = Z(:,3)';
-    SE = sqrt(Z(:,8).*Z(:,5))';
+    SE = sqrt(Z(:,7).*Z(:,5))';
 
     if isfield(parameters,'explore')
         explore = parameters.explore;
