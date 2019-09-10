@@ -77,58 +77,40 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
                     end
 
                     z = Z(i,:);
-                    [k, Y, beta, var, alpha, eta, lambda] = deal(z(1),z(2),z(3),z(4),z(6),z(7),z(8));
+                    [k, Y, beta, delta, alpha, nu, lambda] = deal(z(1),z(2),z(3),z(4),z(6),z(7),z(8));
 
-                    if k > 0
+                    %these step size calculations taken from Pg. 446-447 in
+                    %Approximate Dynamic Programming by Powell in 2011 and
+                    %Adaptive stepsizes for recursive estimation with applications 
+                    %in approximate dynamic programming (2006)
+                    
+                    if k == 0
+                        %this is the "initialization" step from the algorithm; we don't use many of these for a few iterations.
+                                %[k, Y, beta, delta, var, alpha,  nu, lambda]
+                        Z(i,:) = [1, y,    0,     0,   0,     1,   1,      0];
+                    else
+                        Y = (1-alpha)*Y + alpha*y;
 
-                        %these step size calculations taken from Pg. 446-447 in
-                        %Approximate Dynamic Programming by Powell in 2011
-                        epsilon = Y - y;
-
-                        if(epsilon == 0 && k > 2)
-                            %for some reason I keep getting 0 error in my
-                            %estimate, even after four iterations. This in turn
-                            %causes my estimate of my estimator's bias (b)
-                            %and the estimate of its variance (v) to become
-                            %zero in some cases making my stepsize (a) NaN.
-                            %to combat this I'll add a small perturbation
-                            %with zero mean. That way the bias will be
-                            %small but still existant
-                            epsilon = 1/2*(rand-1/2);
-                        end
-
-                        beta   = (1-eta)*beta + eta*(epsilon);
-                        var    = (1-eta)*var  + eta*(epsilon^2);
-                        sig_sq = (var - beta^2)/(1+lambda);
-
-                        if(k > 2)
-                            BAKF_state = [epsilon, beta, var, sig_sq, sig_sq/var];
-                            assert( ~( (sig_sq/var) > 10000 || any(isnan(BAKF_state)) || any(isinf(BAKF_state)) ) )
-                        end
-
+                        beta   = (1-nu)*beta + nu*(Y - y);
+                        delta  = (1-nu)*delta + nu*(Y - y)^2;
+                        var    = (delta - beta^2)/(1+lambda);
                         lambda = lambda*(1-alpha)^2 + alpha^2;
-                        Y      = (1-alpha)*Y + alpha*y;
 
-                        if (k < 3)
+                        if (delta == 0)
+                            alpha = 1;
+                        elseif (k == 1 || k == 2)
                             alpha = 1/(k+1);
                         else
-                            alpha = 1 - (sig_sq/var);
+                            alpha = 1 - (var/delta);
                         end
 
-                        if(k == 1)
-                            eta = 1;
-                        else
-                            eta = eta/(.95+eta);
-                        end
+                        nu = nu/(.95+nu);
+                        
+                        assert(~any([alpha, nu, lambda] > 1));
+                        assert(~any(isnan([beta, delta, var, alpha, nu, lambda])));
+                        assert(~any(isinf([beta, delta, var, alpha, nu, lambda])))
 
-                        assert(~( any(1.0001 < [alpha,eta]) || any(isnan([alpha, eta, lambda])) || any(isinf([alpha, eta, lambda]))));
-
-                        Z(i,:) = [k+1, Y, beta, var, sig_sq, alpha, eta, lambda];
-
-                    else
-                        %this is the "initialization" step from the algorithm; we don't use many of these for a few iterations.
-                                %[k, Y, beta, var, sig_sq, alpha, eta, lambda]
-                        Z(i,:) = [1, y,    0,   0,      0,     1,   1,      0];
+                        Z(i,:) = [k+1, Y, beta, delta, var, alpha, nu, lambda];
                     end
                 end
             end
