@@ -6,12 +6,18 @@ function analyze_policy(domain, daps, rewards, attributes, statistics, outputs)
         algorithm   = dap{2};
         parameters  = dap{3};
 
-        attribute_names   = cellfun(@(attribute) attribute(), attributes');
+        attribute_names  = cellfun(@(attribute) attribute(), attributes');
         statistic_names  = cellfun(@(statistic) statistic(), statistics);
 
         policy_attributes = zeros(numel(rewards),numel(attributes));
-
+        
+        fprintf([description repmat('.',1,numel(rewards)) '\n']);
+        fprintf([description '\n']);
+        
         parfor r = 1:numel(rewards)
+            
+            fprintf('\b|\n');
+            
             feval([domain '_parameters'], parameters, true);
 
             [policy, time, policies, times] = algorithm(domain, rewards{r});

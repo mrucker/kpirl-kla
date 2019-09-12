@@ -1,4 +1,4 @@
-function [policy, time, policies, times] = kla_spd_new(domain, reward)
+function [policy, time, policies, times] = kla_spd(domain, reward)
 
     gcp; %this is here to force the parallel pool to begin before we start timing
 
@@ -14,6 +14,10 @@ function [policy, time, policies, times] = kla_spd_new(domain, reward)
         T     = parameters.T;
         W     = parameters.W;
         gamma = parameters.gamma;
+
+        is_exp  = ~isfield(parameters,'explore') || parameters.explore;
+        is_OSA  = ~isfield(parameters,'OSA') || parameters.OSA;
+        is_boot =  isfield(parameters,'bootstrap') && parameters.bootstrap;
 
         time     = zeros(5,1);
         policies = cell(1,N);
@@ -36,7 +40,7 @@ function [policy, time, policies, times] = kla_spd_new(domain, reward)
 
         start = tic;
             init_s  = arrayfun(@(m) { s_1() }, 1:M);    
-            explore = get_explore_function(parameters, Z);
+            explore = get_explore_function(is_exp, Z);
 
             t_m = repmat({cell(1,T+W)}, 1,M);
         time(2) = time(2) + toc(start);
@@ -70,38 +74,38 @@ function [policy, time, policies, times] = kla_spd_new(domain, reward)
                 for w = 1:W+1
                     i = v_i(t_m{m}{w});
 
-                    if isfield(parameters,'bootstrap') && parameters.bootstrap
+                    if is_boot
                         y = t_r(w) + gamma*v_f(t_m{m}{w+1});
                     else
                         y = g_mat(w,:) * t_r';
                     end
 
                     z = Z(i,:);
-                    [k, Y, beta, delta, nu, lambda] = deal(z(1),z(2),z(3),z(4),z(6),z(7));
+                    [c, Y, beta, delta, nu, lambda] = deal(z(1),z(2),z(3),z(4),z(6),z(7));
 
                     %these step size calculations taken from Pg. 446-447 in
                     %Approximate Dynamic Programming by Powell in 2011 and
                     %Adaptive stepsizes for recursive estimation with applications 
                     %in approximate dynamic programming (2006)
 
-                    k = k + 1;
+                    c = c + 1;
 
-                    if (k == 1 || k == 2)
+                    if (c == 1 || c == 2)
                         nu = 1;
                     else
                         nu = nu/(.95+nu);
                     end
 
-                    beta   = (1-nu)*beta + nu*(Y - y);
-                    delta  = (1-nu)*delta + nu*(Y - y)^2;
-                    var    = (delta - beta^2)/(1+lambda);
+                    beta  = (1-nu)*beta + nu*(Y - y);
+                    delta = (1-nu)*delta + nu*(Y - y)^2;
+                    var   = (delta - beta^2)/(1+lambda);
 
-                    if (k == 1 || k == 2 || k == 3 || delta == 0)
-                        alpha = 1/k;
+                    if (c == 1 || c == 2 || c == 3 || delta == 0 || ~is_OSA)
+                        alpha = 1/c;
                     else
                         alpha = 1 - (var/delta);
                     end
-                    
+
                     Y      = (1-alpha)*Y + alpha*y;
                     lambda = lambda*(1-alpha)^2 + alpha^2;
 
@@ -109,7 +113,7 @@ function [policy, time, policies, times] = kla_spd_new(domain, reward)
                     assert(~any(isnan([beta, delta, var, alpha, nu, lambda])));
                     assert(~any(isinf([beta, delta, var, alpha, nu, lambda])))
 
-                    Z(i,:) = [k, Y, beta, delta, var, nu, lambda];
+                    Z(i,:) = [c, Y, beta, delta, var, nu, lambda];
                 end
             end
         time(4) = time(4) + toc(start);
@@ -140,24 +144,20 @@ function [policy, time, policies, times] = kla_spd_new(domain, reward)
     time   = times(:,end);
 end
 
-function f = get_explore_function(parameters, Z)
+function f = get_explore_function(is_exp, Z)
 
-    K  = Z(:,1)';
-    BI = Z(:,3)';
-    SE = sqrt(Z(:,7).*Z(:,5))';
+    C = Z(:,1)';
 
-    if isfield(parameters,'explore')
-        explore = parameters.explore;
+    if ~is_exp || all(C<3)
+        U = zeros(1, size(Z,1));
     else
-        explore = 1;
+        SE = sqrt(Z(:,7).*Z(:,5))';
+        BI = -Z(:,3)';
+        U  = BI + 2*SE;
+        
+        %U(C<3) = prctile(U(C>=3), 95);
+        U(C<3) = mean(BI) + 2*max(SE);
     end
 
-    if explore == 0 || all(K<3)
-        f = @(v_is) 0;
-    else
-        SE(K<3) = max (SE(K>=3));
-        BI(K<3) = mean(BI(K>=3));
-
-        f = @(v_is) -BI(v_is) + 2*SE(v_is);    
-    end
+    f = @(v_is) U(v_is);
 end

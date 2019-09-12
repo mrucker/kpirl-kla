@@ -15,6 +15,10 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
         W     = parameters.W;
         gamma = parameters.gamma;
 
+        is_exp  = ~isfield(parameters,'explore') || parameters.explore;
+        is_OSA  = ~isfield(parameters,'OSA') || parameters.OSA;
+        is_boot =  isfield(parameters,'bootstrap') && parameters.bootstrap;
+        
         time     = zeros(5,1);
         policies = cell(1,N);
         times    = zeros(5,N);
@@ -69,7 +73,7 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
                 for w = 1:W+1
                     i = v_i(t_m{m}{w});
                     
-                    if isfield(parameters,'bootstrap') && parameters.bootstrap
+                    if is_boot
                         y = t_r(w) + gamma*v_f(t_m{m}{w+1});
                     else
                         y = g_mat(w,:) * t_r';
@@ -81,16 +85,16 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
                     end
                     
                     z = Z(i);
-                    [k, Y, beta, delta, nu, lambda] = deal(z(1),z(2),z(3),z(4),z(6),z(7));
+                    [c, Y, beta, delta, nu, lambda] = deal(z(1),z(2),z(3),z(4),z(6),z(7));
                         
                     %these step size calculations taken from Pg. 446-447 in
                     %Approximate Dynamic Programming by Powell in 2011 and
                     %Adaptive stepsizes for recursive estimation with applications 
                     %in approximate dynamic programming (2006)
 
-                    k = k + 1;
+                    c = c + 1;
 
-                    if (k == 1 || k == 2)
+                    if (c == 1 || c == 2)
                         nu = 1;
                     else
                         nu = nu/(.95+nu);
@@ -100,8 +104,8 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
                     delta  = (1-nu)*delta + nu*(Y - y)^2;
                     var    = (delta - beta^2)/(1+lambda);
 
-                    if (k == 1 || k == 2 || k == 3 || delta == 0)
-                        alpha = 1/k;
+                    if (c == 1 || c == 2 || c == 3 || delta == 0 || ~is_OSA)
+                        alpha = 1/c;
                     else
                         alpha = 1 - (var/delta);
                     end
@@ -114,7 +118,7 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
                     assert(~any(isinf([beta, delta, var, alpha, nu, lambda])))
                         
 
-                    Z(i) = [k+1, Y, beta, delta, var, nu, lambda];
+                    Z(i) = [c, Y, beta, delta, var, nu, lambda];
                 end
             end
         time(4) = time(4) + toc(start);
@@ -144,13 +148,7 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
     time   = times(:,end);
 end
 
-function f = get_explore_function(parameters, Z)
-
-    if isfield(parameters,'explore')
-        explore_type = parameters.explore;
-    else
-        explore_type = 1;
-    end
+function f = get_explore_function(is_exp, Z)
 
     GT = cellfun(@(z) z(1)>=3        , values(Z));
     SE = cellfun(@(z) sqrt(z(7)*z(5)), values(Z));
@@ -159,11 +157,11 @@ function f = get_explore_function(parameters, Z)
     max_SE = max (SE(GT));
     avg_BI = mean(BI(GT));
 
-    function c = zero_explore(~)
-        c = 0;
+    function u = zero_explore(~)
+        u = 0;
     end
 
-    function c = standard_explore(i)
+    function u = standard_explore(i)
         if ~iscell(i)
             i = num2cell(i');
         end
@@ -176,10 +174,10 @@ function f = get_explore_function(parameters, Z)
 
         enough_visits_for_confidence = (z(:,1) >=3);
 
-        c = (enough_visits_for_confidence .* sqrt(z(:,7).*z(:,5)) + ~enough_visits_for_confidence * (-avg_BI + 2 * max_SE))'; 
+        u = (enough_visits_for_confidence .* sqrt(z(:,7).*z(:,5)) + ~enough_visits_for_confidence * (-avg_BI + 2 * max_SE))'; 
     end
 
-    if (explore_type == 0 || ~any(GT))
+    if (~is_exp || ~any(GT))
         f = @zero_explore;
     else 
         f = @standard_explore;
