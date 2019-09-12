@@ -34,12 +34,12 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
 
     policies{1} = @(s) best_action_from_state(s, a_f(s), t_d, v_f);
     times(:,1)  = zeros(5,1);
-    
+
     for n = 2:N
 
         start = tic;
             init_s  = arrayfun(@(m) { s_1() }, 1:M);
-            explore = get_explore_function(parameters, Z);
+            explore = get_explore_function(is_exp, Z);
 
             t_m = repmat({cell(1,T+W)}, 1,M);
         time(2) = time(2) + toc(start);
@@ -72,7 +72,7 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
                 t_r = reward(t_s(t_m{m}));
                 for w = 1:W+1
                     i = v_i(t_m{m}{w});
-                    
+
                     if is_boot
                         y = t_r(w) + gamma*v_f(t_m{m}{w+1});
                     else
@@ -83,10 +83,10 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
                         Z(i) = zeros(1,7);
                         X(i) = v_p(t_m{m}{w})';
                     end
-                    
+
                     z = Z(i);
                     [c, Y, beta, delta, nu, lambda] = deal(z(1),z(2),z(3),z(4),z(6),z(7));
-                        
+
                     %these step size calculations taken from Pg. 446-447 in
                     %Approximate Dynamic Programming by Powell in 2011 and
                     %Adaptive stepsizes for recursive estimation with applications 
@@ -109,7 +109,7 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
                     else
                         alpha = 1 - (var/delta);
                     end
-                    
+
                     Y      = (1-alpha)*Y + alpha*y;
                     lambda = lambda*(1-alpha)^2 + alpha^2;
 

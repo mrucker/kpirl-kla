@@ -122,7 +122,7 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
 
             x = v_p(:, Z(:,1) > 0);
             y =   Z(Z(:,1) > 0, 2);
-        
+
             %https://www.mathworks.com/help/stats/fitrsvm.html#busljl4-BoxConstraint
             if iqr(y) < .0001
                 box_constraint = 1;
@@ -135,7 +135,7 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
             v_f = @(s) v_v(v_i(s));
 
         time(5) = time(5) + toc(start);
-        
+
         policies{n} = @(s) best_action_from_state(s, a_f(s), t_d, v_f);
         times(:,n)  = time;
     end
@@ -154,7 +154,7 @@ function f = get_explore_function(is_exp, Z)
         SE = sqrt(Z(:,7).*Z(:,5))';
         BI = -Z(:,3)';
         U  = BI + 2*SE;
-        
+
         %U(C<3) = prctile(U(C>=3), 95);
         U(C<3) = mean(BI) + 2*max(SE);
     end
