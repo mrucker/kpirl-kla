@@ -1,5 +1,7 @@
 function analyze_policy(domain, daps, rewards, attributes, statistics, outputs)
 
+    daps(1,:) = pad(daps(1,:));
+
     for dap = daps
 
         description = dap{1};

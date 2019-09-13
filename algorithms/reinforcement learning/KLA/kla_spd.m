@@ -15,9 +15,9 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
         W     = parameters.W;
         gamma = parameters.gamma;
 
-        is_exp  = ~isfield(parameters,'explore') || parameters.explore;
-        is_OSA  = ~isfield(parameters,'OSA') || parameters.OSA;
-        is_boot =  isfield(parameters,'bootstrap') && parameters.bootstrap;
+        explore_type = struct_get_or_default(parameters, 'explore', 1);
+        target_type  = struct_get_or_default(parameters, 'target' , 0);
+        smooth_type  = struct_get_or_default(parameters, 'smooth' , 1);
 
         time     = zeros(5,1);
         policies = cell(1,N);
@@ -40,7 +40,7 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
 
         start = tic;
             init_s  = arrayfun(@(m) { s_1() }, 1:M);    
-            explore = get_explore_function(is_exp, Z);
+            explore = get_explore_function(explore_type, Z);
 
             t_m = repmat({cell(1,T+W)}, 1,M);
         time(2) = time(2) + toc(start);
@@ -74,7 +74,7 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
                 for w = 1:W+1
                     i = v_i(t_m{m}{w});
 
-                    if is_boot
+                    if target_type == 1
                         y = t_r(w) + gamma*v_f(t_m{m}{w+1});
                     else
                         y = g_mat(w,:) * t_r';
@@ -100,7 +100,7 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
                     delta = (1-nu)*delta + nu*(Y - y)^2;
                     var   = (delta - beta^2)/(1+lambda);
 
-                    if (c == 1 || c == 2 || c == 3 || delta == 0 || ~is_OSA)
+                    if (c == 1 || c == 2 || c == 3 || delta == 0 || smooth_type == 0)
                         alpha = 1/c;
                     else
                         alpha = 1 - (var/delta);
@@ -144,20 +144,28 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
     time   = times(:,end);
 end
 
-function f = get_explore_function(is_exp, Z)
+function f = get_explore_function(explore_type, Z)
 
     C = Z(:,1)';
 
-    if ~is_exp || all(C<3)
+    if explore_type == 0
         U = zeros(1, size(Z,1));
-    else
-        SE = sqrt(Z(:,7).*Z(:,5))';
-        BI = -Z(:,3)';
-        U  = BI + 2*SE;
-
-        %U(C<3) = prctile(U(C>=3), 95);
-        U(C<3) = mean(BI) + 2*max(SE);
     end
 
-    f = @(v_is) U(v_is);
+    if explore_type == 1
+        if all(C<3)
+            U = zeros(1, size(Z,1));
+        else
+            SE     = sqrt(Z(:,7).*Z(:,5))';
+            BI     = -Z(:,3)';
+            U      = BI + 2*SE;
+            U(C<3) = mean(BI) + 2*max(SE);
+        end
+    end
+    
+    if explore_type == 2
+        U = 100*rand(1, size(Z,1));
+    end
+
+    f = U;
 end

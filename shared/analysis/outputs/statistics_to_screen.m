@@ -3,7 +3,7 @@ function f = statistics_to_screen()
     f = @screen_closure;
 
     function screen_closure(description, parameters, attribute_names, attribute_values, statistic_names, statistic_values)
-        fprintf('%7s', description);
+        fprintf('%s ', description);
 
         disp_statistics(attribute_names, attribute_values, statistic_names, statistic_values);
         disp_parameters(parameters);
