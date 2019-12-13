@@ -1,4 +1,4 @@
-clear; close all; run(fullfile(fileparts(which(mfilename)), '..', '..', '..', 'qs_paths.m'));
+run(fullfile(fileparts(which(mfilename)), '..', '..', '..', 'shared', 'paths.m'));
 
 %WARNING: reducing n_rewds will make the estimate of E[V|DAP  ] less precise causing performance comparisons to be more suspect
 %WARNING: reducing n_samps will make the estimate of E[V|DAP,R] less precise causing performance comparisons to be more suspect
@@ -18,8 +18,8 @@ for i = 1:200
     outputs    = { attributes_to_file("kla.csv") };
 
     daps = {
-        %'random'                        , @kla_spd, struct('N', 30, 'M', 01 , 'T', 01, 'v_basis', '1b', 'W', 00);
-        %'kla, Monte Carlo, explore, W=0', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 00, 'explore', 1, 'bootstrap', 0);
+        'random'                        , @kla_spd, struct('N', 30, 'M', 01 , 'T', 01, 'v_basis', '1b', 'W', 00);
+        'kla, Monte Carlo, explore, W=0', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 00, 'explore', 1, 'bootstrap', 0);
         %'kla, Monte Carlo, explore, W=1', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 01, 'explore', 1, 'bootstrap', 0);
         %'kla, Monte Carlo, explore, W=2', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 02, 'explore', 1, 'bootstrap', 0);
         %'kla, Monte Carlo, exploit, W=0', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_basis', '1a', 'W', 00, 'explore', 0, 'bootstrap', 0);

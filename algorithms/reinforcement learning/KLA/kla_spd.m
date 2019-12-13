@@ -15,9 +15,9 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
         W     = parameters.W;
         gamma = parameters.gamma;
 
-        explore_type = struct_get_or_default(parameters, 'explore', 1);
-        target_type  = struct_get_or_default(parameters, 'target' , 0);
-        smooth_type  = struct_get_or_default(parameters, 'smooth' , 1);
+        explore_type = get_or_default(parameters, 'explore', 1);
+        target_type  = get_or_default(parameters, 'target' , 0);
+        smooth_type  = get_or_default(parameters, 'smooth' , 1);
 
         time     = zeros(5,1);
         policies = cell(1,N);

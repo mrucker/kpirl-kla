@@ -1,16 +1,17 @@
-function p_out = rem_parameters(p_in, force); persistent parameters;
+function p_out = rem_parameters(p_in); persistent parameters;
 
-    if((nargin == 2 && force) || (nargin == 1 && isempty(parameters)))
-        parameters = fill_default_params(p_in, default_params());
-    elseif(nargin == 0 && isempty(parameters))
-        parameters = fill_default_params(struct(), default_params());
+    if(nargin == 1)
+        parameters = set_or_default(p_in, defaults());
+    end
+
+    if(nargin == 0 && isempty(parameters))
+        parameters = set_or_default(struct(), defaults());
     end
 
     p_out = parameters;
-
 end
 
-function d = default_params()
+function d = defaults()
     d = struct(...
          'rand_ns' , 10     ...
         ,'epsilon' ,.001    ...
@@ -28,18 +29,4 @@ function d = default_params()
         ,'v_basis' , '1a'   ...
         ,'kernel'  , k_dot()...
     );
-end
-
-function params = fill_default_params(params,defaults)
-
-    % Get default field names.
-    defaultfields = fieldnames(defaults);
-
-    % Step over all fields in the defaults structure.
-    for i=1:length(defaultfields)
-        if ~isfield(params,defaultfields{i})
-            params.(defaultfields{i}) = defaults.(defaultfields{i});
-        end
-    end
-
 end

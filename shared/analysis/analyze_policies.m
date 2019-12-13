@@ -1,6 +1,6 @@
 function analyze_policies(domain, daps, rewards, attributes, statistics, outputs)
 
-    daps(1,:) = pad(daps(1,:))
+    daps(1,:) = pad(daps(1,:));
 
     for dap = daps
 
@@ -20,7 +20,7 @@ function analyze_policies(domain, daps, rewards, attributes, statistics, outputs
             
             fprintf('\b|\n');
             
-            feval([domain '_parameters'], parameters, true);
+            feval([domain '_parameters'], parameters);
 
             [~, ~, policies, times] = algorithm(domain, rewards{r});
 

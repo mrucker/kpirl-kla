@@ -17,12 +17,12 @@ KLA is an RL algorithm created specifically to be used with KPIRL in large state
 
 * _algorithms_ - contains all algorithm implementations (many of the implemented algorithms are for comparison purposes only)
 	* _inverse reinforcement learning_
-		* _PIRL_ - Projection inverse reinforcemnt learning ([paper](https://dl.acm.org/citation.cfm?id=1015430))
-		* _KPIRL_ - Kernel projection inverse reinforcement learning
+		* _pirl_ - Projection inverse reinforcemnt learning ([paper](https://dl.acm.org/citation.cfm?id=1015430))
+		* _kpirl_ - Kernel projection inverse reinforcement learning
 	* _reinforcement learning_
-		* _KLA_ - Kernel lookup approximation
-		* _KLSPI_ - Kernel-based least squares policy iteration ([paper](https://ieeexplore.ieee.org/abstract/document/4267723))
-		* _LSPI_ - Least-squares policy iteration ([paper](http://www.jmlr.org/papers/v4/lagoudakis03a.html))
+		* _kla_ - Kernel lookup approximation
+		* _klspi_ - Kernel-based least squares policy iteration ([paper](https://ieeexplore.ieee.org/abstract/document/4267723))
+		* _lspi_ - Least-squares policy iteration ([paper](http://www.jmlr.org/papers/v4/lagoudakis03a.html))
 * _domains_ - specific problem domain implementations
 	* _\<domain name\>_ - folder name unique for each domain
 		* _data_ - contains the raw data for the specific domain (no standardization here)
@@ -50,17 +50,16 @@ Two example files have been provided in the root directory for a "quick start". 
 		* Input:
 			* there is no input for this function
 		* Output:
-			* r_i -- a function that can:
-				* take no input and return the number of basis combinations
-				* take a matrix of states and return a row vector of the basis index for each state
-				* take a cell array of states and return a row vector of the basis index for each state
+			* r_i -- a function with the following behavior:
+				* given nothing return the count of feature vectors
+				* given states return a row vector of the feature index for each state
 			* r_p -- a function that can:
-				* take no input and return the number of basis features
+				* given nothing return the count of features
 				* take a matrix of states or basis indexes and return a matrix of basis features
 				* take a cell array of states or basis indexes and return a matrix of basis features
 		* examples:
 			* given a state _s_ the following predicate is always true `r_p(_s_) == r_p(r_i(_s_))`
-			* to get all potential basis permutations one can do `r_p(1:r_i())`
+			* to get all potential feature vectors permutations one can do `r_p(1:r_i())`
 			* to get a random basis permutation one can do `r_p(randi(r_i()))`
 			* to pre-allocate a basis matrix for _n_ states one could do `zeros(r_p(), _n_)`
 

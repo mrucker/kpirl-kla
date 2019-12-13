@@ -1,13 +1,15 @@
-function p_out = krand_parameters(p_in, force); persistent parameters;
+function p_out = krand_parameters(p_in); persistent parameters;
 
-    if((nargin == 2 && force) || (nargin == 1 && isempty(parameters)))
+    if(nargin == 1)
          if isfield(parameters,'grid_world')
             p_in.grid_world      = parameters.grid_world;
             p_in.grid_world_size = parameters.grid_world_size;
          end
-        parameters = fill_default_params(p_in, default_params());
-    elseif(nargin == 0 && isempty(parameters))
-        parameters = fill_default_params(struct(), default_params());
+        parameters = set_or_default(p_in, defaults());
+    end
+    
+    if(nargin == 0 && isempty(parameters))
+        parameters = set_or_default(struct(), defaults());
     end
 
     if ~isfield(parameters,'grid_world')
@@ -23,7 +25,7 @@ function p_out = krand_parameters(p_in, force); persistent parameters;
 
 end
 
-function d = default_params()
+function d = defaults()
     d = struct(...
          'epsilon' ,.001    ...
         ,'gamma'   , 0.9    ...
@@ -34,18 +36,4 @@ function d = default_params()
         ,'T'       ,  01    ... %04
         ,'W'       ,  04    ...
     );
-end
-
-function params = fill_default_params(params,defaults)
-
-    % Get default field names.
-    defaultfields = fieldnames(defaults);
-
-    % Step over all fields in the defaults structure.
-    for i=1:length(defaultfields)
-        if ~isfield(params,defaultfields{i})
-            params.(defaultfields{i}) = defaults.(defaultfields{i});
-        end
-    end
-
 end

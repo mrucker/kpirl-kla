@@ -15,9 +15,9 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
         W     = parameters.W;
         gamma = parameters.gamma;
 
-        explore_type = struct_get_or_default(parameters, 'explore', 1);
-        target_type  = struct_get_or_default(parameters, 'target' , 0);
-        smooth_type  = struct_get_or_default(parameters, 'smooth' , 1);
+        explore_type = get_or_default(parameters, 'explore', 1);
+        target_type  = get_or_default(parameters, 'target' , 0);
+        smooth_type  = get_or_default(parameters, 'smooth' , 1);
 
         time     = zeros(5,1);
         policies = cell(1,N);
@@ -116,7 +116,6 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
                     assert(~any([alpha, nu, lambda] > 1));
                     assert(~any(isnan([beta, delta, var, alpha, nu, lambda])));
                     assert(~any(isinf([beta, delta, var, alpha, nu, lambda])))
-                        
 
                     Z(i) = [c, Y, beta, delta, var, nu, lambda];
                 end

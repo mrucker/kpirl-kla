@@ -1,4 +1,4 @@
-clear; close all; run(fullfile(fileparts(which(mfilename)), '..', '..', '..', 'qs_paths.m'));
+run(fullfile(fileparts(which(mfilename)), '..', '..', '..', 'shared', 'paths.m'));
 
 kernel = k_gaussian(k_norm(), .6);
 

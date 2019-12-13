@@ -1,5 +1,4 @@
-function v = struct_get_or_default(struct, fieldname, default)
-
+function v = get_or_default(struct, fieldname, default)
     if ~isfield(struct,fieldname)
         v = default;
     else

@@ -20,7 +20,7 @@ function analyze_policy(domain, daps, rewards, attributes, statistics, outputs)
             
             fprintf('\b|\n');
             
-            feval([domain '_parameters'], parameters, true);
+            feval([domain '_parameters'], parameters);
 
             [policy, time, policies, times] = algorithm(domain, rewards{r});
 

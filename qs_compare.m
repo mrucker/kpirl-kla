@@ -1,4 +1,4 @@
-clear; close all; qs_paths;
+run(fullfile(fileparts(which(mfilename)), 'shared', 'paths.m'));
 
 %WARNING: reducing n_rewds will make the estimate of E[V|DAP  ] less precise causing performance comparisons to be more suspect
 %WARNING: reducing n_samps will make the estimate of E[V|DAP,R] less precise causing performance comparisons to be more suspect
