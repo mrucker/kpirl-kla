@@ -32,7 +32,7 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
 
     time(1) = toc(start);
 
-    policies{1} = @(s) best_action_from_state(s, a_f(s), t_d, v_f);
+    policies{1} = @(s) randmax(a_f(s), @(a) v_f(t_d(s, a)));
     times(:,1)  = zeros(5,1);
 
     for n = 2:N
@@ -139,7 +139,7 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
 
         time(5) = time(5) + toc(start);
 
-        policies{n} = @(s) best_action_from_state(s, a_f(s), t_d, v_f);
+        policies{n} = @(s) randmax(a_f(s), @(a) v_f(t_d(s, a)));
         times(:,n)  = time;
     end
 

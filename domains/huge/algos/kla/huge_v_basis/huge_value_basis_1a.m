@@ -1,14 +1,14 @@
 function [v_i, v_p] = huge_value_basis_1a()
     n_levels = [3 3 3 3 3 3 3 6];
 
-    state2feature = {
-        @cursor_p_features;
+    states2features = {
+        @cursor_l_features;
         @cursor_v_features;
         @cursor_a_features;
         @target_t_features;
     };
 
-    feature2level = {
+    features2levels = {
         bin_continuous( 0,1,n_levels(1));
         bin_continuous( 0,1,n_levels(2));
         bin_continuous(-1,1,n_levels(3));
@@ -19,7 +19,7 @@ function [v_i, v_p] = huge_value_basis_1a()
           bin_discrete( 0,  n_levels(8));
     };
 
-    level2basis = {
+    levels2features = {
         level2linear(n_levels(1));
         level2linear(n_levels(2));
         level2linear(n_levels(3));
@@ -30,10 +30,10 @@ function [v_i, v_p] = huge_value_basis_1a()
         level2linear(n_levels(8));
     };
 
-    [v_i, v_p] = multi_basis(n_levels, state2feature, feature2level, level2basis);
+    [v_i, v_p] = multi_basis(n_levels, states2features, features2levels, levels2features);
 
-    function p = cursor_p_features(states)
-        p = states(1:2,:) ./ states(9:10,:);
+    function l = cursor_l_features(states)
+        l = states(1:2,:) ./ states(9:10,:);
     end
 
     function v = cursor_v_features(states)
