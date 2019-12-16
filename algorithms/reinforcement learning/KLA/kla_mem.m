@@ -3,11 +3,11 @@ function [policy, time, policies, times] = kla_mem(domain, reward)
     gcp; %this is here to force the parallel pool to begin before we start timing
 
     start = tic;
-        [v_i, v_p  ] = feval([domain '_value_basis']);    
-        [s_1       ] = feval([domain '_random']);
-        [a_f       ] = feval([domain '_actions']);
-        [t_d, t_s  ] = feval([domain '_transitions']);
         [parameters] = feval([domain '_parameters']);
+		[v_i, v_p  ] = feval([domain '_value_basis']);
+        [a_f       ] = feval([domain '_actions']);
+		[s_1       ] = feval([domain '_initiator']);
+        [t_d, t_s  ] = feval([domain '_transitions']);
 
         N     = parameters.N;
         M     = parameters.M;

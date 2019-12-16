@@ -7,8 +7,8 @@ krand_parameters(struct('v_basii', '1a', 'N', 20, 'M', 40, 'T', 25, 'W', 5, 'ste
 reward = kpirl_mem('krand');
 policy = kla_mem('krand', reward);
 
-[s_1          ] = krand_random();
-[  ~,   ~, t_b] = krand_transitions();
+[s_1        ] = krand_initiator();
+[  ~, ~, t_b] = krand_transitions();
 
 trajectory_count  = 200;
 trajectory_length = 2000;

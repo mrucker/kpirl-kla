@@ -2,13 +2,13 @@ function trajectories = huge_reward_trajectories(reward)
 
     domain = 'huge';
 
-    [  ~,   ~, t_b] = feval([domain '_transitions']);
-    [s_1          ] = feval([domain '_random']);
-    [parameters   ] = feval([domain '_parameters']);
+    [ ~, ~, t_b] = feval([domain '_transitions']);
+    [s_1       ] = feval([domain '_initiator']);
+    [parameters] = feval([domain '_parameters']);
 
-    samples = parameters.samples;
-    steps   = parameters.steps;
+    epi_count  = parameters.samples;
+    epi_length = parameters.steps;
 
     policy       = kla_spd(domain, reward);
-    trajectories = trajectories_from_simulations(policy, t_b, s_1, samples, steps);
+    trajectories = policy2episodes(policy, t_b, s_1, epi_count, epi_length);
 end

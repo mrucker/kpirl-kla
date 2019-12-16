@@ -1,4 +1,4 @@
-function [s_1] = rem_random()
+function [s_1] = rem_initiator()
 
     trajectories = rem_expert_trajectories();
     parameters   = rem_parameters();

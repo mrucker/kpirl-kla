@@ -5,7 +5,7 @@ function [nextstate, absorb] = huge_simulator(state, action); persistent t_b s_1
     end
     
     if(isempty(s_1))
-        s_1 = huge_random();
+        s_1 = huge_initiator();
     end
 
     if(nargin==0)

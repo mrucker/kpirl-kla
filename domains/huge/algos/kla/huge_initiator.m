@@ -1,9 +1,4 @@
-function s_1 = huge_random()
-    s_1 = v2();
-end
-
-function s_1 = v2()
-
+function s_1 = huge_initiator()
     path = fullfile(fileparts(which(mfilename)), '..', '..', 'data');
     file = 'huge_observed_trajectories.json';
 

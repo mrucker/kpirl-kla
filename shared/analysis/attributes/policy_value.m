@@ -1,4 +1,4 @@
-function f = policy_value(domain, n_episodes, n_steps, gamma)
+function f = policy_value(domain, episode_count, episode_length, gamma)
 
     f = @policy_value_closure;
    
@@ -7,10 +7,10 @@ function f = policy_value(domain, n_episodes, n_steps, gamma)
         if nargin == 0
             v = "V";
         else
-            [s_1     ] = feval([domain '_random']);
+            [s_1     ] = feval([domain '_initiator']);
             [~,~, t_b] = feval([domain '_transitions']);
             
-            trajectories    = trajectories_from_simulations(policy, t_b, s_1, n_episodes, n_steps);
+            trajectories    = policy2episodes(policy, t_b, s_1, episode_count, episode_length);
             expected_reward = episodes2expect(trajectories, reward, gamma);
             
             v = expected_reward;

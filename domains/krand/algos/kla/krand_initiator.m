@@ -1,4 +1,4 @@
-function [s_1] = krand_random()
+function [s_1] = krand_initiator()
 
     trajectories = krand_expert_trajectories();
 
