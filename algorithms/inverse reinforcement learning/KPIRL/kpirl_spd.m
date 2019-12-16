@@ -13,7 +13,7 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
         r_p = r_p(1:r_n);
         r_e = @(s) double((1:r_n)' == r_i(s));
 
-        s_E = expectation_from_trajectories(E_t, r_e, gamma);
+        s_E = episodes2expect(E_t, r_e, gamma);
 
         r_f = {};
         s_e = {};
@@ -40,7 +40,7 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
                 end
 
                 s_t    = feval([domain, '_reward_trajectories'], r_f{i});
-                s_e{i} = expectation_from_trajectories(s_t, r_e, gamma);
+                s_e{i} = episodes2expect(s_t, r_e, gamma);
 
                 if i == 1
                     s_b{i} = s_e{i};
