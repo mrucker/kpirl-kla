@@ -1,11 +1,14 @@
 function new_policy = lsq_spd(samples, new_policy)
 
-    Rhat     = cell2mat(arrayfun(@(sample) {sample.reward                    }, samples'));
-    Phihat   = cell2mat(arrayfun(@(sample) {sample.basis                     }, samples'));
-    PiPhihat = cell2mat(arrayfun(@(sample) {sample.nextbasis * ~sample.absorb}, samples'));
+    R_hat             = cell2mat(arrayfun(@(sample) {sample.reward   }, samples'));
+    K_hat             = cell2mat(arrayfun(@(sample) {sample.basis    }, samples'));
+    K_hat_next        = cell2mat(arrayfun(@(sample) {sample.nextbasis}, samples'));
+    K_hat_next_absorb = cell2mat(arrayfun(@(sample) {sample.absorb   }, samples'));
 
-    A = Phihat' * (Phihat - new_policy.discount * PiPhihat);
-    b = Phihat' * Rhat;
+    K_hat_next = K_hat_next .* ~K_hat_next_absorb;
+
+    A = K_hat' * (K_hat - new_policy.discount * K_hat_next);
+    b = K_hat' * R_hat;
 
     if rank(A) == size(A,1)
         w = A\b;

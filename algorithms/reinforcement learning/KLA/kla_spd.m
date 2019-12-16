@@ -4,10 +4,10 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
 
     start = tic;
         [parameters] = feval([domain '_parameters']);
-		[v_i, v_p  ] = feval([domain '_value_basis']);
         [a_f       ] = feval([domain '_actions']);
 		[s_1       ] = feval([domain '_initiator']);
         [t_d, t_s  ] = feval([domain '_transitions']);
+		[v_i, v_p  ] = feval([domain '_value_features']);
 
         N     = parameters.N;
         M     = parameters.M;

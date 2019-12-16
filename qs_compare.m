@@ -5,7 +5,7 @@ run(fullfile(fileparts(which(mfilename)), 'shared', 'paths.m'));
 
 domain = 'huge';
 
-n_rewds = 3;
+n_rewds = 1;
 n_samps = 64;
 n_steps = 10;
   gamma = .9;

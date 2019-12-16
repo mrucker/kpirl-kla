@@ -1,7 +1,7 @@
 function state2basis = huge_value_basis_lspi()
 
     [t_d       ] = huge_transitions();
-    [v_i, v_p  ] = huge_value_basis();
+    [v_i, v_p  ] = huge_value_features();
     [parameters] = huge_parameters();
     
     v_p = parameters.transform(v_p(1:v_i()));

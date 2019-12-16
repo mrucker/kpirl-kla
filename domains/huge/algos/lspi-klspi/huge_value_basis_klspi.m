@@ -1,7 +1,7 @@
 function [state2basis, basis2simil] = huge_value_basis_klspi()
 
     [t_d       ] = huge_transitions();
-    [~, v_p    ] = huge_value_basis();
+    [~, v_p    ] = huge_value_features();
     [parameters] = huge_parameters();
 
     kernel = @parameters.kernel;
