@@ -1,8 +1,8 @@
-function trajectories = krand_expert_trajectories()
-    trajectories = read_trajectory_episodes_from_file(fullfile(fileparts(which(mfilename)), '..', '..', 'data'), 'krand_test_trajectory.csv');
+function episodes = krand_expert_episodes()
+    episodes = read_episodes_from_file(fullfile(fileparts(which(mfilename)), '..', '..', 'data'), 'krand_test_episode.csv');
 end
 
-function te = read_trajectory_episodes_from_file(path, file)
+function te = read_episodes_from_file(path, file)
 
     parameters = krand_parameters();
 

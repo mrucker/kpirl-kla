@@ -1,8 +1,8 @@
 function [reward_function, time_measurements] = kpirl_mem(domain)
 
     a_tic = tic;
-        [E_t       ] = feval([domain '_expert_trajectories']);
-        [r_i, r_p  ] = feval([domain '_reward_basis']);
+        [E_t       ] = feval([domain '_expert_episodes']);
+        [r_i, r_p  ] = feval([domain '_reward_features']);
         [parameters] = feval([domain '_parameters']);
 
         epsilon = parameters.epsilon;
@@ -42,7 +42,7 @@ function [reward_function, time_measurements] = kpirl_mem(domain)
                     t_s{i} = sqrt(t_E'*t_g*t_E + t_b'*t_g*t_b - 2*t_E'*t_g*t_b);
                 end
 
-                s_t    = feval([domain, '_reward_trajectories'], r_f{i});
+                s_t    = feval([domain, '_reward_episodes'], r_f{i});
                 s_e{i} = calculate_visitation(s_t, gamma, r_i);
                 X      = cat_hashtable(X, keys(s_e{i}), num2cell(r_p(keys(s_e{i})),1));
 
@@ -98,17 +98,17 @@ function [reward_function, time_measurements] = kpirl_mem(domain)
 
 end
 
-function visitation_hashtable = calculate_visitation(trajectories, gamma, r_i)
+function visitation_hashtable = calculate_visitation(episodes, gamma, r_i)
 
     visitation_hashtable = containers.Map('KeyType','double','ValueType','any');
 
-    for m = 1:numel(trajectories)
-        for t = 1:size(trajectories{m},2)
+    for m = 1:numel(episodes)
+        for t = 1:size(episodes{m},2)
 
-            if iscell(trajectories{m})
-                key = r_i(trajectories{m}{t});
+            if iscell(episodes{m})
+                key = r_i(episodes{m}{t});
             else
-                key = r_i(trajectories{m}(:,t));
+                key = r_i(episodes{m}(:,t));
             end
 
             if ~isKey(visitation_hashtable, key)
@@ -121,7 +121,7 @@ function visitation_hashtable = calculate_visitation(trajectories, gamma, r_i)
     end
 
     for key = keys(visitation_hashtable)
-        visitation_hashtable(key{1}) = visitation_hashtable(key{1}) / numel(trajectories);
+        visitation_hashtable(key{1}) = visitation_hashtable(key{1}) / numel(episodes);
     end
 end
 

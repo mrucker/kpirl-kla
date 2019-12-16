@@ -10,10 +10,10 @@ function f = policy_value(domain, episode_count, episode_length, gamma)
             [s_1     ] = feval([domain '_initiator']);
             [~,~, t_b] = feval([domain '_transitions']);
             
-            trajectories    = policy2episodes(policy, t_b, s_1, episode_count, episode_length);
-            expected_reward = episodes2expect(trajectories, reward, gamma);
+            episodes  = policy2episodes(policy, t_b, s_1, episode_count, episode_length);
+            exp_value = episodes2expect(episodes, reward, gamma);
             
-            v = expected_reward;
+            v = exp_value;
         end
     end
 end

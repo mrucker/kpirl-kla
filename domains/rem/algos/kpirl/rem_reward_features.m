@@ -1,4 +1,4 @@
-function [r_i, r_p] = rem_reward_basis()
+function [r_i, r_p] = rem_reward_features()
 
     n_levels = [2, 30, 2, 30];
 

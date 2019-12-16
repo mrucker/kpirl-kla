@@ -3,7 +3,7 @@ function [t_d, t_s, t_b] = krand_transitions()
     %if you read in your gridworld from your file here then you only need to read it one time
     %this will make look up super fast when the MDP takes an action, since it doesn't have
     %to read from file again. There two ways you can read in from file, one you make every element
-    %in your 2d-matrix a struct. Then you can just reference the values like we did for your trajectories.
+    %in your 2d-matrix a struct. Then you can just reference the values like we did for your episodes.
     %Unfortunately, I'm not really familiar with how to make a 2d-matrix of structs so you'd have to look
     %that up. The second option is to load a 2d matrix of numbers for every single column. Then you'd look
     %up each column values in each of the matrices. You will want to convert all the string values to numbers.

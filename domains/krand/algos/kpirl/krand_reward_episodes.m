@@ -1,6 +1,6 @@
-function trajectories = rem_reward_trajectories(reward)
+function episodes = krand_reward_episodes(reward)
 
-    domain = 'rem';
+    domain = 'krand';
 
     [ ~, ~, t_b] = feval([domain '_transitions']);
     [s_1       ] = feval([domain '_initiator']);
@@ -9,6 +9,6 @@ function trajectories = rem_reward_trajectories(reward)
     epi_count  = parameters.samples;
 	epi_length = parameters.steps;
 
-    policy       = kla_spd(domain, reward);
-    trajectories = policy2episodes(policy, t_b, s_1, epi_count, epi_length);
+    policy   = kla_mem(domain, reward);
+    episodes = policy2episodes(policy, t_b, s_1, epi_count, epi_length);
 end

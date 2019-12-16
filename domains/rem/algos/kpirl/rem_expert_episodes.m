@@ -1,8 +1,8 @@
-function trajectories = rem_trajectories()
-    trajectories = read_trajectory_episodes_from_file(fullfile(fileparts(which(mfilename)), '..', '..', 'data'), 'matlab-trajectories.csv');
+function episodes = rem_episodes()
+    episodes = read_episodes_from_file(fullfile(fileparts(which(mfilename)), '..', '..', 'data'), 'matlab-episodes.csv');
 end
 
-function te = read_trajectory_episodes_from_file(path, file)
+function te = read_episodes_from_file(path, file)
 
     parameters = rem_parameters();
 

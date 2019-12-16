@@ -1,4 +1,4 @@
-function [r_i, r_p] = huge_reward_basis()
+function [r_i, r_p] = huge_reward_features()
 
     partitions = {[3, 3, 8, 6, 8], 1};
     

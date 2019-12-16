@@ -1,8 +1,8 @@
 function [reward_function, time_measurements] = kpirl_spd(domain)
 
     a_tic = tic;
-        [E_t       ] = feval([domain '_expert_trajectories']);
-        [r_i, r_p  ] = feval([domain '_reward_basis']);
+        [E_t       ] = feval([domain '_expert_episodes']);
+        [r_i, r_p  ] = feval([domain '_reward_features']);
         [parameters] = feval([domain '_parameters']);
 
         epsilon = parameters.epsilon;
@@ -39,7 +39,7 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
                     t_s{i} = sqrt(s_E(n_z)'*t_g*s_E(n_z) + s_b{i-1}(n_z)'*t_g*s_b{i-1}(n_z) - 2*s_E(n_z)'*t_g*s_b{i-1}(n_z));
                 end
 
-                s_t    = feval([domain, '_reward_trajectories'], r_f{i});
+                s_t    = feval([domain, '_reward_episodes'], r_f{i});
                 s_e{i} = episodes2expect(s_t, r_e, gamma);
 
                 if i == 1

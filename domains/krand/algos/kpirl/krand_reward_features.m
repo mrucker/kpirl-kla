@@ -1,4 +1,4 @@
-function [v_i, v_p] = krand_reward_basis()
+function [v_i, v_p] = krand_reward_features()
     n_levels = [9, 30, 21, 31, 96, 7];
 
     state2feature = {

@@ -1,6 +1,6 @@
 function s_1 = huge_initiator()
     path = fullfile(fileparts(which(mfilename)), '..', '..', 'data');
-    file = 'huge_observed_trajectories.json';
+    file = 'huge_observed_episodes.json';
 
     initial_states = read_initial_states_from_file(path, file);
 

@@ -1,5 +1,5 @@
-function trajectories = huge_expert_trajectories()
-    trajectories = read_trajectory_episodes_from_file(fullfile(fileparts(which(mfilename)), '..', '..', 'data'), 'huge_observed_trajectories.json');
+function episodes = huge_expert_episodes()
+    episodes = read_trajectory_episodes_from_file(fullfile(fileparts(which(mfilename)), '..', '..', 'data'), 'huge_observed_episodes.json');
 end
 
 function te = read_trajectory_episodes_from_file(path, file)
