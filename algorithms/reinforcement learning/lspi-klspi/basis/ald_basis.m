@@ -1,28 +1,38 @@
-function exemplars = ald_analysis(samples, policy, mu)
+function f = ald_basis(mu, kernel)
 
-    exemplars = policy.basis(samples(1).state, samples(2).action);
+    function b = ald_basis_constructor(samples)
 
-    K_t   = policy.affin(exemplars, exemplars);
+        exemplars = ald_analysis(samples, mu, kernel);
+
+        b = @(features) kernel(features,exemplars);
+    end
+
+    f = @ald_basis_constructor;
+
+end
+
+function exemplars = ald_analysis(samples, mu, kernel)
+
+    exemplars = samples(1).feats;
+
+    K_t   = kernel(exemplars, exemplars);
     K_Inv = K_t^-1;
 
     for i=1:length(samples)
 
-        state  = samples(i).state;
-        action = samples(i).action;
+        current_features = samples(i).feats;
 
-        current_features = policy.basis(state, action);
-
-        k_t = policy.affin(current_features, exemplars)';
-        k_tt= policy.affin(current_features, current_features);
+        k_t = kernel(current_features, exemplars);
+        k_tt= kernel(current_features, current_features);
 
         c_t = K_Inv*k_t;
         d_t = k_tt-k_t'*c_t;
 
-        %in theory K_t == policy.affin(exemplars, exemplars) and K_Inv == K_t^-1. However, because we use iterative updates
+        %in theory K_t == kernel(exemplars, exemplars) and K_Inv == K_t^-1. However, because we use iterative updates
         %to determine K_t and K_Inv each time we add an exemplar rather than recalculating then from scratch our matrices
         %will deviate slightly from the full recalculation. Thus why we make sure no single element deviates by more than .00001.
-        %Calculating policy.affin(exemplars, exemplars)^-1 for our check is duplicate work so we usually leave it commented.
-        % assert(max(abs(policy.affin(exemplars, exemplars) - K_t), [], 'all') < .0001)
+        %Calculating kernel(exemplars, exemplars)^-1 for our check is duplicate work so we usually leave it commented.
+        % assert(max(abs(kernel(exemplars, exemplars) - K_t), [], 'all') < .0001)
         % assert(max(abs(K_t^-1 - K_Inv), [], 'all') < .00001)
 
         if  mu <= d_t
@@ -32,8 +42,8 @@ function exemplars = ald_analysis(samples, policy, mu)
             %if d_t is ever considerably below 0 (i.e., <= -.0001) then something is wrong with the ALD analysis
             assert(d_t > -.0001);
 
-            exemplars   = vertcat(exemplars, current_features);
-            n_exemplars = size(exemplars,1);
+            exemplars   = horzcat(exemplars, current_features);
+            n_exemplars = size(exemplars,2);
 
             temp=-c_t/d_t;
 
@@ -49,6 +59,7 @@ function  Mat_new  = update_matrix(A_t, a_t, b_t, c_t, row_dim1, col_dim1, row_d
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     Mat_new=zeros(row_dim2, col_dim2);
     Mat_new(1:row_dim1, 1:col_dim1) = A_t;
+
     if (col_dim2>col_dim1)
        Mat_new(1:row_dim1, col_dim2) = a_t;
     end

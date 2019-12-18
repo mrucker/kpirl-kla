@@ -1,19 +1,13 @@
-function [state2basis, basis2simil] = huge_value_basis_klspi()
+function state2basis = huge_value_basis_klspi()
 
     [t_d       ] = huge_transitions();
-    [~, v_p    ] = huge_value_features();
-    [parameters] = huge_parameters();
-
-    kernel = @parameters.kernel;
-
+    [v_i, v_p  ] = huge_value_features();
+    
+    v_p = v_p(1:v_i());
+    
     state2basis = @state2basis_closure;
-    basis2simil = @basis2simil_closure;
-
+    
     function phi = state2basis_closure(state, actions)
-        phi = v_p(t_d(state, actions))';
-    end
-
-    function phi = basis2simil_closure(basis, exemplars)
-        phi = kernel(basis', exemplars');
+        phi = v_p(:,v_i(t_d(state, actions)));
     end
 end

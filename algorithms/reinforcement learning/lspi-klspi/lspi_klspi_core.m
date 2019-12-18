@@ -1,4 +1,4 @@
-function [policy, all_policies] = lspi_klspi_core(sampler, eval_alg, policy, max_iter, epsilon)
+function [policy, all_policies] = lspi_klspi_core(sampler, base_alg, eval_alg, policy, max_iter, epsilon)
 
     iteration = 1;
     time      = 0;
@@ -20,10 +20,10 @@ function [policy, all_policies] = lspi_klspi_core(sampler, eval_alg, policy, max
         %%% For example, we could change the discount, basis or action fields
         %%% Also this line works because everything is passed by value in MATLAB
         new_policy = old_policy;
-
-        %%% Evaluate the current policy (and implicitly improve)
-        %%% There are several options here - choose one    
-        new_policy = eval_alg(samples, new_policy);
+        
+        new_policy.basis   = base_alg(samples);
+        new_policy.weights = eval_alg(samples, new_policy.basis, new_policy.discount);
+        new_policy.explore = 0;
 
         %%% Compute the distance between the current and the previous policy
         if(~isfield(old_policy, 'weights') || ~isfield(new_policy, 'weights'))
