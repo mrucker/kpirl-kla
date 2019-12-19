@@ -66,12 +66,12 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
         n_z = (s_E ~= 0) | any(s_m ~= 0,2);
         t_g = kernel(r_p(:,n_z), r_p(:,n_z));
 
-        %Abbeel and Ng suggested solving a convex optimization problem and choosing
-        %the ss with the largest coefficient. This approach didn't seem to have a big
-        %effect on the outcomes in our problem domains and introduced dependencies on 
-        %external solvers like CVX. Therefore, we use this method to make this code
-        %more accessible to new developers. If you are an advanced user and want to use
-        %the convex optimization approach then you need to replace this line.
+        %Abbeel and Ng offer no method to select a single reward/policy from their algorithm. 
+        %Their recommendation is to manually inspect all policies returned for appropriateness.
+        %In the IRL Toolkit Levine solves this problem with CVX to find the convex combination 
+        %of policies closest to the expert. From this combination the policy with the largest 
+        %coefficient is then selected. To remove the dependency on CVX, and thus make this code,
+        %easier to use we instead simply use the policy closest to the expert feature expectation.
         [~,m_i] = min(diag((s_E(n_z)-s_m(n_z,:))'*t_g*(s_E(n_z)-s_m(n_z,:))));
 
         reward_function = r_f{m_i};
