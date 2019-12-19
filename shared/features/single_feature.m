@@ -1,4 +1,4 @@
-function [b_i, b_p] = single_basis()
+function [b_i, b_p] = single_feature()
 
     b_i = @input2index;    
     b_p = @input2basis;

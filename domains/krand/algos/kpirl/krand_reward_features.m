@@ -19,7 +19,7 @@ function [v_i, v_p] = krand_reward_features()
         bin_identity();
     };
 
-    level2basis = {
+    level2features = {
         level2onehot(n_levels(1));
         level2onehot(n_levels(2));
         level2linear(n_levels(3));
@@ -28,7 +28,7 @@ function [v_i, v_p] = krand_reward_features()
         level2linear(n_levels(6));
     };
 
-    [v_i, v_p] = multi_basis(n_levels, state2feature, feature2level, level2basis);
+    [v_i, v_p] = multi_feature(n_levels, state2feature, feature2level, level2features);
 
     function v = rail_type(states)
         v = 1+states.rail_type;
@@ -55,9 +55,10 @@ function [v_i, v_p] = krand_reward_features()
     end
 
     function v = time_of_day_pct(states)
-
+		
+		%WARNING: this is correct as written. If statements are reduced into a single line you get a crazy error.
          seconds_in_day         = 86399;
-         posix_time             = states.time; %WARNING: this is correct as two lines, otherwise you get a crazy error
+         posix_time             = states.time;
          time_of_day_in_seconds = seconds(timeofday(datetime(posix_time,'ConvertFrom','posixtime')));
          time_of_day_as_percent = time_of_day_in_seconds/seconds_in_day;
 

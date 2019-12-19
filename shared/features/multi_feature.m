@@ -1,4 +1,4 @@
-function [b_i, b_p] = multi_basis(partitions, state2feature, feature2level, level2basis)
+function [b_i, b_p] = multi_feature(partitions, state2feature, feature2level, level2feature)
 
     if ~iscell(partitions)
         partitions = {partitions};
@@ -62,7 +62,7 @@ function [b_i, b_p] = multi_basis(partitions, state2feature, feature2level, leve
     end
 
     function b = levels2basis(levels)
-        b = cell2mat(rowfuns(level2basis, levels));
+        b = cell2mat(rowfuns(level2feature, levels));
     end
 
     function l = index2level(index)
@@ -87,7 +87,7 @@ function [b_i, b_p] = multi_basis(partitions, state2feature, feature2level, leve
     end
     
     function f = make_feature2basis()
-        n_feature2basis = max(numel(feature2level), numel(level2basis));
+        n_feature2basis = max(numel(feature2level), numel(level2feature));
         f               = cell(n_feature2basis,1);
     
         for i = 1:n_feature2basis
@@ -98,10 +98,10 @@ function [b_i, b_p] = multi_basis(partitions, state2feature, feature2level, leve
                 f2l = feature2level{i};
             end
             
-            if numel(level2basis) == 1
-                l2b = level2basis{1};
+            if numel(level2feature) == 1
+                l2b = level2feature{1};
             else
-                l2b = level2basis{i};
+                l2b = level2feature{i};
             end
             
             f{i} = @(feature) l2b(nan2zero(f2l(feature)));

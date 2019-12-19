@@ -17,7 +17,7 @@ outputs    = { statistics_to_screen() };
 
 %(D)escription (A)lgorithm (P)arameters
 daps = {
-    %generate a policy using kla_spd and basis '1b' (aka, shared/single_basis) which gives a policy of random actions.
+    %generate a policy using kla_spd and basis '1b' (aka, shared/features/single_feature) which gives a policy of random actions.
     'random'  , @kla_spd, struct('N', 10, 'M', 01 , 'T', 01, 'v_feats', '1b', 'W', 00);
 
     %generate a policy using kla_spd and basis '1a' (this kla implementation decreases computation by increasing memory use)

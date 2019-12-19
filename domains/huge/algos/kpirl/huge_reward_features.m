@@ -15,16 +15,16 @@ function [r_i, r_p] = huge_reward_features()
           bin_discrete(1,       partitions{2}(1));
     };
 
-    level2basis = {
+    level2feature = {
         level2circle(partitions{1}(1)-1, 0  );
         level2circle(partitions{1}(2)-1, 0  );
         level2circle(partitions{1}(3)*2, 0  );
         level2circle(partitions{1}(4)*2, 0  );
-        level2circle(partitions{1}(5)/2, 4.5); % removed `* 6/10`;
+        level2circle(partitions{1}(5)/2, 4.5);
         level2scalar(4);
     };
 
-    [r_i, r_p] = multi_basis(partitions, state2feature, feature2level, level2basis);
+    [r_i, r_p] = multi_feature(partitions, state2feature, feature2level, level2feature);
     
     function f = feature_rollup(states)
         touches = touched_targets(states);

@@ -16,7 +16,7 @@ statistics = { avg() SEM() med() };
 outputs    = { statistics_to_screen() };
 
 daps = {
-    %generate a policy using kla_spd and features '1b' (aka, shared/single_basis) which gives a policy of random actions.
+    %generate a policy using kla_spd and features '1b' (aka, shared/features/single_feature) which gives a policy of random actions.
     'random'  , @kla_spd, struct('N', 30, 'M', 01 , 'T', 01, 'v_feats', '1b', 'W', 00);
 
     %generate a policy using kla_spd and features '1a' (this kla implementation decreases computation by increasing memory use)

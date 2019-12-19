@@ -12,12 +12,12 @@ function [v_i, v_p] = rem_value_features_1b()
           bin_discrete(0  ,n_levels(2));
     };
 
-    level2basis = {
+    level2feature = {
         level2linear(n_levels(1));
         level2linear(n_levels(2));
     };
 
-    [v_i, v_p] = multi_basis(n_levels, state2feature, feature2level, level2basis);
+    [v_i, v_p] = multi_feature(n_levels, state2feature, feature2level, level2feature);
     
     function f = transitivity(states)
         if(size(states,1) < 4) 

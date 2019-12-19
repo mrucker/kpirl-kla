@@ -30,7 +30,7 @@ function [v_i, v_p] = huge_value_features_1a()
         level2linear(n_levels(8));
     };
 
-    [v_i, v_p] = multi_basis(n_levels, states2features, features2levels, levels2features);
+    [v_i, v_p] = multi_feature(n_levels, states2features, features2levels, levels2features);
 
     function l = cursor_l_features(states)
         l = states(1:2,:) ./ states(9:10,:);
