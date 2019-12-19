@@ -4,7 +4,7 @@ function f = ald_basis(mu, kernel)
 
         exemplars = ald_analysis(samples, mu, kernel);
 
-        b = @(features) kernel(features,exemplars);
+        b = @(features) kernel(exemplars,features);
     end
 
     f = @ald_basis_constructor;
@@ -22,7 +22,7 @@ function exemplars = ald_analysis(samples, mu, kernel)
 
         current_features = samples(i).feats;
 
-        k_t = kernel(current_features, exemplars);
+        k_t = kernel(exemplars       , current_features);
         k_tt= kernel(current_features, current_features);
 
         c_t = K_Inv*k_t;

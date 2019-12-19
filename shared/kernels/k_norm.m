@@ -11,6 +11,7 @@ function n = norm(x1,x2)
             n = squareform(pdist(x1'));
         end
     else
-        n = (dot(x1,x1,1)+dot(x2,x2,1)'-2*(x2'*x1)).^(1/2);
+            
+        n = (dot(x1,x1,1)'+dot(x2,x2,1)-2*(x1'*x2)).^(1/2);
     end
 end
