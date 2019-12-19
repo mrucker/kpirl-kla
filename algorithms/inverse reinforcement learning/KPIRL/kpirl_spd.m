@@ -65,6 +65,7 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
         s_m = cell2mat(s_e);
         n_z = (s_E ~= 0) | any(s_m ~= 0,2);
         t_g = kernel(r_p(:,n_z), r_p(:,n_z));
+        t_d = (s_E(n_z)-s_m(n_z,:));
 
         %Abbeel and Ng offer no method to select a single reward/policy from their algorithm. 
         %Their recommendation is to manually inspect all policies returned for appropriateness.
@@ -72,7 +73,7 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
         %of policies closest to the expert. From this combination the policy with the largest 
         %coefficient is then selected. To remove the dependency on CVX, and thus make this code,
         %easier to use we instead simply use the policy closest to the expert feature expectation.
-        [~,m_i] = min(diag((s_E(n_z)-s_m(n_z,:))'*t_g*(s_E(n_z)-s_m(n_z,:))));
+        [~,m_i] = min(diag(t_d'*t_g*t_d));
 
         reward_function = r_f{m_i};
     time_measurements = toc(a_tic);
