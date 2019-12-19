@@ -6,7 +6,7 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
         [parameters] = feval([domain '_parameters']);
         [a_f       ] = feval([domain '_actions']);
 		[s_1       ] = feval([domain '_initiator']);
-        [t_d, t_s  ] = feval([domain '_transitions']);
+        [t_s, t_p  ] = feval([domain '_transitions']);
 		[v_i, v_p  ] = feval([domain '_value_features']);
 
         N     = parameters.N;
@@ -33,7 +33,7 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
         Z = zeros(v_n, 7);
     time(1) = toc(start);
 
-    policies{1} = @(s) randmax(a_f(s), @(a) v_f(t_d(s, a)));
+    policies{1} = @(s) randmax(a_f(s), @(a) v_f(t_p(s, a)));
     times(:,1)  = zeros(5,1);
 
     for n = 2:N
@@ -52,7 +52,7 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
 
                 for t = 1:T+W
 
-                    post_s_as = t_d(s_t, a_f(s_t));
+                    post_s_as = t_p(s_t, a_f(s_t));
                     post_v_vs = v_f(post_s_as);
 
                     if(t == 1)
@@ -136,7 +136,7 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
 
         time(5) = time(5) + toc(start);
 
-        policies{n} = @(s) randmax(a_f(s), @(a) v_f(t_d(s, a)));
+        policies{n} = @(s) randmax(a_f(s), @(a) v_f(t_p(s, a)));
         times(:,n)  = time;
     end
 

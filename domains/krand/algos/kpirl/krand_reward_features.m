@@ -55,7 +55,7 @@ function [v_i, v_p] = krand_reward_features()
     end
 
     function v = time_of_day_pct(states)
-		
+
 		%WARNING: this is correct as written. If statements are reduced into a single line you get a crazy error.
          seconds_in_day         = 86399;
          posix_time             = states.time;

@@ -1,14 +1,14 @@
-function episodes = krand_reward_episodes(reward
+function episodes = krand_reward_episodes(reward)
 
-    domain = 'krand'
+    domain = 'krand';
 
-    [ ~, ~, t_b] = feval([domain '_transitions'])
-    [s_1       ] = feval([domain '_initiator'])
-    [parameters] = feval([domain '_parameters'])
+    t_s    = feval([domain '_transitions']);
+    s_1    = feval([domain '_initiator']);
+    params = feval([domain '_parameters']);
 
-    epi_count  = parameters.samples
-	epi_length = parameters.steps
+    epi_count  = params.samples;
+	epi_length = params.steps;
 
-    policy   = kla_mem(domain, reward)
-    episodes = policy2episodes(policy, t_b, s_1, epi_count, epi_length)
+    policy   = kla_mem(domain, reward);
+    episodes = policy2episodes(policy, t_s, s_1, epi_count, epi_length);
 end

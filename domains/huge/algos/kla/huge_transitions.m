@@ -1,11 +1,10 @@
-function [t_d, t_s, t_b] = huge_transitions()
+function [t_s, t_p] = huge_transitions()
     
-    t_d = @huge_trans_post;
-    t_s = @huge_trans_pre;
-    t_b = @(s,a) t_s(t_d(s,a));
+    t_s = @huge_s;
+    t_p = @huge_p;
 end
 
-function s = huge_trans_post(s, a)
+function s = huge_p(s, a)
 
     if iscell(s)
         s = cell2mat(s);
@@ -24,9 +23,14 @@ function s = huge_trans_post(s, a)
     s = vertcat(cursor_state, repmat([window_state; target_state], [1 size(cursor_state,2)]));
 end
 
-function s = huge_trans_pre(s)
+function s = huge_s(s,a)
+
+    if(nargin == 2)
+        s = huge_p(s,a);
+    end
+    
     if iscell(s)
-        s = cellfun(@update_new_targets_state, s, 'UniformOutput',false);
+        s = cellfun(@(s) { update_new_targets_state(s) }, s);
     else
         s = update_new_targets_state(s);
     end

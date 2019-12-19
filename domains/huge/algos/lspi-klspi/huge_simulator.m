@@ -1,7 +1,7 @@
-function [nextstate, absorb] = huge_simulator(state, action); persistent t_b s_1;
-
-    if(isempty(t_b))
-        [~,~,t_b] = huge_transitions();
+function [nextstate, absorb] = huge_simulator(state, action); persistent t_s s_1;
+    
+    if(isempty(t_s))
+        t_s = huge_transitions();
     end
     
     if(isempty(s_1))
@@ -13,8 +13,8 @@ function [nextstate, absorb] = huge_simulator(state, action); persistent t_b s_1
         absorb    = 0;
     end
 
-    if(nargin==2)        
-        nextstate = t_b(state, action);
+    if(nargin==2)
+        nextstate = t_s(state, action);
         absorb    = 0;
     end
 end

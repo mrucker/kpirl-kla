@@ -7,8 +7,8 @@ krand_parameters(struct('v_basii', '1a', 'N', 20, 'M', 40, 'T', 25, 'W', 5, 'ste
 reward = kpirl_mem('krand')
 policy = kla_mem('krand', reward)
 
-[s_1        ] = krand_initiator()
-[  ~, ~, t_b] = krand_transitions()
+s_1 = krand_initiator()
+t_s = krand_transitions()
 
 trajectory_count  = 200
 trajectory_length = 2000
@@ -22,7 +22,7 @@ for i = 1:trajectory_coun
    
     for j = 2:trajectory_lengt
         action = policy(state)
-        state  = t_b(state,action)
+        state  = t_s(state,action)
        
         states((i-1)*trajectory_length+j, :) = [state.row, state.col, state.time, i, j]
     en
