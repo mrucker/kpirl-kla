@@ -26,7 +26,7 @@ for n = ns
      for m = ms
          for t = ts
              i = i+1;
-             daps(:,i) = {sprintf('n=%d,m=%d,t=%d', [n,m,t]); @kla_mem; struct('v_basis', '1a', 'N', n, 'M', m, 'T', t , 'W', 5, 'gamma', .9)};
+             daps(:,i) = {sprintf('n=%d,m=%d,t=%d', [n,m,t]); @kla_mem; struct('v_feats', '1a', 'N', n, 'M', m, 'T', t , 'W', 5, 'gamma', .9)};
          end
      end
  end

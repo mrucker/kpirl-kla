@@ -4,7 +4,7 @@ function [policy, time, policies, times] = lspi(domain, reward)
     polic_func = [domain '_policy'];
     simul_func = [domain '_simulator'];
     param_func = [domain '_parameters'];
-    feats_func = [domain '_value_basis_lspi'];
+    feats_func = [domain '_value_features_lspi'];
     
     clear(feats_func);
     clear(simul_func);

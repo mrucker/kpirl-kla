@@ -24,7 +24,7 @@ function samples = samples_from_simulation(simulator, policy, n_episodes, n_step
 
     episode_samples = cell(1,n_episodes);
     
-    for e = 1:n_episodes
+    parfor e = 1:n_episodes
         episode_samples{e} = create_episode_samples(simulator, policy, n_steps);
     end
 

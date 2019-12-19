@@ -33,7 +33,7 @@ function [policy, time, policies, times] = kla_spd(domain, reward)
         Z = zeros(v_n, 7);
     time(1) = toc(start);
 
-    policies{1} = @(s) randmax(a_f(s), @(a) v_f(t_d(s, a)));;
+    policies{1} = @(s) randmax(a_f(s), @(a) v_f(t_d(s, a)));
     times(:,1)  = zeros(5,1);
 
     for n = 2:N
