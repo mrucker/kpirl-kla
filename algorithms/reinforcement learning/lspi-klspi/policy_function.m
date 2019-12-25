@@ -8,7 +8,7 @@ function [action, feats] = policy_function(policy, state)
     else
         feats = policy.feats(state, actions);
 
-        [~, i] = randmax(policy.weights' * policy.basis(feats));
+        [~, i] = randargmax(policy.weights' * policy.basis(feats));
                 
         action = actions(:,i);
         feats  = feats(:,i);

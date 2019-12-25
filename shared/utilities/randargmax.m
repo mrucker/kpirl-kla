@@ -1,4 +1,4 @@
-function [M,I] = randmax(A,f)
+function [M,I] = randargmax(A,f)
 
     if nargin == 1
         values = A;

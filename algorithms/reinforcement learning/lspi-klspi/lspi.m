@@ -24,7 +24,7 @@ function [policy, time, policies, times] = lspi(domain, reward)
 
     sampler  = sarsa_sampler(simul_func, policy, max_epis, max_steps, resample);
 
-    base_alg = params.basis;
+    base_alg = get_or_default(params, 'basis' , ident_basis());
     eval_alg = @lsq_spd;
 
     [~, all_policies] = lspi_klspi_core(sampler, base_alg, eval_alg, policy, max_iter, epsilon);
