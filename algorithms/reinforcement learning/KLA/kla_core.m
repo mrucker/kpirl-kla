@@ -41,27 +41,28 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar
                 i = zeros(1,T+W);
                 r = zeros(1,T+W);
                 s = s_1();
-                
+
                 for t = 1:T+W
-                    
                     ps = t_p(s, a_f(s));
                     is = v_i(ps);
-                    
+
                     if t == 1
                         [i(t), p_i] = randargmax(is, @(is) Q_bar(is) + E(is));
                     else
                         [i(t), p_i] = randargmax(is, @(is) Q_bar(is));
                     end
-                    
+
                     %I don't need the last iteration of this
                     s    = t_s(ps(:,p_i));
                     r(t) = reward(s);
                 end
 
-                if target_type == 1
-                    q = r(1:W) + gamma * Q_bar(i(1:W)); %bootstrap
-                else
-                    q = r * g_mat'; %monte carlo
+                if target_type == 0 % monte carlo
+                    q = r * g_mat';
+                end
+
+                if target_type == 1 % bootstrap
+                    q = r(1:W) + gamma * Q_bar(i(1:W));
                 end
 
                 O(:,:,m) = vertcat(i(1:W),q);
@@ -93,10 +94,16 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar
                 delta = (1-nu)*delta + nu*(Q - q)^2;
                 var   = (delta - beta^2)/(1+lambda);
 
-                if (c == 1 || c == 2 || c == 3 || delta == 0 || smooth_type == 0)
+                if smooth_type == 0 % sample averaging
                     alpha = 1/c;
-                else
-                    alpha = 1 - (var/delta);
+                end
+
+                if smooth_type == 1 % OSA optimal step-size
+                    if (c == 1 || c == 2 || c == 3 || delta == 0)
+                        alpha = 1/c;
+                    else
+                        alpha = 1 - (var/delta);
+                    end
                 end
 
                 Q      = (1-alpha)*Q + alpha*q;
@@ -106,7 +113,6 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar
                 assert(~any(isnan([beta, delta, var, alpha, nu, lambda])));
                 assert(~any(isinf([beta, delta, var, alpha, nu, lambda])))
 
-                
                 Q_dot = Q_dot(i, Q);
                 OSA_store(i, [c; beta; delta; var; nu; lambda]);
             end
@@ -132,7 +138,7 @@ end
 function U = get_OSA_max_U(OSA_store)
 
     [c, beta, ~, var, ~, lambda] = OSA_store(OSA_store());
-    
+
     if(all(c < 3))
         U = 0;
     else
@@ -147,14 +153,14 @@ function f = get_explore_function(explore_type, OSA_store)
     max_U = get_OSA_max_U(OSA_store);
 
     if explore_type == 0 %no-exploration
-        f = @(is) zeros(1, size(is,2)); 
+        f = @(is) zeros(1, size(is,2));
     end
-    
+
     if explore_type == 1 %UCB-exploration
         f = @(is) sum(xor(repmat((OSA_store(is) >= 3),2,1),[false;true]) .* vertcat(get_OSA_U(OSA_store, is), max_U * ones(size(is))));
     end
-    
+
     if explore_type == 2 %random-exploration
         f = @(is) 100*rand(1, size(is,1));
-    end    
+    end
 end
