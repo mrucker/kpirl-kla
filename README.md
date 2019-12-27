@@ -13,16 +13,16 @@ In addition to the above two algorithms PIRL, LSPI and KLSPI have also been impl
 
 * Matlab
 	* Statistics and Machine Learning Toolbox (for `pdist` in k_norm.m)
-	* Parallel Computing Toolbox (for `parfor` in kla.m and trajectories_from_simulations.m)
+	* Parallel Computing Toolbox (for `parfor` throughout the repository)
 	
 ## Directory Structure
 
-* _algorithms_ - contains all algorithm implementations (many of the implemented algorithms are for comparison purposes only)
-	* _inverse reinforcement learning_
-		* _pirl_ - Projection inverse reinforcemnt learning ([paper](https://dl.acm.org/citation.cfm?id=1015430))
-		* _kpirl_ - Kernel projection inverse reinforcement learning
-			* _kpirl_spd_ - an implementation of the KPIRL algorithm that has been optimized for speed but loads all reward feature vectors into memory
-			* _kpirl_mem_ - an implementation of the KPIRL algorithm that has been optimized for memory by only loading reward feature vectors into memory when needed.
+* **algorithms** - contains all algorithm implementations (many algorithms are for comparison purposes only)
+	* **inverse reinforcement learning**
+		* **pirl** - Projection inverse reinforcemnt learning ([paper](https://dl.acm.org/citation.cfm?id=1015430))
+		* **kpirl** - Kernel projection inverse reinforcement learning
+			* **kpirl_spd** - an implementation of the KPIRL algorithm that has been optimized for speed but loads all reward feature vectors into memory
+			* **kpirl_mem** - an implementation of the KPIRL algorithm that has been optimized for memory by only loading reward feature vectors into memory when needed.
 	* _reinforcement learning_
 		* _kla_ - Kernel lookup approximation
 			* _kla_spd_ - an implementation of the KLA algorithm that has been optimized for speed but loads all value feature vectors into memory
@@ -50,7 +50,7 @@ Two example files have been provided in the root directory for a "quick start". 
 
 ## Algorithm Functions
 
-These methods need to be implemented in order to use any of this package's algorithms on a new domain.
+These methods need to be implemented in order to use any of this repository's algorithms on a new domain.
 
 ### KPIRL Functions
 	
