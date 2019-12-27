@@ -17,6 +17,7 @@ In addition to the above two algorithms PIRL, LSPI and KLSPI have also been impl
 	
 ## Directory Structure
 
+```
 * **algorithms** - contains all algorithm implementations (many algorithms are for comparison purposes only)
 	* **inverse reinforcement learning**
 		* **pirl** - Projection inverse reinforcemnt learning ([paper](https://dl.acm.org/citation.cfm?id=1015430))
@@ -39,6 +40,7 @@ In addition to the above two algorithms PIRL, LSPI and KLSPI have also been impl
 	* _features_ - utility functions to create indexed features for algorithm implementations
 	* _analysis_ - utility methods written to benchmark the performance of RL algorithms
 	* _utilities_ - general purpose utility methods
+```
 	
 ## Quick Start
 
