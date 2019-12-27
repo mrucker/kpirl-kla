@@ -7,10 +7,9 @@ function f = policy_value(domain, episode_count, episode_length, gamma)
         if nargin == 0
             v = "V";
         else
-            s_1 = feval([domain '_initiator']);
             t_s = feval([domain '_transitions']);
             
-            episodes  = policy2episodes(policy, t_s, s_1, episode_count, episode_length);
+            episodes  = policy2episodes(policy, t_s, episode_count, episode_length);
             exp_value = episodes2expect(episodes, reward, gamma);
             
             v = exp_value;

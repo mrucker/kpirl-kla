@@ -103,12 +103,6 @@ These methods need to be implemented in order to use any of this repository's al
 		* Output:
 			* a_f -- a function which accepts a single state and returns the collection of valid actions for that state.
 
-	* \<domain\>_initiator()
-		* Input:
-			* there is no input for this function
-		* Output:
-			* s_1 -- a function which accepts no inputs and returns a random state (used to begin new episodes during policy iteration).
-
 	* \<domain\>_transitions
 		* Input:
 			* there is no input for this function
@@ -116,6 +110,7 @@ These methods need to be implemented in order to use any of this repository's al
 			* t_p -- a function with the following behavior:
 				* given a state and collection of actions (e.g., `t_p(s, a_f(s))`) return a collection of post decision states. In traditional Q-Learning the post decision state would be (s,a) though it can be more compact.
 			* t_s -- a function that can:
+				* given nothing return a random start (used to initialize new episodes for statistical sampling)
 				* given a collection of post-decision states return a collection of random pre-decision states according the transition probabilities of the MDP.
 				* given a state and a collection of actions return a collection of random pre-decision states according the transition probabilities of the MDP.
 	* \<domain\>_value_features

@@ -1,16 +1,35 @@
 function [t_s, t_p] = huge_transitions()
     
-    t_s = @huge_s;
-    t_p = @huge_p;
+    t_s = @to_s;
+    t_p = @to_p;
+    
+    path = fullfile(fileparts(which(mfilename)), '..', '..', 'data');
+    file = 'huge_observed_episodes.json';
+
+    initial_states = read_states_from_file(path, file);
+   
+    function s = to_s(s,a)
+        
+        if(nargin == 0)
+            s = initial_states{randi(numel(initial_states))};
+        end
+        
+        if(nargin == 1)
+            s = p_to_s(s);
+        end
+        
+        if(nargin == 2)
+            s = p_to_s(to_p(s,a));
+        end
+    end
 end
 
-function s = huge_p(s, a)
-
+function s = to_p(s,a)
     if iscell(s)
         s = cell2mat(s);
     end
-    
-    %removed for speed
+
+    %removed for performance
     %huge_states_assert(s1);
 
     cursor_state = s(1:8   ,1);
@@ -23,16 +42,11 @@ function s = huge_p(s, a)
     s = vertcat(cursor_state, repmat([window_state; target_state], [1 size(cursor_state,2)]));
 end
 
-function s = huge_s(s,a)
-
-    if(nargin == 2)
-        s = huge_p(s,a);
-    end
-    
-    if iscell(s)
-        s = cellfun(@(s) { update_new_targets_state(s) }, s);
+function s = p_to_s(p)
+    if iscell(p)
+        s = cellfun(@(p) { update_new_targets_state(p) }, p);
     else
-        s = update_new_targets_state(s);
+        s = update_new_targets_state(p);
     end
 end
 
@@ -105,21 +119,50 @@ function s = update_new_targets_state(s)
     n = 33;     %could appear at any ms tick
     p = (1/200);%this is the poisson lambda???? Yes, I think so. That is, 1/200'th of a target arrives each milisecond
     
-    no_targets_to_create = binornd(n,p);
+    n_targets_to_create = binornd(n,p);
 
-    if no_targets_to_create == 0
+    if n_targets_to_create == 0
         return;
     end
     
-    new_targets_rands = rand(2,no_targets_to_create);
+    new_targets_rands = rand(2,n_targets_to_create);
     new_targets_scale = diag([(width  - radius*2), (height - radius*2)]);
     
     new_targets_point = new_targets_scale * new_targets_rands;
-    new_targets_age   = 10 * ones(1, no_targets_to_create); %we make age 10 because 10+(33*30) = 1000
+    new_targets_age   = 10 * ones(1, n_targets_to_create); %we make age 10 because 10+(33*30) = 1000
             
     if(size(s,2) >  1)
         s = vertcat(s, repmat(reshape([new_targets_point;new_targets_age],[],1), 1, size(s,2)));
     else 
         s = vertcat(s, reshape([new_targets_point;new_targets_age],[],1));
     end
+end
+
+function states = read_states_from_file(path, file)
+
+    observations = jsondecode(fileread([path filesep file]));
+
+    %assumed observation = [x, y, w, h, r, \forall targets {x, y, age}]
+    assert(all(cellfun(@(o) isnumeric(o) && iscolumn(o), observations)), 'each observation must be a numeric col vector');
+    assert(all(cellfun(@(o) mod(numel(o)-5, 3) == 0    , observations)), 'each observation must have 5 global features and 3x target features');
+
+    %states = [x, y, dx, dy, ddx, ddy, dddx, dddy, width, height, radius, targets{x,y,age}]
+    states = cell(1,numel(observations)+1);
+    
+    %add a zero state for derivative calculations
+    states{1} = zeros(11,1);
+
+    for i = 1:numel(observations)
+        o = observations{i};
+        s = states{i};
+
+        x = [s(1:8); o(3); o(4); o(5)];
+        u = o(1:2) - s(1:2);
+        t = o(6:end);
+
+        states{i+1} = [to_p(x,u); t];
+    end
+
+    %remove the zero state because it is invalid
+    states = states(2:end);
 end

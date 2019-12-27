@@ -5,7 +5,6 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar
     start = tic;
         [params  ] = feval([domain '_parameters']);
         [a_f     ] = feval([domain '_actions']);
-		[s_1     ] = feval([domain '_initiator']);
         [t_s, t_p] = feval([domain '_transitions']);
         [ ~ , v_i] = feval([domain '_value_features']);
 
@@ -40,7 +39,7 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar
             for m = 1:M
                 i = zeros(1,T+W);
                 r = zeros(1,T+W);
-                s = s_1();
+                s = t_s();
 
                 for t = 1:T+W
                     ps = t_p(s, a_f(s));
