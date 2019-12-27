@@ -1,7 +1,7 @@
-function [a_v] = huge_actions()
+function [a_f] = huge_actions()
 
     a_m = get_actions_matrix();
-    a_v = @(s) get_valid_actions(s, a_m);
+    a_f = @(s) get_valid_actions(s, a_m);
 
 end
 
