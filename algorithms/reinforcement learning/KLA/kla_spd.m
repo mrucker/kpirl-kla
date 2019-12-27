@@ -1,6 +1,6 @@
 function [policy, time, policies, times] = kla_spd(domain, reward)
 
-    [v_i, v_p] = feval([domain '_value_features']);
+    [v_p, v_i] = feval([domain '_value_features']);
 
     v_p = v_p(1:v_i());
 

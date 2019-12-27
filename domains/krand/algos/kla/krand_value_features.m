@@ -1,7 +1,7 @@
-function [v_i, v_p] = krand_value_features()
+function [v_p, v_i] = krand_value_features()
 
     parameters = krand_parameters();
     
-    [v_i, v_p] = feval(['krand_value_features_' parameters.v_feats]);
+    [v_p, v_i] = feval(['krand_value_features_' parameters.v_feats]);
 
 end

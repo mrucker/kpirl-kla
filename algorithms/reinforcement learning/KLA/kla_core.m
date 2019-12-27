@@ -7,7 +7,7 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar
         [a_f     ] = feval([domain '_actions']);
 		[s_1     ] = feval([domain '_initiator']);
         [t_s, t_p] = feval([domain '_transitions']);
-        [v_i     ] = feval([domain '_value_features']);
+        [ ~ , v_i] = feval([domain '_value_features']);
 
         N     = params.N;
         M     = params.M;

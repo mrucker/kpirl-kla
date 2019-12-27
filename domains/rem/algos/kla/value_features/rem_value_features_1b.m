@@ -1,4 +1,4 @@
-function [v_i, v_p] = rem_value_features_1b()
+function [v_p, v_i] = rem_value_features_1b()
 
     n_levels = [2, 2];
 
@@ -17,7 +17,7 @@ function [v_i, v_p] = rem_value_features_1b()
         level2linear(n_levels(2));
     };
 
-    [v_i, v_p] = multi_feature(n_levels, state2feature, feature2level, level2feature);
+    [v_p, v_i] = multi_feature(n_levels, state2feature, feature2level, level2feature);
     
     function f = transitivity(states)
         if(size(states,1) < 4) 

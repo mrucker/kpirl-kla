@@ -1,4 +1,4 @@
-function [r_i, r_p] = huge_reward_features()
+function [r_p, r_i] = huge_reward_features()
 
     partitions = {[3, 3, 8, 6, 8], 1};
     
@@ -24,46 +24,47 @@ function [r_i, r_p] = huge_reward_features()
         level2scalar(4);
     };
 
-    [r_i, r_p] = multi_feature(partitions, state2feature, feature2level, level2feature);
-    
-    function f = feature_rollup(states)
-        touches = touched_targets(states);
-        i_first = i_first_touch(touches);
-        
-        if all(isnan(i_first))
-            f = vertcat(nan(5, size(states,2)), ones(1,size(states,2))) ;
-        else
-            f = [
-                index_dim1_else_nan(target_x_features(states), i_first);
-                index_dim1_else_nan(target_y_features(states), i_first);
-                index_nan0_else_nan(cursor_v_features(states), i_first);
-                index_nan0_else_nan(cursor_a_features(states), i_first);
-                index_nan0_else_nan(cursor_d_features(states), i_first);
-                index_nan1_else_nan(   double(isnan(i_first)), i_first);
-            ];
-        end
-    end
+    [r_p, r_i] = multi_feature(partitions, state2feature, feature2level, level2feature);  
+end
 
-    function x = target_x_features(states)
-        x = states(12:3:end,:) ./ states(9,:);
-    end
+function f = feature_rollup(states)
+    touches = touched_targets(states);
+    i_first = i_first_touch(touches);
 
-    function y = target_y_features(states)
-        y = states(13:3:end,1) ./ states(10,:);
-    end
-
-    function v = cursor_v_features(states)
-        v = vecnorm(states(3:4,:));
-    end
-
-    function a = cursor_a_features(states)
-        a = vecnorm(states(5:6,:));
-    end
-
-    function d = cursor_d_features(states)
-        d = atan2(-states(4,:), states(3,:)) + pi;
+    if all(isnan(i_first))
+        f = vertcat(nan(5, size(states,2)), ones(1,size(states,2))) ;
+    else
+        f = [
+            index_dim1_else_nan(target_x_features(states), i_first);
+            index_dim1_else_nan(target_y_features(states), i_first);
+            index_nan0_else_nan(cursor_v_features(states), i_first);
+            index_nan0_else_nan(cursor_a_features(states), i_first);
+            index_nan0_else_nan(cursor_d_features(states), i_first);
+            index_nan1_else_nan(   double(isnan(i_first)), i_first);
+        ];
     end
 end
+
+function x = target_x_features(states)
+    x = states(12:3:end,:) ./ states(9,:);
+end
+
+function y = target_y_features(states)
+    y = states(13:3:end,1) ./ states(10,:);
+end
+
+function v = cursor_v_features(states)
+    v = vecnorm(states(3:4,:));
+end
+
+function a = cursor_a_features(states)
+    a = vecnorm(states(5:6,:));
+end
+
+function d = cursor_d_features(states)
+    d = atan2(-states(4,:), states(3,:)) + pi;
+end
+
 
 function [cd, pd] = distance_from_targets(states)
     cp = states(1:2,:);

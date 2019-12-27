@@ -1,7 +1,7 @@
-function [v_i, v_p] = rem_value_features()
+function [v_p, v_i] = rem_value_features()
 
     parameters = rem_parameters();
     
-    [v_i, v_p] = feval(['rem_value_features_' parameters.v_feats]);
+    [v_p, v_i] = feval(['rem_value_features_' parameters.v_feats]);
 
 end

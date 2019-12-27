@@ -1,4 +1,4 @@
-function [r_i, r_p] = rem_reward_features()
+function [r_p, r_i] = rem_reward_features()
 
     n_levels = [2, 30, 2, 30];
 
@@ -23,7 +23,7 @@ function [r_i, r_p] = rem_reward_features()
         level2linear(n_levels(4));
     };
 
-    [r_i, r_p] = multi_feature(n_levels, state2feature, feature2level, level2feature);
+    [r_p, r_i] = multi_feature(n_levels, state2feature, feature2level, level2feature);
     
     function f = transitivity(states)
         if(size(states,1) < 4) 

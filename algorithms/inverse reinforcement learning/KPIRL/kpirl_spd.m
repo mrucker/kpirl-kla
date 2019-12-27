@@ -2,7 +2,7 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
 
     a_tic = tic;
         [E_t       ] = feval([domain '_expert_episodes']);
-        [r_i, r_p  ] = feval([domain '_reward_features']);
+        [r_p, r_i  ] = feval([domain '_reward_features']);
         [parameters] = feval([domain '_parameters']);
 
         epsilon = parameters.epsilon;

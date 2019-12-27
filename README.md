@@ -18,18 +18,18 @@ In addition to the above two algorithms PIRL, LSPI and KLSPI have also been impl
 ## Directory Structure
 
 ```
-* **algorithms** - contains all algorithm implementations (many algorithms are for comparison purposes only)
-	* **inverse reinforcement learning**
-		* **pirl** - Projection inverse reinforcemnt learning ([paper](https://dl.acm.org/citation.cfm?id=1015430))
-		* **kpirl** - Kernel projection inverse reinforcement learning
-			* **kpirl_spd** - an implementation of the KPIRL algorithm that has been optimized for speed but loads all reward feature vectors into memory
-			* **kpirl_mem** - an implementation of the KPIRL algorithm that has been optimized for memory by only loading reward feature vectors into memory when needed.
-	* _reinforcement learning_
-		* _kla_ - Kernel lookup approximation
-			* _kla_spd_ - an implementation of the KLA algorithm that has been optimized for speed but loads all value feature vectors into memory
-			* _kla_mem_ - an implementation of the KLA algorithm that has been optimized for memory by only loading value feature vectors into memory when needed.
-		* _klspi_ - Kernel-based least squares policy iteration ([paper](https://ieeexplore.ieee.org/abstract/document/4267723))
-		* _lspi_ - Least-squares policy iteration ([paper](http://www.jmlr.org/papers/v4/lagoudakis03a.html))
+algorithms - contains all algorithm implementations (many algorithms are for comparison purposes only)
+└---inverse reinforcement learning
+|   └---pirl - Projection inverse reinforcemnt learning ([paper](https://dl.acm.org/citation.cfm?id=1015430))
+|   └---kpirl - Kernel projection inverse reinforcement learning
+|           kpirl_spd - an implementation of the KPIRL algorithm that has been optimized for speed but loads all reward feature vectors into memory
+|           kpirl_mem - an implementation of the KPIRL algorithm that has been optimized for memory by only loading reward feature vectors into memory when needed.
+└---reinforcement learning
+    └---kla - Kernel lookup approximation
+    |       kla_spd - an implementation of the KLA algorithm that has been optimized for speed but loads all value feature vectors into memory
+    |       kla_mem - an implementation of the KLA algorithm that has been optimized for memory by only loading value feature vectors into memory when needed.
+    └---lspi - Least-squares policy iteration ([paper](http://www.jmlr.org/papers/v4/lagoudakis03a.html))
+    └---klspi - Kernel-based least squares policy iteration ([paper](https://ieeexplore.ieee.org/abstract/document/4267723))
 * _domains_ - specific problem domain implementations
 	* _\<domain name\>_ - folder name unique for each domain
 		* _data_ - contains the raw data for the specific domain (no standardization here)

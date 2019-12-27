@@ -1,5 +1,5 @@
-function [v_i, v_p] = rem_value_features_1c()
+function [v_p, v_i] = rem_value_features_1c()
 
-    [v_i, v_p] = single_feature();
+    [v_p, v_i] = single_feature();
 
 end

@@ -1,4 +1,4 @@
-function [v_i, v_p] = huge_value_features_1a()
+function [v_p, v_i] = huge_value_features_1a()
     n_levels = [3 3 3 3 3 3 3 6];
 
     states2features = {
@@ -30,37 +30,37 @@ function [v_i, v_p] = huge_value_features_1a()
         level2linear(n_levels(8));
     };
 
-    [v_i, v_p] = multi_feature(n_levels, states2features, features2levels, levels2features);
+    [v_p, v_i] = multi_feature(n_levels, states2features, features2levels, levels2features);
+end
 
-    function l = cursor_l_features(states)
-        l = states(1:2,:) ./ states(9:10,:);
-    end
+function l = cursor_l_features(states)
+    l = states(1:2,:) ./ states(9:10,:);
+end
 
-    function v = cursor_v_features(states)
-        v = states(3:4,:) / 75;
-    end
+function v = cursor_v_features(states)
+    v = states(3:4,:) / 75;
+end
 
-    function a = cursor_a_features(states)
-        a = states(5:6,:) / 75;
-    end
+function a = cursor_a_features(states)
+    a = states(5:6,:) / 75;
+end
 
-    function t = target_t_features(states)
-        r2 = states(11, 1).^2;
+function t = target_t_features(states)
+    r2 = states(11, 1).^2;
 
-        [cd, pd] = distance_features(states);
+    [cd, pd] = distance_features(states);
 
-        ct = cd <= r2;
-        pt = pd <= r2;
-        nt = states(14:3:end, 1) <= 30; %in theory this could be 33 (aka, one observation 30 times a second)
+    ct = cd <= r2;
+    pt = pd <= r2;
+    nt = states(14:3:end, 1) <= 30; %in theory this could be 33 (aka, one observation 30 times a second)
 
-        enter_target = any(ct&(~pt|nt),1);
-        leave_target = any(~ct&pt     ,1);
+    enter_target = any(ct&(~pt|nt),1);
+    leave_target = any(~ct&pt     ,1);
 
-        n_approaching = sum(cd < pd,1);
-        i_enter_state = (1:3) * [(enter_target); (~enter_target & ~leave_target); (~enter_target & leave_target)];
-        
-        t = [ i_enter_state; n_approaching ];
-    end
+    n_approaching = sum(cd < pd,1);
+    i_enter_state = (1:3) * [(enter_target); (~enter_target & ~leave_target); (~enter_target & leave_target)];
+
+    t = [ i_enter_state; n_approaching ];
 end
 
 function [cd, pd] = distance_features(states)

@@ -1,4 +1,4 @@
-function [b_i, b_p] = multi_feature(partitions, state2feature, feature2level, level2feature)
+function [s_p, s_i] = multi_feature(partitions, state2feature, feature2level, level2feature)
 
     if ~iscell(partitions)
         partitions = {partitions};
@@ -10,8 +10,8 @@ function [b_i, b_p] = multi_feature(partitions, state2feature, feature2level, le
     n_combos_cum_sum = cumsum([0, n_combos_per_partition])';
     n_combos_cum_sum(end) = [];
 
-    b_i = @input2index;
-    b_p = @input2feats;
+    s_p = @input2phis;
+    s_i = @input2index;
 
     function index = input2index(input)
         assert(nargin == 0 || is_state(input), 'unsupported input');
@@ -23,7 +23,7 @@ function [b_i, b_p] = multi_feature(partitions, state2feature, feature2level, le
         end
     end
 
-    function feats = input2feats(input)
+    function feats = input2phis(input)
         assert(nargin == 0 || is_state(input) || is_index(input), 'unsupported input');
 
         if nargin == 0

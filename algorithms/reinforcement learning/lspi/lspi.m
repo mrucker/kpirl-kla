@@ -19,8 +19,9 @@ function [policy, time, policies, times] = lspi(domain, reward)
     epsilon   = params.epsilon;
     resample  = params.resample;
 
-    policy.reward = reward;
-    policy.feats  = feats;
+    policy.reward   = reward;
+    policy.feats    = feats;
+    policy.function = @(state) policy_function(policy, state);
 
     sampler  = sarsa_sampler(simul_func, policy, max_epis, max_steps, resample);
 
@@ -29,9 +30,9 @@ function [policy, time, policies, times] = lspi(domain, reward)
 
     [~, all_policies] = lspi_klspi_core(sampler, base_alg, eval_alg, policy, max_iter, epsilon);
 
-    policy = @(s) policy_function(all_policies{end}, s);
+    policy = all_policies{end}.function;
     time   = all_policies{end}.time;
 
-    policies = cellfun(@(p) {@(s) policy_function(p, s)}, all_policies);
+    policies = cellfun(@(p) { p.function }, all_policies);
     times    = cell2mat(cellfun(@(p) { p.time }, all_policies));
 end

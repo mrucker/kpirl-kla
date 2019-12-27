@@ -1,6 +1,6 @@
 function f = random_linear_reward(domain, count, rand_w)
 
-    [~, r_p] = feval([domain '_reward_features']);
+    r_p = feval([domain '_reward_features']);
 
     if(nargin < 2)
         count = 1;
