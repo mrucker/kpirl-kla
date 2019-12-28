@@ -1,7 +1,7 @@
 function [reward_function, time_measurements] = kpirl_mem(domain)
 
     a_tic = tic;
-        [E_t       ] = feval([domain '_expert_episodes']);
+        [e_t       ] = feval([domain '_episodes']);
         [r_p, r_i  ] = feval([domain '_features'], 'reward');
         [parameters] = feval([domain '_parameters']);
 
@@ -11,7 +11,7 @@ function [reward_function, time_measurements] = kpirl_mem(domain)
 
         X = containers.Map('KeyType','double','ValueType','any');
 
-        s_E = calculate_visitation(E_t, gamma, r_i);
+        s_E = calculate_visitation(e_t(), gamma, r_i);
         X   = cat_hashtable(X, keys(s_E), num2cell(r_p(keys(s_E)),1));
 
         r_f = {};
@@ -42,8 +42,7 @@ function [reward_function, time_measurements] = kpirl_mem(domain)
                     t_s{i} = sqrt(t_E'*t_g*t_E + t_b'*t_g*t_b - 2*t_E'*t_g*t_b);
                 end
 
-                s_t    = feval([domain, '_reward_episodes'], r_f{i});
-                s_e{i} = calculate_visitation(s_t, gamma, r_i);
+                s_e{i} = calculate_visitation(e_t(r_f{i}), gamma, r_i);
                 X      = cat_hashtable(X, keys(s_e{i}), num2cell(r_p(keys(s_e{i})),1));
 
                 if i == 1

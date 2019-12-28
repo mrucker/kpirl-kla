@@ -17,12 +17,12 @@ outputs    = { statistics_to_screen() };
 
 daps = {
     %generate a policy using kla_spd and features '1b' (aka, shared/features/single_feature) which gives a policy of random actions.
-    'random'  , @kla_spd, struct('N', 30, 'M', 01 , 'T', 01, 'v_feats', '1b', 'W', 00);
+    'random'  , @kla_spd, struct('N', 30, 'M', 01 , 'T', 01, 'v_feats', 0, 'W', 00);
 
     %generate a policy using kla_spd and features '1a' (this kla implementation decreases computation by increasing memory use)
-    'kla_spd' , @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', '1a', 'W', 02, 'explore', 0, 'target', 0, 'smooth', 1);
-    'kla_spd' , @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', '1a', 'W', 02, 'explore', 1, 'target', 0, 'smooth', 1);
-    'kla_spd' , @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', '1a', 'W', 02, 'explore', 2, 'target', 0, 'smooth', 1);
+    'kla_spd' , @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', 1, 'W', 02, 'explore', 0, 'target', 0, 'smooth', 1);
+    'kla_spd' , @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', 1, 'W', 02, 'explore', 1, 'target', 0, 'smooth', 1);
+    'kla_spd' , @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', 1, 'W', 02, 'explore', 2, 'target', 0, 'smooth', 1);
 
     %generate a policy using kla_mem and features '1a' (this kla implementation decreases memory use by increasing computation)
     %'kla_mem' , @kla_mem, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', '1a', 'W', 02, 'explore', 1, 'bootstrap', 0);

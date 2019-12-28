@@ -18,21 +18,21 @@ for i = 1:200
     outputs    = { attributes_to_file("kla.csv") };
 
     daps = {
-        'random'                        , @kla_spd, struct('N', 30, 'M', 01 , 'T', 01, 'v_feats', '1b', 'W', 00);
-        'kla, Monte Carlo, explore, W=0', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', '1a', 'W', 00, 'explore', 1, 'bootstrap', 0);
-        %'kla, Monte Carlo, explore, W=1', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', '1a', 'W', 01, 'explore', 1, 'bootstrap', 0);
-        %'kla, Monte Carlo, explore, W=2', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', '1a', 'W', 02, 'explore', 1, 'bootstrap', 0);
-        %'kla, Monte Carlo, exploit, W=0', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', '1a', 'W', 00, 'explore', 0, 'bootstrap', 0);
-        %'kla, Monte Carlo, exploit, W=1', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', '1a', 'W', 01, 'explore', 0, 'bootstrap', 0);
-        %'kla, Monte Carlo, exploit, W=2', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', '1a', 'W', 02, 'explore', 0, 'bootstrap', 0);
-        %'kla, bootstrap, explore, W=2'  , @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', '1a', 'W', 02, 'explore', 1, 'bootstrap', 1);
-        %'kla, bootstrap, exploit, W=2'  , @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', '1a', 'W', 02, 'explore', 0, 'bootstrap', 1);
-        %'lspi, polynomial=1'            , @lspi   , struct('N', 30, 'M', 90 , 'T', 06, 'v_feats', '1a', 'resample', true, 'basis', poly_basis(1));
-        %'lspi, polynomial=2'            , @lspi   , struct('N', 30, 'M', 90 , 'T', 06, 'v_feats', '1a', 'resample', true, 'basis', poly_basis(2));
-        %'lspi, polynomial=3'            , @lspi   , struct('N', 30, 'M', 90 , 'T', 06, 'v_feats', '1a', 'resample', true, 'basis', poly_basis(3));
-        %'klspi, bandwidth=0.25, mu=0.30', @klspi  , struct('N', 30, 'M', 90 , 'T', 06, 'v_feats', '1a', 'resample', true, 'kernel', k_gaussian(k_norm(),0.25), 'mu', 0.3);
-        %'klspi, bandwidth=0.50, mu=0.30', @klspi  , struct('N', 30, 'M', 90 , 'T', 06, 'v_feats', '1a', 'resample', true, 'kernel', k_gaussian(k_norm(),0.50), 'mu', 0.3);
-        %'klspi, bandwidth=1.00, mu=0.30', @klspi  , struct('N', 30, 'M', 90 , 'T', 06, 'v_feats', '1a', 'resample', true, 'kernel', k_gaussian(k_norm(),1.00), 'mu', 0.3);
+        'random'                        , @kla_spd, struct('N', 30, 'M', 01 , 'T', 01, 'v_feats', 0, 'W', 00);
+        'kla, Monte Carlo, explore, W=0', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', 1, 'W', 00, 'explore', 1, 'bootstrap', 0);
+        %'kla, Monte Carlo, explore, W=1', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', 1, 'W', 01, 'explore', 1, 'bootstrap', 0);
+        %'kla, Monte Carlo, explore, W=2', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', 1, 'W', 02, 'explore', 1, 'bootstrap', 0);
+        %'kla, Monte Carlo, exploit, W=0', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', 1, 'W', 00, 'explore', 0, 'bootstrap', 0);
+        %'kla, Monte Carlo, exploit, W=1', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', 1, 'W', 01, 'explore', 0, 'bootstrap', 0);
+        %'kla, Monte Carlo, exploit, W=2', @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', 1, 'W', 02, 'explore', 0, 'bootstrap', 0);
+        %'kla, bootstrap, explore, W=2'  , @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', 1, 'W', 02, 'explore', 1, 'bootstrap', 1);
+        %'kla, bootstrap, exploit, W=2'  , @kla_spd, struct('N', 30, 'M', 90 , 'T', 04, 'v_feats', 1, 'W', 02, 'explore', 0, 'bootstrap', 1);
+        %'lspi, polynomial=1'            , @lspi   , struct('N', 30, 'M', 90 , 'T', 06, 'v_feats', 1, 'resample', true, 'basis', poly_basis(1));
+        %'lspi, polynomial=2'            , @lspi   , struct('N', 30, 'M', 90 , 'T', 06, 'v_feats', 1, 'resample', true, 'basis', poly_basis(2));
+        %'lspi, polynomial=3'            , @lspi   , struct('N', 30, 'M', 90 , 'T', 06, 'v_feats', 1, 'resample', true, 'basis', poly_basis(3));
+        %'klspi, bandwidth=0.25, mu=0.30', @klspi  , struct('N', 30, 'M', 90 , 'T', 06, 'v_feats', 1, 'resample', true, 'kernel', k_gaussian(k_norm(),0.25), 'mu', 0.3);
+        %'klspi, bandwidth=0.50, mu=0.30', @klspi  , struct('N', 30, 'M', 90 , 'T', 06, 'v_feats', 1, 'resample', true, 'kernel', k_gaussian(k_norm(),0.50), 'mu', 0.3);
+        %'klspi, bandwidth=1.00, mu=0.30', @klspi  , struct('N', 30, 'M', 90 , 'T', 06, 'v_feats', 1, 'resample', true, 'kernel', k_gaussian(k_norm(),1.00), 'mu', 0.3);
     }';
 
     fprintf('\nIteration %i\n',i);

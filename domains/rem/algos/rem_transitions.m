@@ -2,18 +2,12 @@ function [t_s, t_p] = rem_transitions()
     t_s = @to_s;
     t_p = @to_p;
     
-    episodes   = rem_expert_episodes();
-    parameters = rem_parameters();
-
-    epi_count  = numel(episodes);
-    epi_length = size(episodes{1},2);
-
-    rand_states = arrayfun(@(i) { episodes{randi(epi_count)}(randi(epi_length)) }, 1:parameters.rand_ns);
+    e_t    = rem_episodes();
 
     function s = to_s(s,a)
 
         if(nargin == 0)
-            s = rand_states{randi(numel(rand_states))};
+            s = random_state(random_episode(e_t()));
         end
 
         if(nargin == 1)
@@ -50,4 +44,12 @@ function p = to_p(s, a)
         p = repmat(p,1,size(a,2));
         p = vertcat(p,a);
     end
+end
+
+function s = random_state(episode)
+    s = episode(randi(size(episode,2)));
+end
+
+function t = random_episode(episodes)
+    t = episodes{randi(size(episodes,2))};
 end

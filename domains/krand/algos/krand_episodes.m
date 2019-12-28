@@ -1,3 +1,35 @@
+function e = krand_episodes()
+
+    expert_episodes = krand_expert_episodes();
+
+    function e = to_e(reward)
+        if(nargin == 0)
+            e = expert_episodes;
+        end
+
+        if(nargin == 1)
+            e = krand_reward_episodes(reward);
+        end
+    end
+
+    e = @to_e;
+
+end
+
+function episodes = krand_reward_episodes(reward)
+
+    domain = 'krand';
+
+    t_s    = feval([domain '_transitions']);
+    params = feval([domain '_parameters']);
+
+    epi_count  = params.samples;
+	epi_length = params.steps;
+
+    policy   = kla_mem(domain, reward);
+    episodes = policy2episodes(policy, t_s, epi_count, epi_length);
+end
+
 function episodes = krand_expert_episodes()
     episodes = read_episodes_from_file(fullfile(fileparts(which(mfilename)), '..', 'data'), 'test_episode.csv');
 end

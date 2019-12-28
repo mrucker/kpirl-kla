@@ -24,7 +24,7 @@ daps = {
     'kla_spd', @kla_spd, struct('N', 10, 'M', 90, 'T', 04, 'v_feats', 1, 'W', 03);
 
     %generate a policy using kla_mem and features '1a' (this kla implementation decreases memory use by increasing computation)
-    %'kla_mem', @kla_mem, struct('N', 10, 'M', 90, 'T', 04, 'v_feats', 1, 'W', 03);
+    'kla_mem', @kla_mem, struct('N', 10, 'M', 90, 'T', 04, 'v_feats', 1, 'W', 03);
 
     %generate a policy using lspi and features '1a' with a second order polynomial transform applied to the basis 
     'lspi '   , @lspi   , struct('N', 10, 'M', 90, 'T', 06, 'v_feats', 1, 'resample', true, 'basis', poly_basis(2));

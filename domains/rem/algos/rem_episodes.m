@@ -1,8 +1,39 @@
+function e = rem_episodes()
+
+    expert_episodes = rem_expert_episodes();
+    
+    function e = to_e(reward)
+        if(nargin == 0)
+            e = expert_episodes;
+        end
+    
+        if(nargin == 1)
+            e = rem_reward_episodes(reward);
+        end
+    end
+
+    e = @to_e;
+end
+
+function episodes = rem_reward_episodes(reward)
+
+    domain = 'rem';
+
+    [t_s       ] = feval([domain '_transitions']);
+    [parameters] = feval([domain '_parameters']);
+
+    epi_count  = parameters.samples;
+	epi_length = parameters.steps;
+
+    policy   = kla_spd(domain, reward);
+    episodes = policy2episodes(policy, t_s, epi_count, epi_length);
+end
+
 function episodes = rem_expert_episodes()
     episodes = read_episodes_from_file(fullfile(fileparts(which(mfilename)), '..', 'data'), 'matlab-episodes.csv');
 end
 
-function te = read_episodes_from_file(path, file)
+function e = read_episodes_from_file(path, file)
 
     parameters = rem_parameters();
 
@@ -16,13 +47,13 @@ function te = read_episodes_from_file(path, file)
     trajectory_epsiodes_finish = numel(trajectory_states) - trajectory_episodes_length;
     trajectory_episodes_count  = floor((trajectory_epsiodes_finish - trajectory_epsiodes_start)/trajectory_episodes_step_size);
 
-    te = cell(1,trajectory_episodes_count);
+    e = cell(1,trajectory_episodes_count);
 
-    for e = 1:trajectory_episodes_count
-       episode_start = trajectory_epsiodes_start + (e-1)*(trajectory_episodes_step_size);
+    for t = 1:trajectory_episodes_count
+       episode_start = trajectory_epsiodes_start + (t-1)*(trajectory_episodes_step_size);
        episode_stop  = episode_start + trajectory_episodes_length - 1;
 
-       te{e} = trajectory_states(episode_start:episode_stop); 
+       e{t} = trajectory_states(episode_start:episode_stop); 
     end
 end
 

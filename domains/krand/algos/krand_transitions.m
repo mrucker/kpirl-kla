@@ -2,12 +2,12 @@ function [t_s, t_p] = krand_transitions()
     t_s = @to_s;
     t_p = @to_p;
     
-    episodes = krand_expert_episodes();
+    e_t = krand_episodes();
     
     function s = to_s(s, a)
 
         if(nargin == 0)
-            s = random_state(random_episode(episodes));
+            s = random_state(random_episode(e_t()));
         end
 
         if(nargin == 1)
@@ -59,8 +59,8 @@ function s = p_to_s(p)
     s = p;
 end
 
-function s = random_state(trajectory)
-    s = trajectory(randi(size(trajectory,2)));
+function s = random_state(episode)
+    s = episode(randi(size(episode,2)));
 end
 
 function t = random_episode(episodes)
