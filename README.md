@@ -14,7 +14,7 @@ This repository implements two new RL/IRL algorithms and compares them to existi
 
 ## Quick Start
 
-Two files have been provided in the root directory for a "quick start". These files use the "huge" domain, but could easily be used with any domain. The files should be executable "out-of-the-box". Further documentation is provided in-line within the files.
+Two files have been provided in the root for a "quick start". The files should be executable "out-of-the-box". These files use the "huge" domain, but could easily be used with any domain. Further documentation is provided in-line within the files.
 
 * qs_compare.m - compares the performance of three different RL algorithms in the "huge" domain. To compare performance a number of random reward functions are generated, then a policy is learned for each of these functions using the RL algorithms. Using the learned policies a number of random episodes are generated. Each episode's value is calculated, and the expected value for each RL algorithm is output for comparison.
 * qs_inverse.m - uses kpirl on the "huge" domain to determine a reward function.
@@ -74,7 +74,7 @@ The algorithm implementations expect the following domain specific method implem
 	
 Where the above methods are defined as
 
-	* \<domain\>_actions()
+	* \<domain\>_actions
 		* Input:
 			* there is no input for this function
 		* Output:
@@ -86,9 +86,9 @@ Where the above methods are defined as
 		* Output:
 			* t_s = a function with the following behavior:
 				* given nothing return a random state (used to initialize new episodes for statistical sampling)
-				* given a collection of post-decision states return one random pre-decision state for post-decision state according the transition probabilities of the MDP.
+				* given a collection of post-decision states return one random pre-decision state for each post-decision state according the transition probabilities of the MDP.
 				* given a state and a collection of actions return one random pre-decision state for each action according the transition probabilities of the MDP.
-			* t_p = a function that takes a state and a collection of actions and returns a post-decision state for each action. (In traditional Q-Learning the post decision state would be (s,a) though it can be more compact.)
+			* t_p = a function that is given a state and a collection of actions and that returns a post-decision state for each given action. (In traditional Q-Learning the post-decision state would be (s,a) though it can be more compact.)
 
 	* \<domain\>_features
 		* Input:
@@ -115,17 +115,29 @@ Where the above methods are defined as
 
 ## Algorithm Parameters
 
-* kla
-	* N -- the number of policy iterations to perform
-	* M -- the number of episodes to generate during policy evaluation
-	* W -- the number of observations per episode to make during policy evalution
-	* T -- the number of steps to use when making an observation during policy evaluation
-	* gamma -- the amount of reward discount to use when learning an optimal value function
+Each of the above algorithms expects the following parameters to be defined
 
-* klspi
-	* N
-	* kernel
-	* mu
-* lspi
-* kpirl
-* pirl
+	* kla
+		* N -- the number of policy iterations to perform
+		* M -- the number of episodes to generate during policy evaluation
+		* T -- the number of steps to use when making an observation during policy evaluation
+		* W -- the number of observations per episode to make during policy evalution
+		* gamma -- the amount of reward discount to use when calculating value functions
+
+	* lspi
+		* N -- the number of policy iterations to perform
+		* M -- the number of episodes to generate during policy evaluation
+		* T -- the number of steps to use when making an observation during policy evaluation
+		* gamma -- the amount of reward discount to use when calculating value functions
+		* resample -- determines if the sarsa samples are recreated on each policy iteration or simply updated
+	* klspi
+		* all of lspi
+		* kernel -- the kernel method to use when approximating the value function (e.g., kernel = `@(x,y) x'*y`)
+		* mu -- pruning level in the approximate linear dependence analysis. The higher the value the more is pruned.
+	* pirl
+		* epsilon -- the termination condition for the pirl reward iterations
+		* gamma -- the amount of reward discount to use when calculating value functions
+	* kpirl
+		* all of pirl
+		* kernel -- the kernel method to use when approximating the reward function (e.g., kernel = `@(x,y) x'*y`)
+	

@@ -14,8 +14,8 @@ function [policy, time, policies, times] = lspi(domain, reward)
     max_iter  = params.N;
     max_epis  = params.M;
     max_steps = params.T;
-    epsilon   = params.epsilon;
     resample  = params.resample;
+    epsilon   = 0;
 
     policy.explore  = 1;
     policy.actions  = a_f; 
