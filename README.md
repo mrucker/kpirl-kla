@@ -78,27 +78,27 @@ The above methods are described below
 	* Input:
 		* there is no input for this function
 	* Output:
-		1. a function which accepts a single state and returns the collection of valid actions for that state
+		* a function which accepts a single state and returns the collection of valid actions for that state
 
 * \<domain\>_transitions
 	* Input:
 		* there is no input for this function
 	* Output:
-		1. t_s = a function with the following behavior:
+		* t_s = a function with the following behavior:
 			* given nothing return a random state (used to initialize new episodes for statistical sampling)
 			* given a collection of post-decision states return one random pre-decision state for post-decision state according the transition probabilities of the MDP.
 			* given a state and a collection of actions return one random pre-decision state for each action according the transition probabilities of the MDP.
-		2. t_p = a function that takes a state and a collection of actions and returns a post-decision state for each action. (In traditional Q-Learning the post decision state would be (s,a) though it can be more compact.)
+		* t_p = a function that takes a state and a collection of actions and returns a post-decision state for each action. (In traditional Q-Learning the post decision state would be (s,a) though it can be more compact.)
 
 * \<domain\>_features
 	* Input:
-		1. a string indicating whether the features are being used to approximate a reward function or value function
+		* a string indicating whether the features are being used to approximate a reward function or value function
 	* Output:
-		1. v_p = a function with the following behavior:
+		* v_p = a function with the following behavior:
 			* given nothing return the count of features
 			* given states return a matrix whose columns are the feature vectors for each state
 			* given indexes return a matrix whose columns are the feature vectors for the indexes
-		2. v_i = a function with the following behavior:
+		* v_i = a function with the following behavior:
 			* given nothing return the count of feature vectors
 			* given states return a row vector containing the feature index for each state
 	* examples:
