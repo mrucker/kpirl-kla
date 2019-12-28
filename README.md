@@ -33,8 +33,8 @@ root
 └---domains_- specific problem domain implementations
 |   └---\<domain\> - a separate folder for each domain
 |       └---algos - contains the domain specific methods for the various algorithms
-|       └---data  - contains the raw data for the specific domain (no standardization here)
-|       └---work  - catch all folder for domain specific work/research (no standardization here)
+|       └---data - contains the raw data for the specific domain (no standardization here)
+|       └---work - catch all folder for domain specific work/research (no standardization here)
 └---shared - a collection of utility functions that can be used across domains
         └---kernel - implementations of popular kernel methods
         └---features - utility methods to create indexed features
@@ -45,11 +45,12 @@ root
 ## Algorithms
 
 This repository contains five algorithm implementations:
-	1. KLA - kernel lookup approximation
-	2. LSPI - least-squares policy iteration ([paper](http://www.jmlr.org/papers/v4/lagoudakis03a.html))
-	3. KLSPI - kernel-based least squares policy iteration ([paper](http://www.jmlr.org/papers/v4/lagoudakis03a.html))
-	4. PIRL - projection inverse reinforcemnt learning ([paper](https://dl.acm.org/citation.cfm?id=1015430))
-	5. KPIRL - kernel projection inverse reinforcemnt learning
+
+1. KLA - kernel lookup approximation
+2. LSPI - least-squares policy iteration ([paper](http://www.jmlr.org/papers/v4/lagoudakis03a.html))
+3. KLSPI - kernel-based least squares policy iteration ([paper](http://www.jmlr.org/papers/v4/lagoudakis03a.html))
+4. PIRL - projection inverse reinforcemnt learning ([paper](https://dl.acm.org/citation.cfm?id=1015430))
+5. KPIRL - kernel projection inverse reinforcemnt learning
 	
 Most of the algorithm implementations have two versions: 
 	1. a memory efficient version (`_mem`) that runs slower but only loads features into memory as needed
