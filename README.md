@@ -16,8 +16,8 @@ This repository implements two new RL/IRL algorithms and compares them to existi
 
 Two files have been provided in the root for a "quick start". The files should be executable "out-of-the-box". These files use the "huge" domain, but could easily be used with any domain. Further documentation is provided in-line within the files.
 
-* qs_compare.m - compares the performance of three different RL algorithms in the "huge" domain. To compare performance a number of random reward functions are generated, then a policy is learned for each of these functions using the RL algorithms. Using the learned policies a number of random episodes are generated. Each episode's value is calculated, and the expected value for each RL algorithm is output for comparison.
-* qs_inverse.m - uses kpirl on the "huge" domain to determine a reward function.
+* **qs_compare.m** - compares the performance of five RL algorithms in the "huge" domain. To compare performance a number of random reward functions are generated, then a policy is learned for each of these functions using the RL algorithms. Using the learned policies a number of random episodes are generated. Each episode's value is calculated, and the expected value for each RL algorithm is output for comparison.
+* **qs_inverse.m** - uses kpirl on the "huge" domain to determine a reward function.
 
 
 ## Directory Structure
