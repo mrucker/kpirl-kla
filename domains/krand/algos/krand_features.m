@@ -1,4 +1,21 @@
-function [v_p, v_i] = krand_reward_features()
+function [p, i] = krand_features(func)
+
+    params = krand_parameters();
+    
+    if(strcmp(func, 'reward'))
+        [p, i] = krand_reward_features();
+    end
+    
+    if(strcmp(func, 'value'))
+        if(params.v_feats == 0)
+            [p, i] = single_feature();
+        else
+            [p, i] = krand_reward_features();
+        end 
+    end
+end
+
+function [p, i] = krand_reward_features()
     n_levels = [9, 30, 21, 31, 96, 7];
 
     state2feature = {
@@ -28,7 +45,7 @@ function [v_p, v_i] = krand_reward_features()
         level2linear(n_levels(6));
     };
 
-    [v_p, v_i] = multi_feature(n_levels, state2feature, feature2level, level2features);
+    [p, i] = multi_feature(n_levels, state2feature, feature2level, level2features);
 
     function v = rail_type(states)
         v = 1+states.rail_type;

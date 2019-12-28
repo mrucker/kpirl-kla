@@ -1,5 +1,5 @@
 function episodes = krand_expert_episodes()
-    episodes = read_episodes_from_file(fullfile(fileparts(which(mfilename)), '..', '..', 'data'), 'test_episode.csv');
+    episodes = read_episodes_from_file(fullfile(fileparts(which(mfilename)), '..', 'data'), 'test_episode.csv');
 end
 
 function te = read_episodes_from_file(path, file)

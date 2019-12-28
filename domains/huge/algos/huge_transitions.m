@@ -3,7 +3,7 @@ function [t_s, t_p] = huge_transitions()
     t_s = @to_s;
     t_p = @to_p;
     
-    path = fullfile(fileparts(which(mfilename)), '..', '..', 'data');
+    path = fullfile(fileparts(which(mfilename)), '..', 'data');
     file = 'huge_observed_episodes.json';
 
     initial_states = read_states_from_file(path, file);

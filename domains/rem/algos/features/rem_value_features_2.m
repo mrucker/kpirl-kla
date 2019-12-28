@@ -1,4 +1,4 @@
-function [v_p, v_i] = rem_value_features_1b()
+function [v_p, v_i] = rem_value_features_2()
 
     n_levels = [2, 2];
 

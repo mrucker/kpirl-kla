@@ -4,10 +4,10 @@ function [policy, time, policies, times] = lspi(domain, reward)
     actio_func = [domain '_actions'];
     param_func = [domain '_parameters'];
     trans_func = [domain '_transitions'];
-    feats_func = [domain '_value_features'];
+    feats_func = [domain '_features'];
 
     [a_f    ] = feval(actio_func);
-    [v_p    ] = feval(feats_func);
+    [v_p    ] = feval(feats_func, 'value');
     [t_s,t_p] = feval(trans_func);
     [params ] = feval(param_func);
 

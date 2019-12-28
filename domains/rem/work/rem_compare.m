@@ -13,8 +13,8 @@ statistics = { avg() SEM() med() };
 outputs    = { statistics_to_screen() };
 
 daps = {
-    'kla_spd T=1 W=3;', @kla_spd, struct('v_feats', '1a', 'N', 20, 'M', 90, 'T', 1 , 'W', 3, 'gamma', 1);
-    'kla_mem T=1 W=3;', @kla_mem, struct('v_feats', '1a', 'N', 20, 'M', 90, 'T', 1 , 'W', 3, 'gamma', 1);    
+    'kla_spd T=1 W=3;', @kla_spd, struct('v_feats', 1, 'N', 20, 'M', 90, 'T', 1 , 'W', 3, 'gamma', 1);
+    'kla_mem T=1 W=3;', @kla_mem, struct('v_feats', 1, 'N', 20, 'M', 90, 'T', 1 , 'W', 3, 'gamma', 1);    
 }';
 
 analyze_policy(domain, daps, rewards, attributes, statistics, outputs);

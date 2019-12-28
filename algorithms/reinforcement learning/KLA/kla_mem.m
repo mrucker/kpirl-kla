@@ -1,6 +1,6 @@
 function [policy, time, policies, times] = kla_mem(domain, reward)
 
-    v_p = feval([domain '_value_features']);
+    v_p = feval([domain '_features'], 'value');
 
     Q_dot     = Q_dot_ctor(containers.Map('KeyType','double','ValueType','double'));
     Q_bar     = Q_bar_ctor(v_p, @(is) ones(1,numel(is)));

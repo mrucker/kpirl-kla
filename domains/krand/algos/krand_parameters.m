@@ -13,7 +13,7 @@ function p_out = krand_parameters(p_in); persistent parameters;
     end
 
     if ~isfield(parameters,'grid_world')
-        grid_world = (fullfile(fileparts(which(mfilename)), 'data', 'allowed3.csv'));
+        grid_world = (fullfile(fileparts(which(mfilename)), '..', 'data', 'allowed3.csv'));
         grid_world = readtable(grid_world);
         grid_world = grid_world(:,3:6);  %Rail type, street type, street maxspeed, building type
 

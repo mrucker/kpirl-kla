@@ -2,7 +2,7 @@ function [reward_function, time_measurements] = kpirl_mem(domain)
 
     a_tic = tic;
         [E_t       ] = feval([domain '_expert_episodes']);
-        [r_p, r_i  ] = feval([domain '_reward_features']);
+        [r_p, r_i  ] = feval([domain '_features'], 'reward');
         [parameters] = feval([domain '_parameters']);
 
         epsilon = parameters.epsilon;

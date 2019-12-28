@@ -1,4 +1,4 @@
-function [v_p, v_i] = huge_value_features_1a()
+function [v_p, v_i] = huge_value_features()
     n_levels = [3 3 3 3 3 3 3 6];
 
     states2features = {

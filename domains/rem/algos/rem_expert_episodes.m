@@ -1,5 +1,5 @@
-function episodes = rem_episodes()
-    episodes = read_episodes_from_file(fullfile(fileparts(which(mfilename)), '..', '..', 'data'), 'matlab-episodes.csv');
+function episodes = rem_expert_episodes()
+    episodes = read_episodes_from_file(fullfile(fileparts(which(mfilename)), '..', 'data'), 'matlab-episodes.csv');
 end
 
 function te = read_episodes_from_file(path, file)
