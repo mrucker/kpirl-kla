@@ -7,7 +7,7 @@ function weights = lsq_mem(samples, basis, discount)
     for i=1:length(samples)
 
         phi      = basis(samples(i).feats);
-        phi_next = basis(samples(i).nextfeats) * ~samples(i).absorb;
+        phi_next = basis(samples(i).nextfeats);
 
         A = A + phi * (phi - discount * phi_next)';
         b = b + phi * samples(i).reward;

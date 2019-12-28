@@ -1,17 +1,15 @@
 % A wrapper that conforms LSPI to the RL interface
 function [policy, time, policies, times] = lspi(domain, reward)
 
-    polic_func = [domain '_policy'];
-    simul_func = [domain '_simulator'];
+    actio_func = [domain '_actions'];
     param_func = [domain '_parameters'];
-    feats_func = [domain '_value_features_lspi'];
-    
-    clear(feats_func);
-    clear(simul_func);
+    trans_func = [domain '_transitions'];
+    feats_func = [domain '_value_features'];
 
-    [policy] = feval(polic_func);
-    [params] = feval(param_func);
-    [feats ] = feval(feats_func);
+    [a_f    ] = feval(actio_func);
+    [v_p    ] = feval(feats_func);
+    [t_s,t_p] = feval(trans_func);
+    [params ] = feval(param_func);
 
     max_iter  = params.N;
     max_epis  = params.M;
@@ -19,11 +17,14 @@ function [policy, time, policies, times] = lspi(domain, reward)
     epsilon   = params.epsilon;
     resample  = params.resample;
 
+    policy.explore  = 1;
+    policy.actions  = a_f; 
     policy.reward   = reward;
-    policy.feats    = feats;
-    policy.function = @(state) policy_function(policy, state);
+    policy.discount = params.gamma;
+    policy.feats    = @(s, as) v_p(t_p(s,as));
+    policy.function = @(s) policy_function(policy, s);
 
-    sampler  = sarsa_sampler(simul_func, policy, max_epis, max_steps, resample);
+    sampler  = sarsa_sampler(t_s, policy, max_epis, max_steps, resample);
 
     base_alg = get_or_default(params, 'basis' , ident_basis());
     eval_alg = @lsq_spd;
