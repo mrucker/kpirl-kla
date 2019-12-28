@@ -53,70 +53,65 @@ This repository contains five algorithm implementations:
 5. KPIRL - kernel projection inverse reinforcemnt learning
 	
 Most of the algorithm implementations have two versions: 
-	1. a memory efficient version (`_mem`) that runs slower but only loads features into memory as needed
-	2. a compute efficient version (`_spd`) that runs faster but loads all features into memory upfront
+
+1. a memory efficient version (`_mem`) that runs slower but only loads features into memory as needed
+2. a compute efficient version (`_spd`) that runs faster but loads all features into memory upfront
 	
 ## Algorithm Methods
 
-Depending on which algorithms you would like to use in your domain different methods need to be defined.
+The algorithm implementations expect the following domain specific method implementations
 
-* kla
+* kla, lspi and klspi
 	* \<domain\>_actions
 	* \<domain\>_transitions
 	* \<domain\>_features
 	* \<domain\>_parameters
-	
-* klspi (lspi)
-	* \<domain\>_actions
-	* \<domain\>_transitions
-	* \<domain\>_features
-	* \<domain\>_parameters
-	
-* kpirl (pirl)
+		
+* kpirl and pirl
 	* \<domain\>_features
 	* \<domain\>_episodes
 	* \<domain\>_parameters
 	
 The above methods are described below
 
-	* \<domain\>_actions()
-		* Input:
-			* there is no input for this function
-		* Output:
-			1. a function which accepts a single state and returns the collection of valid actions for that state
+* \<domain\>_actions()
+	* Input:
+		* there is no input for this function
+	* Output:
+		1. a function which accepts a single state and returns the collection of valid actions for that state
 
-	* \<domain\>_transitions
-		* Input:
-			* there is no input for this function
-		* Output:
-			1. t_s = a function with the following behavior:
-				* given nothing return a random state (used to initialize new episodes for statistical sampling)
-				* given a collection of post-decision states return one random pre-decision state for post-decision state according the transition probabilities of the MDP.
-				* given a state and a collection of actions return one random pre-decision state for each action according the transition probabilities of the MDP.
-			2. t_p = a function that takes a state and a collection of actions and returns a post-decision state for each action. (In traditional Q-Learning the post decision state would be (s,a) though it can be more compact.)
+* \<domain\>_transitions
+	* Input:
+		* there is no input for this function
+	* Output:
+		1. t_s = a function with the following behavior:
+			* given nothing return a random state (used to initialize new episodes for statistical sampling)
+			* given a collection of post-decision states return one random pre-decision state for post-decision state according the transition probabilities of the MDP.
+			* given a state and a collection of actions return one random pre-decision state for each action according the transition probabilities of the MDP.
+		2. t_p = a function that takes a state and a collection of actions and returns a post-decision state for each action. (In traditional Q-Learning the post decision state would be (s,a) though it can be more compact.)
 
-	* \<domain\>_features
-		* Input:
-			1. a string indicating whether the features are being used to approximate a reward function or value function
-		* Output:
-			1. v_p = a function with the following behavior:
-				* given nothing return the count of features
-				* given states return a matrix whose columns are the feature vectors for each state
-				* given indexes return a matrix whose columns are the feature vectors for the indexes
-			2. v_i = a function with the following behavior:
-				* given nothing return the count of feature vectors
-				* given states return a row vector containing the feature index for each state
-		* examples:
-			* given a state _s_ the following predicate should always true `v_p(_s_) == v_p(v_i(_s_))`
-			* to get all feature vectors one can do `v_p(1:v_i())`
-			* to get a random feature vector one can do `v_p(randi(v_i()))`
-			* to pre-allocate a matrix for _n_ feature vectors one could do `zeros(r_p(), _n_)`
+* \<domain\>_features
+	* Input:
+		1. a string indicating whether the features are being used to approximate a reward function or value function
+	* Output:
+		1. v_p = a function with the following behavior:
+			* given nothing return the count of features
+			* given states return a matrix whose columns are the feature vectors for each state
+			* given indexes return a matrix whose columns are the feature vectors for the indexes
+		2. v_i = a function with the following behavior:
+			* given nothing return the count of feature vectors
+			* given states return a row vector containing the feature index for each state
+	* examples:
+		* given a state _s_ the following predicate should always true `v_p(_s_) == v_p(v_i(_s_))`
+		* to get all feature vectors one can do `v_p(1:v_i())`
+		* to get a random feature vector one can do `v_p(randi(v_i()))`
+		* to pre-allocate a matrix for _n_ feature vectors one could do `zeros(r_p(), _n_)`
 
-	* \<domain\>_parameters
-		* Input:
-			* p_in -- a struct that will be used to change the current parameters. This input is optional. Without it the current parameter struct will be returned unchanged.
-		* Output:
-			* p_out -- a struct containing the parameters for the current domain. This function needs to persist the paramters from call to call in order to work properly. The example domains do this via matlab's `persistent` command though it could be done other ways if necessary.
+* \<domain\>_parameters
+	* Input:
+		* p_in -- a struct that will be used to change the current parameters. This input is optional. Without it the current parameter struct will be returned unchanged.
+	* Output:
+		* p_out -- a struct containing the parameters for the current domain. This function needs to persist the paramters from call to call in order to work properly. The example domains do this via matlab's `persistent` command though it could be done other ways if necessary.
 
 ## Algorithm Parameters
 
