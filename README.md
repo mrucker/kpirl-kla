@@ -24,22 +24,22 @@ Two files have been provided in the root for a "quick start". The files should b
 
 ```
 root
-└———algorithms - contains all algorithm implementations
-|   └---inverse reinforcement learning
-|   |   └---kpirl (pirl)
-|   └---reinforcement learning
-|       └---kla
-|       └---klspi (lspi)
-└---domains_- specific problem domain implementations
-|   └---\<domain\> - a separate folder for each domain
-|       └---algos - contains the domain specific methods for the various algorithms
-|       └---data - contains the raw data for the specific domain (no standardization here)
-|       └---work - catch all folder for domain specific work/research (no standardization here)
-└---shared - a collection of utility functions that can be used across domains
-        └---kernel - implementations of popular kernel methods
-        └---features - utility methods to create indexed features
-        └---analysis - utility methods to benchmark algorithm performance
-        └---utilities - utility methods
+└–––algorithms - contains all algorithm implementations
+|   └–––inverse reinforcement learning
+|   |   └–––kpirl (pirl)
+|   └–––reinforcement learning
+|       └–––kla
+|       └–––klspi (lspi)
+└–––domains_- specific problem domain implementations
+|   └–––\<domain\> - a separate folder for each domain
+|       └–––algos - contains the domain specific methods for the various algorithms
+|       └–––data - contains the raw data for the specific domain (no standardization here)
+|       └–––work - catch all folder for domain specific work/research (no standardization here)
+└–––shared - a collection of utility functions that can be used across domains
+        └–––kernel - implementations of popular kernel methods
+        └–––features - utility methods to create indexed features
+        └–––analysis - utility methods to benchmark algorithm performance
+        └–––utilities - utility methods
 ```
 
 ## Algorithms
