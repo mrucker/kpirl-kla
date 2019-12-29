@@ -5,9 +5,9 @@ run(fullfile(fileparts(which(mfilename)), '..', '..', '..', 'shared', 'paths.m')
 
 domain = 'huge';
 
-for i = 1:5
+for i = 1:28
 
-    n_rewds = 4;
+    n_rewds = 36;
     n_samps = 64;
     n_steps = 10;
       gamma = .9;
