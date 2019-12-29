@@ -16,7 +16,7 @@ function analyze_policies(domain, daps, rewards, attributes, statistics, outputs
         fprintf([description repmat('.',1,numel(rewards)) '\n']);
         fprintf([description '\n']);
         
-        for r = 1:numel(rewards)
+        parfor r = 1:numel(rewards)
             
             fprintf('\b|\n');
             
