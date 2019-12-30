@@ -11,7 +11,7 @@ function [a, f] = policy_function(policy, state)
     
     [~, i] = randargmax(qs);
     
-    f = fs(:,i);
     a = as(:,i);
+    f = fs(:,i);
 end
 

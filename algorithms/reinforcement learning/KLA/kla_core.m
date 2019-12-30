@@ -61,7 +61,7 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar
                 end
 
                 if target_type == 1 % bootstrap
-                    q = r(1:W) + gamma * Q_bar(i(1:W));
+                    q = r(1:W) + gamma * Q_bar(i(1 + (1:W)));
                 end
 
                 O(:,:,m) = vertcat(i(1:W),q);
