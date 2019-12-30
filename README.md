@@ -21,7 +21,7 @@ Two files have been provided in the root for a "quick start". The files should b
 
 ## Architecture Principles/Tradeoffs
 
-In general this repository has been designed primarily for understandability and extensibility. Because of this the code makes heavy use of Matlab's closure functionality to preserve state and reduce dependencies. A consequence of this decision is less vectorization and more function calls. This means there is room for considerable compute improvement with a different implementation.
+This repository was designed primarily for understandability and extensibility. Because of this the code leans heavily on MATLAB's closure functionality to preserve state while reducing dependencies. A consequence of this decision is less vectorization and more function calls. This means there is room for considerable compute improvement with a different implementation.
 
 ## Directory Structure
 
