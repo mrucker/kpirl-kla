@@ -19,6 +19,9 @@ Two files have been provided in the root for a "quick start". The files should b
 * **qs_compare.m** - compares the performance of five RL algorithms in the "huge" domain. To compare performance a number of random reward functions are generated, then a policy is learned for each of these functions using the RL algorithms. Using the learned policies a number of random episodes are generated. Each episode's value is calculated, and the expected value for each RL algorithm is output for comparison.
 * **qs_inverse.m** - uses kpirl on the "huge" domain to determine a reward function.
 
+## Architecture Principles/Tradeoffs
+
+In general this repository has been designed primarily for understandability and extensibility. Because of this the code makes heavy use of Matlab's closure functionality to preserve state and reduce dependencies. A consequence of this decision is less vectorization and more function calls. This means there is room for considerable compute improvement with a different implementation.
 
 ## Directory Structure
 
