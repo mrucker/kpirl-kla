@@ -9,90 +9,89 @@ function [reward_function, time_measurements] = kpirl_mem(domain)
         gamma   = parameters.gamma;
         kernel  = parameters.kernel;
 
-        X = containers.Map('KeyType','double','ValueType','any');
-
-        s_E = calculate_visitation(e_t(), gamma, r_i);
-        X   = cat_hashtable(X, keys(s_E), num2cell(r_p(keys(s_E)),1));
-
-        r_f = {};
-        s_e = {};
-        s_b = {};
-        t_s = {};
-
-        i = 0;
+        reward_function = {};
+        mu              = {};
+        mu_bar          = {};
         
-        while 1
+        i    = 1;
+        mu_E = calculate_visitation(e_t(), gamma, r_i);
+        X    = cat_hashtable(containers.Map('KeyType','double','ValueType','any'), keys(mu_E), num2cell(r_p(keys(mu_E)),1));
+
+        tic_id = tic;
+            reward_values      = rand(1,r_i());
+            reward_function{i} = @(s) reward_values(r_i(s));
+            
+            mu{i}              = calculate_visitation(e_t(reward_function{i}), gamma, r_i);
+            X                  = cat_hashtable(X, keys(mu{i}), num2cell(r_p(keys(mu{i})),1));
+
+            basis = cell2mat(values(X));
+            
+            mu_bar{i}          = mu{i};
+
+            t_E    = cell2mat(values(pad_hashtable(mu_E     , keys(X), 0)))';
+            t_bar  = cell2mat(values(pad_hashtable(mu_bar{i}, keys(X), 0)))';
+
+            t = gramian_dist(t_E-t_bar, kernel(basis, basis));
+            j = inf;
+        time_measurements = toc(tic_id);
+        
+        print_status(i, t, j, time_measurements);
+        
+        while t > epsilon && j > epsilon
             i = i + 1;
-
+            
             tic_id = tic;
-                if i == 1
-                    r_w    = rand(r_p(),1);
-                    r_f{i} = @(s) r_w'*r_p(s);
-                    t_s{i} = Inf;
-                else
+                alpha = cell2mat(values(sub_hashtables(mu_E, mu_bar{i-1})))';
 
-                    r_w    = cell2mat(values(sub_hashtables(s_E, s_b{i-1})))';
-                    r_x    = cell2mat(values(X));
+                reward_function{i} = @(s) alpha'*kernel(basis, r_p(s));
 
-                    r_f{i} = @(s) r_w'*kernel(r_x, r_p(s));
+                mu{i} = calculate_visitation(e_t(reward_function{i}), gamma, r_i);
+                X     = cat_hashtable(X, keys(mu{i}), num2cell(r_p(keys(mu{i})),1));
 
-                    t_g    = kernel(cell2mat(values(X)), cell2mat(values(X)));
-                    t_E    = cell2mat(values(pad_hashtable(s_E     , keys(X), 0)))';
-                    t_b    = cell2mat(values(pad_hashtable(s_b{i-1}, keys(X), 0)))';
-                    t_s{i} = sqrt(t_E'*t_g*t_E + t_b'*t_g*t_b - 2*t_E'*t_g*t_b);
-                end
+                basis      = cell2mat(values(X));
+                basis_gram = kernel(basis, basis);
+                
+                s_k  = keys(X);
 
-                s_e{i} = calculate_visitation(e_t(r_f{i}), gamma, r_i);
-                X      = cat_hashtable(X, keys(s_e{i}), num2cell(r_p(keys(s_e{i})),1));
+                s_1 = sub_hashtables(mu{i},mu_bar{i-1});
+                s_2 = sub_hashtables( mu_E,mu_bar{i-1});
+                s_3 = mu_bar{i-1};
 
-                if i == 1
-                    s_b{i} = s_e{i};
-                else
-                    s_k  = keys(X);
-                    s_g  = kernel(cell2mat(values(X)), cell2mat(values(X)));
+                s_1  = cell2mat(values(pad_hashtable(s_1, s_k, 0)))';
+                s_2  = cell2mat(values(pad_hashtable(s_2, s_k, 0)))';
+                s_3  = cell2mat(values(pad_hashtable(s_3, s_k, 0)))';
 
-                    s_1 = sub_hashtables(s_e{i},s_b{i-1});
-                    s_2 = sub_hashtables(   s_E,s_b{i-1});
-                    s_3 = s_b{i-1};
+                theta_num = s_1'*basis_gram*s_2;
+                theta_den = s_1'*basis_gram*s_1;
 
-                    s_1  = cell2mat(values(pad_hashtable(s_1, s_k, 0)))';
-                    s_2  = cell2mat(values(pad_hashtable(s_2, s_k, 0)))';
-                    s_3  = cell2mat(values(pad_hashtable(s_3, s_k, 0)))';
+                mu_bar_vals = s_3 + (theta_num/theta_den) * s_1;
 
-                    s_n    = s_1'*s_g*s_2;
-                    s_d    = s_1'*s_g*s_1;
-                    s_v    = s_3 + (s_n/s_d) * s_1;
+                mu_bar{i} = containers.Map(s_k, num2cell(mu_bar_vals'));
 
-                    s_b{i} = containers.Map(s_k, num2cell(s_v'));
-                end
+                s_4  = cell2mat(values(pad_hashtable(sub_hashtables(mu_E       ,mu_bar{i}), s_k, 0)))';
+                s_5  = cell2mat(values(pad_hashtable(sub_hashtables(mu_bar{i-1},mu_bar{i}), s_k, 0)))';
+                
+                t = gramian_dist(s_4, basis_gram);
+                j = gramian_dist(s_5, basis_gram);
+
             time_measurements = toc(tic_id);
-
-            if ~exist('silent', 'var')
-                fprintf('Completed IRL algorithm, i=%03d, t=%8.6f, time=%06.3f\n',[i,t_s{i},time_measurements]);
-            end
-
-            if  (i > 1) && (abs(t_s{i}-t_s{i-1}) <= epsilon) || (t_s{i} <= epsilon)
-                break;
-            end
-        end
-
-        for i = 1:numel(s_e)
+            
+            print_status(i, t, j, time_measurements);
         end
         
-        t_E = cell2mat(values(pad_hashtable(s_E, keys(X), 0)))';
-        t_m = cell2mat(cellfun(@(s) { cell2mat(values(pad_hashtable(s,keys(X),0)))' }, s_e));
-        t_g = kernel(cell2mat(values(X)), cell2mat(values(X)));
-        t_d = t_E-t_m;
-
+        t_E   =                         cell2mat(values(pad_hashtable(mu_E, keys(X), 0)))';
+        t_mu  = cell2mat(cellfun(@(s) { cell2mat(values(pad_hashtable(s   , keys(X), 0)))' }, mu));
+        basis = cell2mat(values(X));
+        
         %Abbeel and Ng offer no method to select a single reward/policy from their algorithm. 
         %Their recommendation is to manually inspect all policies returned for appropriateness.
         %In the IRL Toolkit Levine solves this problem with CVX to find the convex combination 
         %of policies closest to the expert. From this combination the policy with the largest 
         %coefficient is then selected. To remove the dependency on CVX, and thus make this code,
         %easier to use we instead simply use the policy closest to the expert feature expectation.
-        [~,m_i] = min(diag(t_d'*t_g*t_d));
+        [~,m_i] = min(gramian_dist(t_E - t_mu, kernel(basis,basis)));
 
-        reward_function = r_f{m_i};
+        reward_function = reward_function{m_i};
     time_measurements = toc(a_tic);
 
 end
@@ -153,4 +152,12 @@ function catted_hashtable = cat_hashtable(hashtable, keys, values)
     new_hashtable = containers.Map(keys, values);
     
     catted_hashtable = [new_hashtable; hashtable];
+end
+
+function d = gramian_dist(vectors, gramian)
+    d = sqrt(diag(vectors'*gramian*vectors));
+end
+
+function print_status(i, t, j, time)
+    fprintf('Completed IRL algorithm, i=%03d, t=%8.6f, j=%8.6f, time=%06.3f\n',[i,t,j,time]);
 end

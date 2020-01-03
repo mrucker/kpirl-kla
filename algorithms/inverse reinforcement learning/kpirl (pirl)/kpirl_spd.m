@@ -9,62 +9,65 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
         gamma   = parameters.gamma;
         kernel  = parameters.kernel;
 
-        r_n = r_i();
+        r_n = r_i(); %determine this value once
+        
         r_p = r_p(1:r_n);
-        r_e = @(s) double((1:r_n)' == r_i(s));
+        r_p = @(is) r_p(:,is); %this makes r_p behave identically to before except that it is already calculated.
 
-        s_E = episodes2expect(e_t(), r_e, gamma);
+        e_hat = @(s) double((1:r_n)' == r_i(s));
 
-        r_f = {};
-        s_e = {};
-        s_b = {};
-        t_s = {};
+        reward_function = {};
+        mu              = {};
+        mu_bar          = {};
 
-        i = 0;
+        i    = 1;
+        mu_E = episodes2expect(e_t(), e_hat, gamma);
+        
+        tic_id = tic;
+            reward_values      = rand(1,r_n);
+            reward_function{i} = @(s) reward_values(r_i(s));
+            mu{i}              = episodes2expect(e_t(reward_function{i}), e_hat, gamma);
 
-        while 1
+            %to avoid having a huge set of basis functions 
+            %we remove all feature vectors with zero weight.
+            n_z                = find((mu_E ~= 0) | (mu{i} ~= 0));
+            basis              = r_p(n_z);
+
+            mu_bar{i}          = mu{i};
+
+            t                  = kernel_dist(mu_E(n_z)-mu_bar{i}(n_z), kernel, r_p);
+            j                  = inf;
+        time_measurements = toc(tic_id);
+        
+        print_status(i, t, j, time_measurements);
+        
+        while t > epsilon && j > epsilon
             i = i + 1;
 
             tic_id = tic;
-                if i == 1
-                    r_v    = rand(size(r_p,1),1)'*r_p;
-                    r_f{i} = @(s) r_v(r_i(s));
-                    t_s{i} = Inf;
-                else
-                    n_z    = (s_E ~= 0) | (s_b{i-1} ~= 0);
-                    r_g    = kernel(r_p(:,n_z),r_p);
-                    t_g    = kernel(r_p(:,n_z),r_p(:,n_z));
-                    r_v    = (s_E(n_z)-s_b{i-1}(n_z))'*r_g;
-                    r_f{i} = @(s) r_v(r_i(s));
-                    t_s{i} = sqrt(s_E(n_z)'*t_g*s_E(n_z) + s_b{i-1}(n_z)'*t_g*s_b{i-1}(n_z) - 2*s_E(n_z)'*t_g*s_b{i-1}(n_z));
-                end
+                alpha              = mu_E(n_z)-mu_bar{i-1}(n_z);
+            
+                reward_values      = alpha'*kernel(basis, r_p(1:r_n));
+                reward_function{i} = @(s) reward_values(r_i(s));
 
-                s_e{i} = episodes2expect(e_t(r_f{i}), r_e, gamma);
+                mu{i} = episodes2expect(e_t(reward_function{i}), e_hat, gamma);
 
-                if i == 1
-                    s_b{i} = s_e{i};
-                else
-                    n_z    = (s_E ~= 0) | (s_b{i-1} ~= 0) | (s_e{i} ~= 0);
-                    s_g    = kernel(r_p(:,n_z), r_p(:,n_z));
-                    s_n    = (s_e{i}(n_z)-s_b{i-1}(n_z))'*s_g*(   s_E(n_z)-s_b{i-1}(n_z));
-                    s_d    = (s_e{i}(n_z)-s_b{i-1}(n_z))'*s_g*(s_e{i}(n_z)-s_b{i-1}(n_z));
-                    s_b{i} = s_b{i-1} + (s_n/s_d) * (s_e{i}-s_b{i-1});
-                end
+                n_z        = find((mu_E ~= 0) | (mu{i} ~= 0) | (mu_bar{i-1} ~= 0));
+                basis      = r_p(n_z);
+                basis_gram = kernel(basis, basis);
+
+                theta_num = (mu{i}(n_z)-mu_bar{i-1}(n_z))'*basis_gram*(mu_E(n_z) -mu_bar{i-1}(n_z));
+                theta_den = (mu{i}(n_z)-mu_bar{i-1}(n_z))'*basis_gram*(mu{i}(n_z)-mu_bar{i-1}(n_z));
+                theta     = (theta_num/theta_den);
+
+                mu_bar{i} = mu_bar{i-1} + theta * (mu{i}-mu_bar{i-1});
+
+                t = gramian_dist(mu_E(n_z)-mu_bar{i}(n_z), basis_gram);
+                j = kernel_dist(mu_bar{i}-mu_bar{i-1}, kernel, r_p);
             time_measurements = toc(tic_id);
-
-            if ~exist('silent', 'var')
-                fprintf('Completed IRL algorithm, i=%03d, t=%8.6f, time=%06.3f\n',[i,t_s{i},time_measurements]);
-            end
-
-            if  (i > 1) && (abs(t_s{i}-t_s{i-1}) <= epsilon) || (t_s{i} <= epsilon)
-                break;
-            end            
+            
+            print_status(i, t, j, time_measurements);
         end
-
-        s_m = cell2mat(s_e);
-        n_z = (s_E ~= 0) | any(s_m ~= 0,2);
-        t_g = kernel(r_p(:,n_z), r_p(:,n_z));
-        t_d = (s_E(n_z)-s_m(n_z,:));
 
         %Abbeel and Ng offer no method to select a single reward/policy from their algorithm. 
         %Their recommendation is to manually inspect all policies returned for appropriateness.
@@ -72,9 +75,25 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
         %of policies closest to the expert. From this combination the policy with the largest 
         %coefficient is then selected. To remove the dependency on CVX, and thus make this code,
         %easier to use we instead simply use the policy closest to the expert feature expectation.
-        [~,m_i] = min(diag(t_d'*t_g*t_d));
+        [~,m_i] = min(kernel_dist(mu_E - cell2mat(mu), kernel, r_p));
 
-        reward_function = r_f{m_i};
+        reward_function = reward_function{m_i};
     time_measurements = toc(a_tic);
 
+end
+
+function d = kernel_dist(weights, kernel, features)
+    n_z     = find(any(weights ~= 0,2));
+    basis   = features(n_z);
+    weights = weights(n_z,:);
+    
+    d = gramian_dist(weights, kernel(basis,basis));
+end
+
+function d = gramian_dist(vectors, gramian)
+    d = sqrt(diag(vectors'*gramian*vectors));
+end
+
+function print_status(i, t, j, time)
+    fprintf('Completed IRL algorithm, i=%03d, t=%8.6f, j=%8.6f, time=%06.3f\n',[i,t,j,time]);
 end
