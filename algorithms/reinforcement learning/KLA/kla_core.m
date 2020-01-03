@@ -89,8 +89,8 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar
                     nu = nu/(.95+nu);
                 end
 
-                beta  = (1-nu)*beta + nu*(Q - q);
-                delta = (1-nu)*delta + nu*(Q - q)^2;
+                beta  = (1-nu)*beta + nu*(q - Q);
+                delta = (1-nu)*delta + nu*(q - Q)^2;
                 var   = (delta - beta^2)/(1+lambda);
 
                 if smooth_type == 0 % sample averaging
@@ -131,7 +131,7 @@ end
 
 function U = get_OSA_U(OSA_store, is)
     [~, beta, ~, var, ~, lambda] = OSA_store(is);
-    U = -beta + 2*sqrt(lambda.*var);
+    U = beta + 2*sqrt(lambda.*var);
 end
 
 function U = get_OSA_max_U(OSA_store)
@@ -141,7 +141,7 @@ function U = get_OSA_max_U(OSA_store)
     if(all(c < 3))
         U = 0;
     else
-        U = -beta + 2*sqrt(lambda.*var);
+        U = beta + 2*sqrt(lambda.*var);
         U = max(U(c >= 3));    
     end
 

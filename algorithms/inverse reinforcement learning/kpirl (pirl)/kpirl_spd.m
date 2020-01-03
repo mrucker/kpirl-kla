@@ -35,12 +35,15 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
 
             mu_bar{i}          = mu{i};
 
-            t                  = kernel_dist(mu_E(n_z)-mu_bar{i}(n_z), kernel, r_p);
+            t                  = kern_dist(mu_E(n_z)-mu_bar{i}(n_z), kernel, r_p);
             j                  = inf;
         time_measurements = toc(tic_id);
         
         print_status(i, t, j, time_measurements);
         
+        %convergence can really slow down over time, especially with the noise from approximate solutions
+        %therefore we add an additional termination condition in practice that sees if the solutions are 
+        %converging to eachother. This second check could probably be improved by finding the average j distance.
         while t > epsilon && j > epsilon
             i = i + 1;
 
@@ -62,8 +65,8 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
 
                 mu_bar{i} = mu_bar{i-1} + theta * (mu{i}-mu_bar{i-1});
 
-                t = gramian_dist(mu_E(n_z)-mu_bar{i}(n_z), basis_gram);
-                j = kernel_dist(mu_bar{i}-mu_bar{i-1}, kernel, r_p);
+                t = gram_dist(mu_E(n_z)-mu_bar{i}(n_z), basis_gram);
+                j = kern_dist(mu_bar{i}-mu_bar{i-1}, kernel, r_p);
             time_measurements = toc(tic_id);
             
             print_status(i, t, j, time_measurements);
@@ -75,22 +78,22 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
         %of policies closest to the expert. From this combination the policy with the largest 
         %coefficient is then selected. To remove the dependency on CVX, and thus make this code,
         %easier to use we instead simply use the policy closest to the expert feature expectation.
-        [~,m_i] = min(kernel_dist(mu_E - cell2mat(mu), kernel, r_p));
+        [~,m_i] = min(kern_dist(mu_E - cell2mat(mu), kernel, r_p));
 
         reward_function = reward_function{m_i};
     time_measurements = toc(a_tic);
 
 end
 
-function d = kernel_dist(weights, kernel, features)
+function d = kern_dist(weights, kernel, features)
     n_z     = find(any(weights ~= 0,2));
     basis   = features(n_z);
     weights = weights(n_z,:);
     
-    d = gramian_dist(weights, kernel(basis,basis));
+    d = gram_dist(weights, kernel(basis,basis));
 end
 
-function d = gramian_dist(vectors, gramian)
+function d = gram_dist(vectors, gramian)
     d = sqrt(diag(vectors'*gramian*vectors));
 end
 
