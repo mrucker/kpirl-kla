@@ -89,7 +89,7 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar
                     nu = nu/(.95+nu);
                 end
 
-                beta  = (1-nu)*beta + nu*(q - Q);
+                beta  = (1-nu)*beta + nu*(q - Q); %be careful with this, Powell reverses it between his book and paper
                 delta = (1-nu)*delta + nu*(q - Q)^2;
                 var   = (delta - beta^2)/(1+lambda);
 
@@ -105,7 +105,7 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar
                     end
                 end
 
-                Q      = (1-alpha)*Q + alpha*q;
+                Q      = (1-alpha)*Q + alpha*q; % = Q + alpha*(q-Q)
                 lambda = lambda*(1-alpha)^2 + alpha^2;
 
                 assert(~any([alpha, nu, lambda] > 1));

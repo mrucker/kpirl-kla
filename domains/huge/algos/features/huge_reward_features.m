@@ -9,8 +9,8 @@ function [r_p, r_i] = huge_reward_features()
     feature2level = {
         bin_continuous(0,    1, partitions{1}(1));
         bin_continuous(0,    1, partitions{1}(2));
-        bin_continuous(0,    7, partitions{1}(3));
-        bin_continuous(0,    5, partitions{1}(4));
+        bin_continuous(0,   48, partitions{1}(3));
+        bin_continuous(0,   60, partitions{1}(4));
         bin_continuous(0, 2*pi, partitions{1}(5));
           bin_discrete(1,       partitions{2}(1));
     };
@@ -62,7 +62,7 @@ function a = cursor_a_features(states)
 end
 
 function d = cursor_d_features(states)
-    d = atan2(-states(4,:), states(3,:)) + pi;
+    d = atan2(-states(4,:), -states(3,:)) + pi;
 end
 
 

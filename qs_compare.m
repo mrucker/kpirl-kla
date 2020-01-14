@@ -5,7 +5,7 @@ run(fullfile(fileparts(which(mfilename)), 'shared', 'paths.m'));
 
 domain = 'huge';
 
-n_rewds = 80;
+n_rewds = 3;
 n_samps = 64;
 n_steps = 10;
   gamma = .9;
@@ -18,7 +18,7 @@ outputs    = { statistics_to_screen() };
 %(D)escription (A)lgorithm (P)arameters
 daps = {
     %generate a policy using kla_spd and feature set 0 (aka, shared/features/single_feature) which gives a policy of random actions.
-    'random' , @kla_spd, struct('N', 10, 'M', 01 , 'T', 01, 'v_feats', 0, 'W', 01);
+    'random' , @kla_spd, struct('N', 10, 'M', 01, 'T', 01, 'v_feats', 0, 'W', 01);
 
     %generate a policy using kla_spd and feature set 1 (this kla implementation decreases computation by increasing memory use)
     'kla_spd', @kla_spd, struct('N', 10, 'M', 90, 'T', 03, 'v_feats', 1, 'W', 03);
