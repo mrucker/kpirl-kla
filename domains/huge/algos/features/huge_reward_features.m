@@ -1,7 +1,7 @@
 function [r_p, r_i] = huge_reward_features()
 
     partitions = {[3, 3, 8, 6, 8], 1};
-    
+
     state2feature = {
         @feature_rollup;
     };
@@ -28,29 +28,25 @@ function [r_p, r_i] = huge_reward_features()
 end
 
 function f = feature_rollup(states)
-    touches = touched_targets(states);
-    i_first = i_first_touch(touches);
+    touched = any(touched_targets(states));
 
-    if all(isnan(i_first))
-        f = vertcat(nan(5, size(states,2)), ones(1,size(states,2))) ;
-    else
-        f = [
-            index_dim1_else_nan(target_x_features(states), i_first);
-            index_dim1_else_nan(target_y_features(states), i_first);
-            index_nan0_else_nan(cursor_v_features(states), i_first);
-            index_nan0_else_nan(cursor_a_features(states), i_first);
-            index_nan0_else_nan(cursor_d_features(states), i_first);
-            index_nan1_else_nan(   double(isnan(i_first)), i_first);
-        ];
-    end
+    f = [
+        cursor_x_features(states);
+        cursor_y_features(states);
+        cursor_v_features(states);
+        cursor_a_features(states);
+        cursor_d_features(states);
+    ];
+
+    f = [f .* one_or_nan(touched); one_or_nan(~touched)];
 end
 
-function x = target_x_features(states)
-    x = states(12:3:end,:) ./ states(9,:);
+function x = cursor_x_features(states)
+    x = states(1,:) ./ states(9,:);
 end
 
-function y = target_y_features(states)
-    y = states(13:3:end,1) ./ states(10,:);
+function y = cursor_y_features(states)
+    y = states(2,:) ./ states(10,:);
 end
 
 function v = cursor_v_features(states)
@@ -91,39 +87,7 @@ function t = touched_targets(states)
     t = ct&(~pt|nt);
 end
 
-function i = i_first_touch(touches)
-
-    if isempty(touches)
-        i = nan;
-    else
-        [v, i] = max(touches,[],1);
-        i(v==0) = nan;
-    end
-end
-
-function v = index_dim1_else_nan(A, i_r)
-    [n_r, n_c] = size(A);
-    
-    i_c = find(~isnan(i_r));
-    i_r = i_r(i_c);
-    
-    v = nan(1,n_c);
-    
-    v(i_c) = A(sub2ind([n_r, n_c], i_r, i_c));
-end
-
-function v = index_nan0_else_nan(a, i)
-    n = size(a,2);
-    i = find(~isnan(i));
-
-    v    = nan(1,n);
-    v(i) = a(i);
-end
-
-function v = index_nan1_else_nan(a, i)
-    n = size(a,2);
-    i = find(isnan(i));
-
-    v    = nan(1,n);
-    v(i) = a(i);
+function i = one_or_nan(logicals)
+    i     = double(any(logicals));
+    i(~i) = nan;
 end
