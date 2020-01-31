@@ -88,6 +88,6 @@ function t = touched_targets(states)
 end
 
 function i = one_or_nan(logicals)
-    i     = double(any(logicals));
+    i     = double(logicals);
     i(~i) = nan;
 end
