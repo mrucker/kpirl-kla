@@ -159,6 +159,8 @@ The repository also contains a custom made benchmarking API. This API follows a 
 
 	* (random-rewards | to-policies | to-attributes) | group-by 'algorithm', 'policy-iteration' | to-statistics | to-output
 
+Implemented examples can be seen in `qs_compare.m`, `huge_policy_compare.m` or `huge_policies_compare.m`
+	
 To start the pipline the API has two root methods that need to be called with appropriate parameters
 
 	* analyze_policy -- processes the pipeline and creates outputs for only the final policy iteration
