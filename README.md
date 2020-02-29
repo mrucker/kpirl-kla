@@ -155,9 +155,9 @@ Each of the above algorithms expects the following parameters to be defined
 	
 ## Benchmarking/Analysis API
 
-The repository contains a custom made benchmarking API. This API follows a pipeline architecture as follows:
+The repository also contains a custom made benchmarking API. This API follows a pipeline architecture as follows:
 
-### (random-rewards | to-policies | to-attributes) | group-by 'algorithm', 'policy-iteration' | to-statistics | to-output
+	* (random-rewards | to-policies | to-attributes) | group-by 'algorithm', 'policy-iteration' | to-statistics | to-output
 
 To start the pipline the API has two root methods that need to be called with appropriate parameters
 
