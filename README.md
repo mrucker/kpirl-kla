@@ -49,11 +49,11 @@ root
 
 This repository contains five algorithm implementations:
 
-1. KLA - kernel lookup approximation
+1. KLA - kernel lookup approximation ([paper](https://arxiv.org/abs/2002.10904))
 2. LSPI - least-squares policy iteration ([paper](http://www.jmlr.org/papers/v4/lagoudakis03a.html))
 3. KLSPI - kernel-based least squares policy iteration ([paper](http://www.jmlr.org/papers/v4/lagoudakis03a.html))
 4. PIRL - projection inverse reinforcemnt learning ([paper](https://dl.acm.org/citation.cfm?id=1015430))
-5. KPIRL - kernel projection inverse reinforcemnt learning
+5. KPIRL - kernel projection inverse reinforcemnt learning ([paper](https://arxiv.org/abs/2002.10904))
 	
 Most of the algorithm implementations have two versions: 
 
@@ -91,7 +91,7 @@ Where the above methods are defined as
 				* given nothing return a random state (used to initialize new episodes for statistical sampling)
 				* given a collection of post-decision states return one random pre-decision state for each post-decision state according the transition probabilities of the MDP.
 				* given a state and a collection of actions return one random pre-decision state for each action according the transition probabilities of the MDP.
-			* t_p = a function that is given a state and a collection of actions and that returns a post-decision state for each given action. (In traditional Q-Learning the post-decision state would be (s,a) though it can be more compact.)
+			* t_p = a function that is given a state and a collection of actions and returns a post-decision state for each given action. (In traditional Q-Learning the post-decision state would be (s,a) though it can be more compact.)
 
 	* \<domain\>_features
 		* Input:
@@ -103,12 +103,20 @@ Where the above methods are defined as
 				* given indexes return a matrix whose columns are the feature vectors for the indexes
 			* v_i = a function with the following behavior:
 				* given nothing return the count of feature vectors
-				* given states return a row vector containing the feature index for each state
+				* given states return a row vector containing the feature vector index for each state
 		* examples:
 			* given a state _s_ the following predicate should always true `v_p(_s_) == v_p(v_i(_s_))`
 			* to get all feature vectors one can do `v_p(1:v_i())`
 			* to get a random feature vector one can do `v_p(randi(v_i()))`
-			* to pre-allocate a matrix for _n_ feature vectors one could do `zeros(r_p(), _n_)`
+			* to pre-allocate a matrix for all feature vectors one could do `zeros(v_p(), v_i())`
+
+	* \<domain\>_episodes
+		* Input:
+			* there is no input for this function
+		* Output:
+			* e = a function with the following behavior:
+				* given nothing return a cell array of expert trajectories used in IRL
+				* given a reward return sample trajectories that are approximately optimal
 
 	* \<domain\>_parameters
 		* Input:
@@ -144,3 +152,33 @@ Each of the above algorithms expects the following parameters to be defined
 		* all of pirl
 		* kernel -- the kernel method to use when approximating the reward function (e.g., kernel = `@(x,y) x'*y`)
 	
+	
+## Benchmarking/Analysis API
+
+The repository contains a custom made benchmarking API. This API follows a pipeline architecture as follows:
+
+### (random-rewards | to-policies | to-attributes) | group-by 'algorithm', 'policy-iteration' | to-statistics | to-output
+
+To start the pipline the API has two root methods that need to be called with appropriate parameters
+
+	* analyze_policy -- processes the pipeline and creates outputs for only the final policy iteration
+	* analyze_policies -- processes the pipeline and creates outputs for all policy iterations
+
+The following attributes are implemented:
+
+	* policy_iteration_index -- the index of the policy iteration (this is only relevant for policy iteration algorithms)
+	* policy_iteration_time -- the amount of time spent on the current iteration of policy iteration
+	* policy_time -- the amount of time spent in total to generate a policy (i.e., including time spent on all previous iterations)
+	* policy_value -- uses monte carlo methods to estimate the expected value of a policy
+	* reward_index -- the index of the random reward (used to compare policies directly across algorithms)
+
+The following statistics are implemented:
+
+	* avg -- the average of all attributes grouped by algorithm and policy iteration (meaningless for index attributes)
+	* med -- the average of all attributes grouped by algorithm and policy iteration (meaningless for index attributes)
+	* SEM -- the standard error of the mean (i.e., sqrt([Var of attribute]/[reward count])) (meaningless for index attributes)
+
+The following outputs are implemented:
+
+	* attributes_to_file -- writes a flat CSV file with all selected attributes, ignoring any desired statistics
+	* statistics_to_screen -- writes a flat CSV with all selected statistics of the selected attributes
