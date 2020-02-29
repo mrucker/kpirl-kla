@@ -155,7 +155,7 @@ Each of the above algorithms expects the following parameters to be defined
 	
 ## Benchmarking/Analysis API
 
-The repository also contains a custom made benchmarking API. This API follows a pipeline architecture as follows:
+The repository also contains a custom made benchmarking API. This API follows a pipeline architecture with pseudo-code:
 
 	* (random-rewards | to-policies | to-attributes) | group-by 'algorithm', 'policy-iteration' | to-statistics | to-output
 
@@ -166,7 +166,11 @@ To start the pipline the API has two root methods that need to be called with ap
 	* analyze_policy -- processes the pipeline and creates outputs for only the final policy iteration
 	* analyze_policies -- processes the pipeline and creates outputs for all policy iterations
 
-The following attributes are implemented:
+The following `to-policies` are implemented:
+	
+	*KLA, KLSPI, LSPI
+	
+The following `to-attributes` are implemented:
 
 	* policy_iteration_index -- the index of the policy iteration (this is only relevant for policy iteration algorithms)
 	* policy_iteration_time -- the amount of time spent on the current iteration of policy iteration
@@ -174,13 +178,13 @@ The following attributes are implemented:
 	* policy_value -- uses monte carlo methods to estimate the expected value of a policy
 	* reward_index -- the index of the random reward (used to compare policies directly across algorithms)
 
-The following statistics are implemented:
+The following `to-statistics` are implemented:
 
 	* avg -- the average of all attributes grouped by algorithm and policy iteration (meaningless for index attributes)
 	* med -- the average of all attributes grouped by algorithm and policy iteration (meaningless for index attributes)
 	* SEM -- the standard error of the mean (i.e., sqrt([Var of attribute]/[reward count])) (meaningless for index attributes)
 
-The following outputs are implemented:
+The following `to-output` are implemented:
 
 	* attributes_to_file -- writes a flat CSV file with all selected attributes, ignoring any desired statistics
 	* statistics_to_screen -- writes a flat CSV with all selected statistics of the selected attributes
