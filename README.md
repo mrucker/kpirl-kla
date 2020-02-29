@@ -16,7 +16,7 @@ This repository implements two new RL/IRL algorithms and compares them to existi
 
 Two files have been provided in the root for a "quick start". The files should be executable "out-of-the-box". These files use the "huge" domain, but could easily be used with any domain. Further documentation is provided in-line within the files.
 
-* **qs_compare.m** - compares the performance RL algorithms in the "huge" domain using the benchmarking API (described below)
+* **qs_compare.m** - compares RL algorithms in the "huge" domain using the benchmarking API described below
 * **qs_inverse.m** - solves for the reward function using KPIRL in the "huge" domain
 
 ## Architecture Principles/Tradeoffs
