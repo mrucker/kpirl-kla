@@ -59,6 +59,8 @@ Most of the algorithm implementations have two versions:
 
 1. a memory efficient version (`_mem`) that runs slower but only loads features into memory as needed
 2. a compute efficient version (`_spd`) that runs faster but loads all features into memory upfront
+
+Additionally, a high-level interface is defined for both IRL and RL in order to seamlessly benchmark all algorithms. This high-level definition can be found in the respective `/algorithms/inverse reinforcement learning/interface.md` and `/algorithms/reinforcement learning/interface.md` files.
 	
 ## Algorithm Methods
 
@@ -141,13 +143,16 @@ Each of the above algorithms expects the following parameters to be defined
 		* T -- the number of steps to use when making an observation during policy evaluation
 		* gamma -- the amount of reward discount to use when calculating value functions
 		* resample -- determines if the sarsa samples are recreated on each policy iteration or simply updated
+
 	* klspi
 		* all of lspi
 		* kernel -- the kernel method to use when approximating the value function (e.g., kernel = `@(x,y) x'*y`)
 		* mu -- pruning level in the approximate linear dependence analysis. The higher the value the more is pruned.
+
 	* pirl
 		* epsilon -- the termination condition for the pirl reward iterations
 		* gamma -- the amount of reward discount to use when calculating value functions
+
 	* kpirl
 		* all of pirl
 		* kernel -- the kernel method to use when approximating the reward function (e.g., kernel = `@(x,y) x'*y`)
@@ -168,7 +173,7 @@ To start the pipline the API has two root methods that need to be called with ap
 
 The following `to-policies` are implemented:
 	
-	*KLA, KLSPI, LSPI
+	*KLA, KLSPI, LSPI (any RL algorithm is usable as long as it conforms to the RL interface described above)
 	
 The following `to-attributes` are implemented:
 
