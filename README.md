@@ -111,7 +111,7 @@ Where the above methods are defined as
 				* given nothing return the count of feature vectors
 				* given states return a row vector containing the feature vector index for each state
 		* examples:
-			* given a state _s_ the following predicate should always true `v_p(_s_) == v_p(v_i(_s_))`
+			* given a state s the following predicate should always true `v_p(s) == v_p(v_i(s))`
 			* to get all feature vectors one can do `v_p(1:v_i())`
 			* to get a random feature vector one can do `v_p(randi(v_i()))`
 			* to pre-allocate a matrix for all feature vectors one could do `zeros(v_p(), v_i())`
