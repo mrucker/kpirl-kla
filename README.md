@@ -2,7 +2,7 @@
 
 This repository implements several RL and IRL algorithm via a consistent interface. 
 
-Three example problem "domains" utilizing the algorithms are included in the project for demonstration.
+Three example problem "domains" utilizing the algorithms are included in the project.
 
 The "huge" domain corresponds to the experiments and models described in the original KPIRL/KLA ([paper](https://arxiv.org/abs/2002.10904))
 
