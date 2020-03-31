@@ -1,6 +1,10 @@
 ## KPIRL-KLA
 
-This repository implements two new RL/IRL algorithms and compares them to existing RL/IRL algorithms across three different problem domains.
+This repository implements several RL and IRL algorithm via a consistent interface. 
+
+Three example problem "domains" utilizing the algorithms are included in the project for demonstration.
+
+The "huge" domain corresponds to the experiments and models described in the original KPIRL/KLA ([paper](https://arxiv.org/abs/2002.10904))
 
 ## Installation
 
