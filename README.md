@@ -136,15 +136,15 @@ Each of the above algorithms expects the following parameters to be defined
 
 	* kla
 		* N -- the number of policy iterations to perform
-		* M -- the number of episodes to generate during policy evaluation
-		* T -- the number of steps to use when making an observation during policy evaluation
-		* W -- the number of observations per episode to make during policy evalution
+		* M -- the number of episodes per policy iteration for policy evaluation
+		* T -- the number of steps per episode-observation for policy evaluation
+		* W -- the number of episode-observations per episode for policy evalution
 		* gamma -- the amount of reward discount to use when calculating value functions
 
 	* lspi
 		* N -- the number of policy iterations to perform
-		* M -- the number of episodes to generate during policy evaluation
-		* T -- the number of steps to use when making an observation during policy evaluation
+		* M -- the number of episodes per policy iteration for policy evaluation
+		* T -- the number of steps per episode for policy evaluation
 		* gamma -- the amount of reward discount to use when calculating value functions
 		* resample -- determines if the sarsa samples are recreated on each policy iteration or simply updated
 
