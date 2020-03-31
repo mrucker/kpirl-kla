@@ -64,9 +64,7 @@ Most of the algorithm implementations have two versions:
 1. a memory efficient version (`_mem`) that runs slower but only loads features into memory as needed
 2. a compute efficient version (`_spd`) that runs faster but loads all features into memory upfront
 
-Additionally, a high-level interface is defined for both [IRL](https://github.com/mrucker/kpirl-kla/blob/master/algorithms/inverse%20reinforcement%20learning/) and [RL](https://github.com/mrucker/kpirl-kla/blob/master/algorithms/reinforcement%20learning/) algorithms for seamless benchmarking.
-
-The can be found in the respective `/algorithms/inverse reinforcement learning/interface.md` and `/algorithms/reinforcement learning/interface.md` files.
+Additionally, a high-level interface is defined for both [IRL](https://github.com/mrucker/kpirl-kla/blob/master/algorithms/inverse%20reinforcement%20learning/) and [RL](https://github.com/mrucker/kpirl-kla/blob/master/algorithms/reinforcement%20learning/) algorithms for seamless benchmarking. The interfaces are documented in the respective `/algorithms/inverse reinforcement learning/interface.md` and `/algorithms/reinforcement learning/interface.md` files.
 	
 ## Algorithm Methods
 
