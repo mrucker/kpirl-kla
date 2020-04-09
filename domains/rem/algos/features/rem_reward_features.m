@@ -16,14 +16,7 @@ function [r_p, r_i] = rem_reward_features()
         bin_continuous(0,1,n_levels(4));
     };
 
-    level2feature = {
-        level2linear(n_levels(1));
-        level2linear(n_levels(2));
-        level2linear(n_levels(3));
-        level2linear(n_levels(4));
-    };
-
-    [r_p, r_i] = multi_feature(n_levels, state2feature, feature2level, level2feature);
+    [r_p, r_i] = multi_feature(n_levels, state2feature, feature2level);
     
     function f = transitivity(states)
         if(size(states,1) < 4) 

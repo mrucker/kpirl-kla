@@ -13,21 +13,22 @@ end
 
 function d = defaults()
     d = struct(...
-         'epsilon'  , 0            ... % when to exit kpirl, lspi and klspi
-        ,'gamma'    , 0.9          ...
-        ,'steps'    , 10           ...
-        ,'samples'  , 100          ...
-        ,'N'        , 30           ... % policy iterations in kla, lspi and klspi
-        ,'M'        , 90           ... % episode count in kla, lspi and klspi
-        ,'T'        , 04           ... % episode length in kla, lspi and klspi
-        ,'W'        , 04           ... 
-        ,'v_feats'  , 1            ... % the value features for function approximation in kla and lspi-klspi
-        ,'kernel'   , k_dot()      ... % the kernel function used in kpirl and klspi
-        ,'mu'       , 0.3          ... % the decision criteria used in klspi ald analysis
-        ,'basis'    , ident_basis()... % the basis functions applied to the features in lspi-klspi
-        ,'resample' , false        ... % whether lspi-klspi should resample each policy iteration
-        ,'target'   , 0            ... % whether KLA estimates q via (0) one-step bootstrap or (1) T-step Monte Carlo
-        ,'explore'  , 1            ... % whether KLA explores a_0 via (0) exploit, (1) upper-bound heuristic or (2) random selection
-		,'smooth'   , 1            ... % whether KLA smooths q via(0) alpha=1/n or (1) alpha=OSA
+         'gamma'    , 0.9          ... (pirl, kpirl, kla, lspi, klspi) discount factor for all MDP's 
+        ,'r_kernel' , k_huge_rwd() ... (    , kpirl,    ,     ,      ) the kernel function applied to the reward features
+        ,'v_kernel' , k_huge_val() ... (    ,      , kla,     , klspi) the kernel function applied to the value features
+        ,'epsilon'  , 0            ... (pirl, kpirl,    ,     ,      ) when to end the algorithm
+        ,'steps'    , 10           ... (pirl, kpirl,    ,     ,      ) how many steps to use when estimating feature expectation
+        ,'samples'  , 100          ... (pirl, kpirl,    ,     ,      ) how many episodes to use when estimating feature expectation
+        ,'N'        , 30           ... (    ,      , kla, lspi, klspi) how many policy iterations 
+        ,'M'        , 90           ... (    ,      , kla, lspi, klspi) how many episodes to use when evaluating a policy
+        ,'T'        , 04           ... (    ,      , kla, lspi, klspi) how many steps to use when evaluating a policy
+        ,'W'        , 04           ... (    ,      , kla,     ,      ) how many windows to use when evaluating a policy
+        ,'target'   , 0            ... (    ,      , kla,     ,      ) update target: (0) one-step bootstrap and (1) T-step Monte Carlo
+        ,'explore'  , 1            ... (    ,      , kla,     ,      ) exploration: (0) exploit, (1) upper-bound heuristic or (2) random selection
+		,'smooth'   , 1            ... (    ,      , kla,     ,      ) learning rate: (0) alpha=1/n or (1) alpha=OSA
+        ,'resample' , false        ... (    ,      ,    , lspi, klspi) whether lspi-klspi should resample each policy iteration    
+        ,'mu'       , 0.3          ... (    ,      ,    ,     , klspi) the decision criteria used for ald analysis
+        ,'basis'    , ident_basis()... (    ,      ,    , lspi, klspi) the basis transforms applied to the features
+        ,'v_feats'  , 1            ... (    ,      , kla, lspi, klspi) which value features to use [DOMAIN SPECIFIC]
     );
 end

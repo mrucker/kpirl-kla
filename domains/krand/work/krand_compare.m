@@ -15,9 +15,9 @@ attributes = { policy_time() policy_value(domain, n_samps, n_steps, gamma) };
 statistics = { avg() SEM() med() };
 outputs    = { statistics_to_screen() };
 
-ns = [20 30];
-ms = 40;
-ts = 25;
+ns = [10 20];
+ms = 15;
+ts = 10;
 
 daps = cell(3,numel(ns)*numel(ms)*numel(ts));
 i    = 0;
@@ -26,7 +26,7 @@ for n = ns
      for m = ms
          for t = ts
              i = i+1;
-             daps(:,i) = {sprintf('n=%d,m=%d,t=%d', [n,m,t]); @kla_mem; struct('v_feats', 1, 'N', n, 'M', m, 'T', t , 'W', 5, 'gamma', .9)};
+             daps(:,i) = {sprintf('n=%d,m=%d,t=%d', [n,m,t]); @kla_mem; struct('v_feats', 1, 'N', n, 'M', m, 'T', t , 'W', 5, 'gamma', .9, 'v_kernel', k_krand())};
          end
      end
  end

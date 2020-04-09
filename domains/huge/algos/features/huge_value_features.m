@@ -19,18 +19,7 @@ function [v_p, v_i] = huge_value_features()
           bin_discrete( 0,  n_levels(8));
     };
 
-    levels2features = {
-        level2linear(n_levels(1));
-        level2linear(n_levels(2));
-        level2linear(n_levels(3));
-        level2linear(n_levels(4));
-        level2linear(n_levels(5));
-        level2linear(n_levels(6));
-        level2onehot(n_levels(7));
-        level2linear(n_levels(8));
-    };
-
-    [v_p, v_i] = multi_feature(n_levels, states2features, features2levels, levels2features);
+    [v_p, v_i] = multi_feature(n_levels, states2features, features2levels);
 end
 
 function l = cursor_l_features(states)

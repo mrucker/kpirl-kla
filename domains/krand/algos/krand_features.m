@@ -36,16 +36,7 @@ function [p, i] = krand_reward_features()
         bin_identity();
     };
 
-    level2features = {
-        level2onehot(n_levels(1));
-        level2onehot(n_levels(2));
-        level2linear(n_levels(3));
-        level2onehot(n_levels(4));
-        level2linear(n_levels(5));
-        level2linear(n_levels(6));
-    };
-
-    [p, i] = multi_feature(n_levels, state2feature, feature2level, level2features);
+    [p, i] = multi_feature(n_levels, state2feature, feature2level);
 
     function v = rail_type(states)
         v = 1+states.rail_type;

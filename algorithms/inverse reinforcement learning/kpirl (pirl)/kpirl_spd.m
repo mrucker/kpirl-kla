@@ -7,7 +7,7 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
 
         epsilon = parameters.epsilon;
         gamma   = parameters.gamma;
-        kernel  = parameters.kernel;
+        kernel  = parameters.r_kernel;
 
         r_n = r_i(); %determine this value once
         
@@ -98,5 +98,5 @@ function d = gram_dist(vectors, gramian)
 end
 
 function print_status(i, t, j, time)
-    fprintf('Completed IRL algorithm, i=%03d, t=%8.6f, j=%8.6f, time=%06.3f\n',[i,t,j,time]);
+    fprintf('Finished iteration %03d with t=%09.6f, j=%09.6f, time=%06.3f\n',[i,t,j,time]);
 end

@@ -1,8 +1,8 @@
 run(fullfile(fileparts(which(mfilename)), '..', '..', '..', 'shared', 'paths.m'))
 
-kernel = k_gaussian(k_norm(), .6);
+kernel = k_krand(.6);
 
-krand_parameters(struct('N', 20, 'M', 40, 'T', 25, 'W', 5, 'steps',200, 'samples',100, 'gamma',.9, 'epsilon',.001, 'kernel',kernel));
+krand_parameters(struct('N', 20, 'M', 40, 'T', 25, 'W', 5, 'steps',200, 'samples',100, 'gamma',.9, 'epsilon',.001, 'r_kernel',kernel));
 
 reward = kpirl_mem('krand');
 policy = kla_mem('krand', reward);

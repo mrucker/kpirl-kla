@@ -2,11 +2,11 @@ function [r_p, r_i] = huge_reward_features()
 
     partitions = {[3, 3, 8, 6, 8], 1};
 
-    state2feature = {
+    states2features = {
         @feature_rollup;
     };
 
-    feature2level = {
+    features2levels = {
         bin_continuous(0,    1, partitions{1}(1));
         bin_continuous(0,    1, partitions{1}(2));
         bin_continuous(0,   48, partitions{1}(3));
@@ -15,16 +15,7 @@ function [r_p, r_i] = huge_reward_features()
           bin_discrete(1,       partitions{2}(1));
     };
 
-    level2feature = {
-        level2circle(partitions{1}(1)-1, 0  );
-        level2circle(partitions{1}(2)-1, 0  );
-        level2circle(partitions{1}(3)*2, 0  );
-        level2circle(partitions{1}(4)*2, 0  );
-        level2circle(partitions{1}(5)/2, 4.5);
-        level2scalar(4);
-    };
-
-    [r_p, r_i] = multi_feature(partitions, state2feature, feature2level, level2feature);  
+    [r_p, r_i] = multi_feature(partitions, states2features, features2levels);  
 end
 
 function f = feature_rollup(states)
@@ -60,7 +51,6 @@ end
 function d = cursor_d_features(states)
     d = atan2(-states(4,:), -states(3,:)) + pi;
 end
-
 
 function [cd, pd] = distance_from_targets(states)
     cp = states(1:2,:);

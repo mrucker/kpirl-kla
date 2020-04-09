@@ -16,14 +16,7 @@ function [v_p, v_i] = rem_value_features_1()
         bin_continuous(0,1,n_levels(4));
     };
 
-    level2feature = {
-        level2linear(n_levels(1));
-        level2linear(n_levels(2));
-        level2linear(n_levels(3));
-        level2linear(n_levels(4));
-    };
-
-    [v_p, v_i] = multi_feature(n_levels, state2feature, feature2level, level2feature);
+    [v_p, v_i] = multi_feature(n_levels, state2feature, feature2level);
     
     function f = transitivity(states)
         if(size(states,1) < 4) 

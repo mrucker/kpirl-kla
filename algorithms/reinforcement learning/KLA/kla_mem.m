@@ -1,9 +1,17 @@
-function [policy, time, policies, times] = kla_mem(domain, reward)
+function [policy, time, policies, times] = kla_mem(domain, reward); global fitrsvm_kernel;
 
-    v_p = feval([domain '_features'], 'value');
+    params = feval([domain '_parameters']);
+    v_p    = feval([domain '_features'], 'value');
 
+    if(isa(params.v_kernel,'function_handle'))
+        fitrsvm_kernel = params.v_kernel;
+        KernelFunction = 'fitrsvm_kernel_caller';
+    else
+        KernelFunction = params.v_kernel;
+    end
+    
     Q_dot     = Q_dot_ctor(containers.Map('KeyType','double','ValueType','double'));
-    Q_bar     = Q_bar_ctor(v_p, @(is) ones(1,numel(is)));
+    Q_bar     = Q_bar_ctor(KernelFunction, v_p, @(is) ones(1,numel(is)));
     OSA_store = OSA_store_ctor(containers.Map('KeyType','double','ValueType','any'));
 
     [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar, OSA_store);
@@ -36,7 +44,7 @@ function f = Q_dot_ctor(Q)
     f = @Q_dot;
 end
 
-function f = Q_bar_ctor(v_p, G, X, ~)
+function f = Q_bar_ctor(K, v_p, G, X, ~)
 
     if nargin == 2
         [X, ~] = deal([],[]);
@@ -64,9 +72,18 @@ function f = Q_bar_ctor(v_p, G, X, ~)
                 box_constraint = iqr(y)/1.349;
             end
 
-            m = fitrsvm(x',y' ,'KernelFunction','rbf', 'BoxConstraint',box_constraint, 'Standardize',true);
+            m = fitrsvm(x',y' ,'KernelFunction',K, 'BoxConstraint',box_constraint);
 
-            q = Q_bar_ctor(v_p, @(is) predict(m, v_p(is)')', is, qs);
+            if(any(strcmp(K, ["linear","gaussian","rbf","polynomial"])))
+                y = @(is) predict(m, v_p(is)')';
+            else
+                %for some reason fitrsvm doesn't vectorize custom kernel functions 
+                %so I handle predicting manually to take advantage of vectorization
+                %https://www.mathworks.com/matlabcentral/answers/516513-fitrsvm-doesn-t-vectorize-my-custom-kernel
+                y = @(is) m.Bias + m.Alpha' * feval(K,m.SupportVectors,v_p(is)');
+            end
+            
+            q = Q_bar_ctor(K, v_p, y, is, qs);
         end
     end
     f = @Q_bar;

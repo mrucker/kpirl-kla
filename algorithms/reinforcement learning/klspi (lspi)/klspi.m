@@ -2,7 +2,7 @@
 function [policy, time, policies, times] = klspi(domain, reward)
 
     params       = feval([domain '_parameters']);
-    params.basis = ald_basis(params.mu, params.kernel);
+    params.basis = ald_basis(params.mu, params.v_kernel);
 
     feval([domain '_parameters'], params);
 

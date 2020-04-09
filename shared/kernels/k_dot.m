@@ -1,3 +1,3 @@
 function k = k_dot()
-    k = @(x1,x2) x1'*x2;
+    k = @(U,V) U'*V;
 end
