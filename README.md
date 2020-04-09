@@ -1,6 +1,10 @@
 ## KPIRL-KLA
 
-This repository implements two new RL/IRL algorithms and compares them to existing RL/IRL algorithms across three different problem domains.
+This repository implements several RL and IRL algorithm via a consistent interface. 
+
+Three example problem "domains" utilizing the algorithms are included in the project.
+
+The "huge" domain corresponds to the experiments and models described in the original KPIRL/KLA ([paper](https://arxiv.org/abs/2002.10904))
 
 ## Installation
 
@@ -21,7 +25,7 @@ Two files have been provided in the root for a "quick start". The files should b
 
 ## Architecture Principles/Tradeoffs
 
-This repository was designed primarily for understandability and extensibility. Towards this end, the code leans heavily on MATLAB's closure functionality to preserve state while reducing dependencies. One consequence of this decision is a reduction vectorization and an increase in function calls. Taken together this means there is room for considerable compute improvement with a different implementation.
+This repository was designed primarily for understandability and extensibility. Towards this end, the code leans heavily on MATLAB's closure functionality to preserve state while reducing dependencies. One consequence of this decision is a reduction in vectorization and an increase in function calls. Taken together this means there is room for considerable compute improvement with a different implementation.
 
 ## Directory Structure
 
@@ -61,9 +65,7 @@ Most of the algorithm implementations have two versions:
 1. a memory efficient version (`_mem`) that runs slower but only loads features into memory as needed
 2. a compute efficient version (`_spd`) that runs faster but loads all features into memory upfront
 
-Additionally, a high-level interface is defined for both [IRL](https://github.com/mrucker/kpirl-kla/blob/master/algorithms/inverse%20reinforcement%20learning/) and [RL](https://github.com/mrucker/kpirl-kla/blob/master/algorithms/reinforcement%20learning/) algorithms for seamless benchmarking.
-
-The can be found in the respective `/algorithms/inverse reinforcement learning/interface.md` and `/algorithms/reinforcement learning/interface.md` files.
+Additionally, a high-level interface is defined for both [IRL](https://github.com/mrucker/kpirl-kla/blob/master/algorithms/inverse%20reinforcement%20learning/) and [RL](https://github.com/mrucker/kpirl-kla/blob/master/algorithms/reinforcement%20learning/) algorithms for seamless benchmarking. The interfaces are documented in the respective `/algorithms/inverse reinforcement learning/interface.md` and `/algorithms/reinforcement learning/interface.md` files.
 	
 ## Algorithm Methods
 
@@ -110,7 +112,7 @@ Where the above methods are defined as
 				* given nothing return the count of feature vectors
 				* given states return a row vector containing the feature vector index for each state
 		* examples:
-			* given a state _s_ the following predicate should always true `v_p(_s_) == v_p(v_i(_s_))`
+			* given a state s the following predicate should always true `v_p(s) == v_p(v_i(s))`
 			* to get all feature vectors one can do `v_p(1:v_i())`
 			* to get a random feature vector one can do `v_p(randi(v_i()))`
 			* to pre-allocate a matrix for all feature vectors one could do `zeros(v_p(), v_i())`
@@ -135,15 +137,15 @@ Each of the above algorithms expects the following parameters to be defined
 
 	* kla
 		* N -- the number of policy iterations to perform
-		* M -- the number of episodes to generate during policy evaluation
-		* T -- the number of steps to use when making an observation during policy evaluation
-		* W -- the number of observations per episode to make during policy evalution
+		* M -- the number of episodes per policy iteration for policy evaluation
+		* T -- the number of steps per episode-observation for policy evaluation
+		* W -- the number of episode-observations per episode for policy evalution
 		* gamma -- the amount of reward discount to use when calculating value functions
 
 	* lspi
 		* N -- the number of policy iterations to perform
-		* M -- the number of episodes to generate during policy evaluation
-		* T -- the number of steps to use when making an observation during policy evaluation
+		* M -- the number of episodes per policy iteration for policy evaluation
+		* T -- the number of steps per episode for policy evaluation
 		* gamma -- the amount of reward discount to use when calculating value functions
 		* resample -- determines if the sarsa samples are recreated on each policy iteration or simply updated
 
