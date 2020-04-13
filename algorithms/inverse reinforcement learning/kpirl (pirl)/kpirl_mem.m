@@ -1,28 +1,31 @@
 function [reward_function, time_measurements] = kpirl_mem(domain)
 
     a_tic = tic;
-        [e_t       ] = feval([domain '_episodes']);
-        [r_p, r_i  ] = feval([domain '_features'], 'reward');
-        [parameters] = feval([domain '_parameters']);
+        [r2e         ] = feval([domain '_episodes']);
+        [s2f         ] = feval([domain '_features'], 'reward');
+        [edges, parts] = feval([domain '_discrete'], 'reward');
+        [params      ] = feval([domain '_parameters']);
 
-        epsilon = parameters.epsilon;
-        gamma   = parameters.gamma;
-        kernel  = parameters.r_kernel;
+        [s2d, s2i] = discretes(s2f, edges, parts);
+
+        epsilon = params.epsilon;
+        gamma   = params.gamma;
+        kernel  = params.r_kernel;
 
         reward_function = {};
         mu              = {};
         mu_bar          = {};
         
         i    = 1;
-        mu_E = calculate_visitation(e_t(), gamma, r_i);
-        X    = cat_hashtable(containers.Map('KeyType','double','ValueType','any'), keys(mu_E), num2cell(r_p(keys(mu_E)),1));
+        mu_E = calculate_visitation(r2e(), gamma, s2i);
+        X    = cat_hashtable(containers.Map('KeyType','double','ValueType','any'), keys(mu_E), num2cell(s2d(keys(mu_E)),1));
 
         tic_id = tic;
-            reward_values      = rand(1,r_i());
-            reward_function{i} = @(s) reward_values(r_i(s));
+            reward_values      = rand(1,s2i());
+            reward_function{i} = @(s) reward_values(s2i(s));
             
-            mu{i}              = calculate_visitation(e_t(reward_function{i}), gamma, r_i);
-            X                  = cat_hashtable(X, keys(mu{i}), num2cell(r_p(keys(mu{i})),1));
+            mu{i}              = calculate_visitation(r2e(reward_function{i}), gamma, s2i);
+            X                  = cat_hashtable(X, keys(mu{i}), num2cell(s2d(keys(mu{i})),1));
 
             basis = cell2mat(values(X));
             
@@ -43,10 +46,10 @@ function [reward_function, time_measurements] = kpirl_mem(domain)
             tic_id = tic;
                 alpha = cell2mat(values(sub_hashtables(mu_E, mu_bar{i-1})))';
 
-                reward_function{i} = @(s) alpha'*kernel(basis, r_p(s));
+                reward_function{i} = @(s) alpha'*kernel(basis, s2d(s));
 
-                mu{i} = calculate_visitation(e_t(reward_function{i}), gamma, r_i);
-                X     = cat_hashtable(X, keys(mu{i}), num2cell(r_p(keys(mu{i})),1));
+                mu{i} = calculate_visitation(r2e(reward_function{i}), gamma, s2i);
+                X     = cat_hashtable(X, keys(mu{i}), num2cell(s2d(keys(mu{i})),1));
 
                 basis      = cell2mat(values(X));
                 basis_gram = kernel(basis, basis);

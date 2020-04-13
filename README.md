@@ -71,15 +71,23 @@ Additionally, a high-level interface is defined for both [IRL](https://github.co
 
 The algorithm implementations expect the following domain specific method implementations
 
-	* kla, lspi and klspi
+	* lspi and klspi
 		* \<domain\>_actions
 		* \<domain\>_transitions
 		* \<domain\>_features
 		* \<domain\>_parameters
+
+	* kla
+		* \<domain\>_actions
+		* \<domain\>_transitions
+		* \<domain\>_features
+		* \<domain\>_discrete
+		* \<domain\>_parameters
 			
 	* kpirl and pirl
-		* \<domain\>_features
 		* \<domain\>_episodes
+		* \<domain\>_features
+		* \<domain\>_discrete
 		* \<domain\>_parameters
 	
 Where the above methods are defined as
@@ -94,34 +102,31 @@ Where the above methods are defined as
 		* Input:
 			* there is no input for this function
 		* Output:
-			* t_s = a function with the following behavior:
+			* s2s = a function with the following behavior:
 				* given nothing return a random state (used to initialize new episodes for statistical sampling)
-				* given a collection of post-decision states return one random pre-decision state for each post-decision state according the transition probabilities of the MDP.
-				* given a state and a collection of actions return one random pre-decision state for each action according the transition probabilities of the MDP.
-			* t_p = a function that is given a state and a collection of actions and returns a post-decision state for each given action. (In traditional Q-Learning the post-decision state would be (s,a) though it can be more compact.)
+				* given a collection of post-decision states return a random pre-decision state for each post-decision state according the transition probabilities of the MDP.
+				* given a state and a collection of actions return a random pre-decision state for each action according the transition probabilities of the MDP.
+			* s2p = a function with the following behavior:
+				* given a state and a collection of actions return a post-decision state for each action. (If one wants traditional Q-Learning the post-decision state s be (s,a))
 
 	* \<domain\>_features
 		* Input:
 			* a string indicating whether the features are being used to approximate a reward function or value function
 		* Output:
-			* v_p = a function with the following behavior:
-				* given nothing return the count of features
-				* given states return a matrix whose columns are the feature vectors for each state
-				* given indexes return a matrix whose columns are the feature vectors for the indexes
-			* v_i = a function with the following behavior:
-				* given nothing return the count of feature vectors
-				* given states return a row vector containing the feature vector index for each state
-		* examples:
-			* given a state s the following predicate should always true `v_p(s) == v_p(v_i(s))`
-			* to get all feature vectors one can do `v_p(1:v_i())`
-			* to get a random feature vector one can do `v_p(randi(v_i()))`
-			* to pre-allocate a matrix for all feature vectors one could do `zeros(v_p(), v_i())`
-
+			* a function that accepts either a collection of either pre-decision or post-decision states and returns a feature vector for each state
+			
+	* \<domain\>_discrete
+		* Input:
+			* a string indicating whether the features are being used to approximate a reward function or value function
+		* Output:
+			* edges = a cell array of edges used to discretize state features (discretization is necessary for kla and kpirl only)
+			* partitions = a cell array of edge indexes in order to define partitions. By default all edges belong to one partition.
+			
 	* \<domain\>_episodes
 		* Input:
 			* there is no input for this function
 		* Output:
-			* e = a function with the following behavior:
+			* r2e = a function with the following behavior:
 				* given nothing return a cell array of expert trajectories used in IRL
 				* given a reward return sample trajectories that are approximately optimal
 
@@ -141,6 +146,7 @@ Each of the above algorithms expects the following parameters to be defined
 		* T -- the number of steps per episode-observation for policy evaluation
 		* W -- the number of episode-observations per episode for policy evalution
 		* gamma -- the amount of reward discount to use when calculating value functions
+		* v_kernel -- the kernel method to use when approximating the value function (e.g., kernel = `@(x,y) x'*y`)
 
 	* lspi
 		* N -- the number of policy iterations to perform
@@ -151,16 +157,17 @@ Each of the above algorithms expects the following parameters to be defined
 
 	* klspi
 		* all of lspi
-		* kernel -- the kernel method to use when approximating the value function (e.g., kernel = `@(x,y) x'*y`)
 		* mu -- pruning level in the approximate linear dependence analysis. The higher the value the more is pruned.
+		* v_kernel -- the kernel method to use when approximating the value function (e.g., kernel = `@(x,y) x'*y`)
+		
 
 	* pirl
 		* epsilon -- the termination condition for the pirl reward iterations
-		* gamma -- the amount of reward discount to use when calculating value functions
+		* gamma -- the amount of discount to use when calculating feature expectations
 
 	* kpirl
 		* all of pirl
-		* kernel -- the kernel method to use when approximating the reward function (e.g., kernel = `@(x,y) x'*y`)
+		* r_kernel -- the kernel method to use when approximating the reward function (e.g., kernel = `@(x,y) x'*y`)
 	
 	
 ## Benchmarking/Analysis API

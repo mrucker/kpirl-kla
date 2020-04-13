@@ -1,7 +1,10 @@
 function [policy, time, policies, times] = kla_mem(domain, reward); global fitrsvm_kernel;
 
-    params = feval([domain '_parameters']);
-    v_p    = feval([domain '_features'], 'value');
+    [params      ] = feval([domain '_parameters']);
+    [s2f         ] = feval([domain '_features'], 'value');
+    [edges, parts] = feval([domain '_discrete'], 'value');
+        
+    [i2d         ] = discretes(s2f, edges, parts);
 
     if(isa(params.v_kernel,'function_handle'))
         fitrsvm_kernel = params.v_kernel;
@@ -9,9 +12,9 @@ function [policy, time, policies, times] = kla_mem(domain, reward); global fitrs
     else
         KernelFunction = params.v_kernel;
     end
-    
+
     Q_dot     = Q_dot_ctor(containers.Map('KeyType','double','ValueType','double'));
-    Q_bar     = Q_bar_ctor(KernelFunction, v_p, @(is) ones(1,numel(is)));
+    Q_bar     = Q_bar_ctor(KernelFunction, i2d, @(is) ones(1,numel(is)));
     OSA_store = OSA_store_ctor(containers.Map('KeyType','double','ValueType','any'));
 
     [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar, OSA_store);
@@ -28,7 +31,7 @@ function f = Q_dot_ctor(Q)
             if ~iscell(is)
                 is = num2cell(is');
             end
-            
+
             if ~isKey(Q,is)
                 q = 0;
             else
@@ -44,7 +47,7 @@ function f = Q_dot_ctor(Q)
     f = @Q_dot;
 end
 
-function f = Q_bar_ctor(K, v_p, G, X, ~)
+function f = Q_bar_ctor(K, i2d, G, X, ~)
 
     if nargin == 2
         [X, ~] = deal([],[]);
@@ -62,7 +65,7 @@ function f = Q_bar_ctor(K, v_p, G, X, ~)
 
         if(nargin==2)
 
-            x = v_p(is);
+            x = i2d(is);
             y = qs;
 
             %https://www.mathworks.com/help/stats/fitrsvm.html#busljl4-BoxConstraint
@@ -75,15 +78,15 @@ function f = Q_bar_ctor(K, v_p, G, X, ~)
             m = fitrsvm(x',y' ,'KernelFunction',K, 'BoxConstraint',box_constraint);
 
             if(any(strcmp(K, ["linear","gaussian","rbf","polynomial"])))
-                y = @(is) predict(m, v_p(is)')';
+                y = @(is) predict(m, i2d(is)')';
             else
                 %for some reason fitrsvm doesn't vectorize custom kernel functions 
                 %so I handle predicting manually to take advantage of vectorization
                 %https://www.mathworks.com/matlabcentral/answers/516513-fitrsvm-doesn-t-vectorize-my-custom-kernel
-                y = @(is) m.Bias + m.Alpha' * feval(K,m.SupportVectors,v_p(is)');
+                y = @(is) m.Bias + m.Alpha' * feval(K,m.SupportVectors,i2d(is)');
             end
             
-            q = Q_bar_ctor(K, v_p, y, is, qs);
+            q = Q_bar_ctor(K, i2d, y, is, qs);
         end
     end
     f = @Q_bar;
@@ -107,11 +110,11 @@ function f = OSA_store_ctor(Z)
 
                 is_key  = isKey(Z,is);
                 is_keys = is(is_key);
-                
+
                 z = zeros(6, numel(is));
-                
+
                 z(:,is_key) = cell2mat(values(Z, is_keys));
-                
+
                 varargout = num2cell(z,2);
 
             end

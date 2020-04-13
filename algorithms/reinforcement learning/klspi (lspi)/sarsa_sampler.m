@@ -1,9 +1,9 @@
-function sampler = sarsa_sampler(t_s, policy, max_epis, max_steps, resample)
+function sampler = sarsa_sampler(s2p, p2s, policy, max_epis, max_steps, resample)
 
     if resample
-        sampler = @(new_policy) samples_from_simulations(t_s, new_policy, max_epis, max_steps);
+        sampler = @(new_policy) samples_from_simulations(s2p, p2s, new_policy, max_epis, max_steps);
     else
-        samples = samples_from_simulations(t_s, policy, max_epis, max_steps);
+        samples = samples_from_simulations(s2p, p2s, policy, max_epis, max_steps);
         sampler = @(new_policy) samples_from_samples(samples, new_policy);
     end
 
@@ -20,7 +20,7 @@ function samples = samples_from_samples(samples, policy)
     end
 end
 
-function samples = samples_from_simulations(t_s, policy, n_episodes, n_steps)
+function samples = samples_from_simulations(s2p, p2s, policy, n_episodes, n_steps)
 
     samples = cell(1,n_episodes);
     
@@ -29,7 +29,7 @@ function samples = samples_from_simulations(t_s, policy, n_episodes, n_steps)
         samp = {};
         step = 0;
 
-        [s   ] = t_s();
+        [s   ] = p2s();
         [a, f] = policy.function(s);
 
         while (step < n_steps)
@@ -40,7 +40,7 @@ function samples = samples_from_simulations(t_s, policy, n_episodes, n_steps)
             samp{step}.action = a;
             samp{step}.feats  = f;
 
-            [s   ] = t_s(s, a);
+            [s   ] = p2s(s2p(s,a));
             [a, f] = policy.function(s);
             [r   ] = policy.reward(s);
 

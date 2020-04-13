@@ -1,4 +1,4 @@
-function e = krand_episodes()
+function s2e = krand_episodes()
 
     expert_episodes = krand_expert_episodes();
 
@@ -12,7 +12,7 @@ function e = krand_episodes()
         end
     end
 
-    e = @to_e;
+    s2e = @to_e;
 
 end
 

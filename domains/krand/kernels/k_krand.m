@@ -4,25 +4,31 @@ function k = k_krand(bandwidth)
         bandwidth=1;
     end
 
+    sizes = [];
+    
     k = @kernel;
     
     function G = kernel(U,V)
-        U = features2structure(U);
-        V = features2structure(V);
+
+        if(isempty(sizes))
+            edges = krand_discrete('value');
+            sizes = cellfun(@numel, edges)-1;        
+        end
+
+        U = features2structure(U,sizes);
+        V = features2structure(V,sizes);
 
         G = exp(-pdist2(U',V','squaredeuclidean')/bandwidth);
     end
 end
 
-function structure = features2structure(levels)
-    n_levels = [9, 30, 21, 31, 96, 7];
-    
+function structure = features2structure(levels,sizes)
     structure = cell2mat({
-        feature2simplex(levels(1,:),n_levels(1));
-        feature2simplex(levels(2,:),n_levels(2));
-        feature2line(levels(3,:),n_levels(3));
-        feature2simplex(levels(4,:),n_levels(4));
-        feature2line(levels(5,:),n_levels(5));
-        feature2line(levels(6,:),n_levels(6));
+        feature2simplex(levels(1,:),sizes(1));
+        feature2simplex(levels(2,:),sizes(2));
+        feature2line(levels(3,:),sizes(3));
+        feature2simplex(levels(4,:),sizes(4));
+        feature2line(levels(5,:),sizes(5));
+        feature2line(levels(6,:),sizes(6));
     });
 end

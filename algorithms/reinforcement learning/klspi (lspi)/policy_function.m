@@ -1,17 +1,15 @@
 function [a, f] = policy_function(policy, state)
+    actions = policy.actions(state);
 
-    as = policy.actions(state);
-    fs = policy.feats(state, as);
-
-    if (rand < policy.explore)    
-        qs = rand(1,size(fs,2));
+    if (rand < policy.explore)
+        q_vals = zeros(1,size(actions,2));
     else
-        qs = policy.weights' * policy.basis(fs);
+        q_vals = policy.weights' * policy.basis(policy.feats(state, actions));
     end
     
-    [~, i] = randargmax(qs);
+    [~, i] = randargmax(@(as) q_vals, actions);
     
-    a = as(:,i);
-    f = fs(:,i);
+    a = actions(:,i);
+    f = policy.feats(state, a);
 end
 

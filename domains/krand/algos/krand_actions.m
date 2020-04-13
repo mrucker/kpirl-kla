@@ -1,6 +1,5 @@
-function [a_v] = krand_actions()
-
-    a_v = @actions_valid;
+function [s2a] = krand_actions()
+    s2a = @actions_valid;
 end
 
 %Early version - any action is permitted.  Come back later and restric

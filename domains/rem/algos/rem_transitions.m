@@ -1,6 +1,6 @@
-function [t_s, t_p] = rem_transitions()
-    t_s = @to_s;
-    t_p = @to_p;
+function [s2s, s2p] = rem_transitions()
+    s2s = @to_s;
+    s2p = @to_p;
     
     e_t    = rem_episodes();
 
@@ -47,7 +47,7 @@ function p = to_p(s, a)
 end
 
 function s = random_state(episode)
-    s = episode(randi(size(episode,2)));
+    s = episode{randi(size(episode,2))};
 end
 
 function t = random_episode(episodes)

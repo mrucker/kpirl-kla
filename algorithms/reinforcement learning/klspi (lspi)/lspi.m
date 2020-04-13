@@ -6,9 +6,9 @@ function [policy, time, policies, times] = lspi(domain, reward)
     trans_func = [domain '_transitions'];
     feats_func = [domain '_features'];
 
-    [a_f    ] = feval(actio_func);
-    [v_p    ] = feval(feats_func, 'value');
-    [t_s,t_p] = feval(trans_func);
+    [s2a    ] = feval(actio_func);
+    [s2f    ] = feval(feats_func, 'value');
+    [s2s,s2p] = feval(trans_func);
     [params ] = feval(param_func);
 
     max_iter  = params.N;
@@ -18,13 +18,13 @@ function [policy, time, policies, times] = lspi(domain, reward)
     epsilon   = 0;
 
     policy.explore  = 1;
-    policy.actions  = a_f; 
+    policy.actions  = s2a; 
     policy.reward   = reward;
     policy.discount = params.gamma;
-    policy.feats    = @(s, as) v_p(t_p(s,as));
+    policy.feats    = @(s, as) s2f(s2p(s,as));
     policy.function = @(s) policy_function(policy, s);
 
-    sampler  = sarsa_sampler(t_s, policy, max_epis, max_steps, resample);
+    sampler  = sarsa_sampler(s2p, s2s, policy, max_epis, max_steps, resample);
 
     base_alg = get_or_default(params, 'basis' , ident_basis());
     eval_alg = @lsq_spd;

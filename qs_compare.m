@@ -5,7 +5,7 @@ run(fullfile(fileparts(which(mfilename)), 'shared', 'paths.m'));
 
 domain = 'huge';
 
-n_rewds = 2;
+n_rewds = 3;
 n_samps = 64;
 n_steps = 10;
   gamma = .9;
@@ -30,7 +30,7 @@ daps = {
     'lspi'   , @lspi   , struct('N', 10, 'M', 90, 'T', 06, 'v_feats', 1, 'resample', true, 'basis', poly_basis(2));
 
     %generate a policy using klspi and feature set 1 with the provided kernel function
-    'klspi'  , @klspi  , struct('N', 10, 'M', 90, 'T', 06, 'v_feats', 1, 'resample', true, 'v_kernel', k_huge_val(1.2), 'mu', 0.2);
+    'klspi'  , @klspi  , struct('N', 10, 'M', 90, 'T', 06, 'v_feats', 1, 'resample', true, 'v_kernel', k_huge_val(1.2,'continuous'), 'mu', 0.2);
 }';
 
 a = tic;

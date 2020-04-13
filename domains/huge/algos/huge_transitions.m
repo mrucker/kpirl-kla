@@ -1,7 +1,7 @@
-function [t_s, t_p] = huge_transitions()
+function [s2s, s2p] = huge_transitions()
     
-    t_s = @to_s;
-    t_p = @to_p;
+    s2s = @to_s;
+    s2p = @to_p;
     
     path = fullfile(fileparts(which(mfilename)), '..', 'data');
     file = 'huge_observed_episodes.json';

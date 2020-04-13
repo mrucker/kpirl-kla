@@ -1,41 +1,44 @@
 function [reward_function, time_measurements] = kpirl_spd(domain)
 
     a_tic = tic;
-        [e_t       ] = feval([domain '_episodes']);
-        [r_p, r_i  ] = feval([domain '_features'], 'reward');
-        [parameters] = feval([domain '_parameters']);
+        [params      ] = feval([domain '_parameters']);    
+        [r2e         ] = feval([domain '_episodes']);
+        [s2f         ] = feval([domain '_features'], 'reward');
+        [edges, parts] = feval([domain '_discrete'], 'reward');
 
-        epsilon = parameters.epsilon;
-        gamma   = parameters.gamma;
-        kernel  = parameters.r_kernel;
+        [s2d, s2i] = discretes(s2f, edges, parts);
 
-        r_n = r_i(); %determine this value once
+        epsilon = params.epsilon;
+        gamma   = params.gamma;
+        kernel  = params.r_kernel;
+
+        r_n = s2i(); %determine this value once
         
-        r_p = r_p(1:r_n);
-        r_p = @(is) r_p(:,is); %this makes r_p behave identically to before except that it is already calculated.
+        s2d = s2d(1:r_n);
+        s2d = @(is) s2d(:,is); %this makes r_p behave identically to before except that it is already calculated.
 
-        e_hat = @(s) double((1:r_n)' == r_i(s));
+        e_hat = @(s) double((1:r_n)' == s2i(s));
 
         reward_function = {};
         mu              = {};
         mu_bar          = {};
 
         i    = 1;
-        mu_E = episodes2expect(e_t(), e_hat, gamma);
+        mu_E = episodes2expect(r2e(), e_hat, gamma);
         
         tic_id = tic;
             reward_values      = rand(1,r_n);
-            reward_function{i} = @(s) reward_values(r_i(s));
-            mu{i}              = episodes2expect(e_t(reward_function{i}), e_hat, gamma);
+            reward_function{i} = @(s) reward_values(s2i(s));
+            mu{i}              = episodes2expect(r2e(reward_function{i}), e_hat, gamma);
 
             %to avoid having a huge set of basis functions 
             %we remove all feature vectors with zero weight.
             n_z                = find((mu_E ~= 0) | (mu{i} ~= 0));
-            basis              = r_p(n_z);
+            basis              = s2d(n_z);
 
             mu_bar{i}          = mu{i};
 
-            t                  = kern_dist(mu_E(n_z)-mu_bar{i}(n_z), kernel, r_p);
+            t                  = kern_dist(mu_E(n_z)-mu_bar{i}(n_z), kernel, s2d);
             j                  = inf;
         time_measurements = toc(tic_id);
         
@@ -50,13 +53,13 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
             tic_id = tic;
                 alpha              = mu_E(n_z)-mu_bar{i-1}(n_z);
             
-                reward_values      = alpha'*kernel(basis, r_p(1:r_n));
-                reward_function{i} = @(s) reward_values(r_i(s));
+                reward_values      = alpha'*kernel(basis, s2d(1:r_n));
+                reward_function{i} = @(s) reward_values(s2i(s));
 
-                mu{i} = episodes2expect(e_t(reward_function{i}), e_hat, gamma);
+                mu{i} = episodes2expect(r2e(reward_function{i}), e_hat, gamma);
 
                 n_z        = find((mu_E ~= 0) | (mu{i} ~= 0) | (mu_bar{i-1} ~= 0));
-                basis      = r_p(n_z);
+                basis      = s2d(n_z);
                 basis_gram = kernel(basis, basis);
 
                 theta_num = (mu{i}(n_z)-mu_bar{i-1}(n_z))'*basis_gram*(mu_E(n_z) -mu_bar{i-1}(n_z));
@@ -66,7 +69,7 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
                 mu_bar{i} = mu_bar{i-1} + theta * (mu{i}-mu_bar{i-1});
 
                 t = gram_dist(mu_E(n_z)-mu_bar{i}(n_z), basis_gram);
-                j = kern_dist(mu_bar{i}-mu_bar{i-1}, kernel, r_p);
+                j = kern_dist(mu_bar{i}-mu_bar{i-1}, kernel, s2d);
             time_measurements = toc(tic_id);
             
             print_status(i, t, j, time_measurements);
@@ -78,7 +81,7 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
         %of policies closest to the expert. From this combination the policy with the largest 
         %coefficient is then selected. To remove the dependency on CVX, and thus make this code,
         %easier to use we instead simply use the policy closest to the expert feature expectation.
-        [~,m_i] = min(kern_dist(mu_E - cell2mat(mu), kernel, r_p));
+        [~,m_i] = min(kern_dist(mu_E - cell2mat(mu), kernel, s2d));
 
         reward_function = reward_function{m_i};
     time_measurements = toc(a_tic);

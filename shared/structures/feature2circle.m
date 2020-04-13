@@ -1,4 +1,4 @@
-function circle = feature2circle(level, n_level, arc)
+function circle = feature2circle(value, size, arc)
 
     assert(nargin ~= 0, "level and n_level are required arguments")
     assert(nargin ~= 1, "n_level is a required argument")
@@ -7,6 +7,6 @@ function circle = feature2circle(level, n_level, arc)
         arc = 2*pi;        
     end
 
-    radians = (level-1)/(n_level-1)*arc;
-    circle  = (level>0).*[cos(radians); sin(radians)];
+    radians = value/size*arc;
+    circle  = [cos(radians); sin(radians)];
 end

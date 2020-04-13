@@ -1,7 +1,11 @@
 function [policy, time, policies, times] = kla_spd(domain, reward); global fitrsvm_kernel;
     
-    [params  ] = feval([domain '_parameters']);
-    [v_p, v_i] = feval([domain '_features'], 'value');
+    [params      ] = feval([domain '_parameters']);
+    [s2f         ] = feval([domain '_features'], 'value');
+    [edges, parts] = feval([domain '_discrete'], 'value');
+        
+    [i2d, d2i    ] = discretes(s2f, edges, parts);
+
     
     if(isa(params.v_kernel,'function_handle'))
         fitrsvm_kernel = params.v_kernel;
@@ -10,11 +14,11 @@ function [policy, time, policies, times] = kla_spd(domain, reward); global fitrs
         KernelFunction = params.v_kernel;
     end
 
-    v_p = v_p(1:v_i());
+    i2d = i2d(1:d2i());
 
-    Q_dot     = Q_dot_ctor(zeros(1,v_i()));
-    Q_bar     = Q_bar_ctor(KernelFunction, v_p, ones(1,v_i()));
-    OSA_store = OSA_store_ctor(zeros(6,v_i()));
+    Q_dot     = Q_dot_ctor(zeros(1,d2i()));
+    Q_bar     = Q_bar_ctor(KernelFunction, i2d, ones(1,d2i()));
+    OSA_store = OSA_store_ctor(zeros(6,d2i()));
 
     [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar, OSA_store);
 
@@ -58,17 +62,17 @@ function f = Q_bar_ctor(K, v_p, G, X, ~)
 
         if(nargin==2)
 
-            x = v_p(:,is);
-            y = qs;
+            X = v_p(:,is);
+            Y = qs;
 
             %https://www.mathworks.com/help/stats/fitrsvm.html#busljl4-BoxConstraint
-            if iqr(y) < .0001
+            if iqr(Y) < .0001
                 box_constraint = 1;
             else
-                box_constraint = iqr(y)/1.349;
+                box_constraint = iqr(Y)/1.349;
             end
 
-            m = fitrsvm(x', y', 'KernelFunction',K, 'BoxConstraint',box_constraint);
+            m = fitrsvm(X', Y', 'KernelFunction',K, 'BoxConstraint',box_constraint);
             
             if(any(strcmp(K, ["linear","gaussian","rbf","polynomial"])))
                 y = predict(m, v_p')';

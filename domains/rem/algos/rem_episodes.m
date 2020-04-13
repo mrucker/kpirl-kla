@@ -1,4 +1,4 @@
-function e = rem_episodes()
+function s2e = rem_episodes()
 
     expert_episodes = rem_expert_episodes();
     
@@ -12,7 +12,7 @@ function e = rem_episodes()
         end
     end
 
-    e = @to_e;
+    s2e = @to_e;
 end
 
 function episodes = rem_reward_episodes(reward)

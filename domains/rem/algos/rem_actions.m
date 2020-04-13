@@ -1,9 +1,9 @@
-function [a_v] = rem_actions()
+function [s2a] = rem_actions()
 
     parameters = rem_parameters();
 
     a_m = actions_matrix(parameters.pop_size);
-    a_v = @(s) a_m;
+    s2a = @(s) a_m;
 end
 
 function a = actions_matrix(pop_size)

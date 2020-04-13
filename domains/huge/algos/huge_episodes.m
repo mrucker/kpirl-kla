@@ -1,4 +1,4 @@
-function e = huge_episodes()
+function r2e = huge_episodes()
     expert_episodes = huge_expert_episodes();
     
     function e = to_e(reward)
@@ -11,7 +11,7 @@ function e = huge_episodes()
         end
     end
 
-    e = @to_e;
+    r2e = @to_e;
 end
 
 function episodes = huge_reward_episodes(reward)

@@ -1,21 +1,7 @@
-function [r_p, r_i] = huge_reward_features()
+function f = huge_reward_features()
 
-    partitions = {[3, 3, 8, 6, 8], 1};
+    f = @feature_rollup;
 
-    states2features = {
-        @feature_rollup;
-    };
-
-    features2levels = {
-        bin_continuous(0,    1, partitions{1}(1));
-        bin_continuous(0,    1, partitions{1}(2));
-        bin_continuous(0,   48, partitions{1}(3));
-        bin_continuous(0,   60, partitions{1}(4));
-        bin_continuous(0, 2*pi, partitions{1}(5));
-          bin_discrete(1,       partitions{2}(1));
-    };
-
-    [r_p, r_i] = multi_feature(partitions, states2features, features2levels);  
 end
 
 function f = feature_rollup(states)

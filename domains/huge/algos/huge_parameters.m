@@ -14,8 +14,8 @@ end
 function d = defaults()
     d = struct(...
          'gamma'    , 0.9          ... (pirl, kpirl, kla, lspi, klspi) discount factor for all MDP's 
-        ,'r_kernel' , k_huge_rwd() ... (    , kpirl,    ,     ,      ) the kernel function applied to the reward features
-        ,'v_kernel' , k_huge_val() ... (    ,      , kla,     , klspi) the kernel function applied to the value features
+        ,'r_kernel' , k_gauss()    ... (    , kpirl,    ,     ,      ) the kernel function applied to the reward features
+        ,'v_kernel' , k_gauss()    ... (    ,      , kla,     , klspi) the kernel function applied to the value features
         ,'epsilon'  , 0            ... (pirl, kpirl,    ,     ,      ) when to end the algorithm
         ,'steps'    , 10           ... (pirl, kpirl,    ,     ,      ) how many steps to use when estimating feature expectation
         ,'samples'  , 100          ... (pirl, kpirl,    ,     ,      ) how many episodes to use when estimating feature expectation

@@ -1,3 +1,3 @@
-function onehot = feature2simplex(level, n_level)
-    onehot = (level>0).*double(1:n_level == level')';
+function onehot = feature2simplex(value, size)
+    onehot = double(1:size == value')';
 end

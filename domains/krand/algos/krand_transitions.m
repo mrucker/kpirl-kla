@@ -1,6 +1,6 @@
-function [t_s, t_p] = krand_transitions()
-    t_s = @to_s;
-    t_p = @to_p;
+function [s2s, s2p] = krand_transitions()
+    s2s = @to_s;
+    s2p = @to_p;
     
     e_t = krand_episodes();
     

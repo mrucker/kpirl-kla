@@ -3,11 +3,14 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar
     gcp; %this is here to force the parallel pool to begin before we start timing
 
     start = tic;
-        [params  ] = feval([domain '_parameters']);
-        [a_f     ] = feval([domain '_actions']);
-        [t_s, t_p] = feval([domain '_transitions']);
-        [ ~ , v_i] = feval([domain '_features'], 'value');
-
+        [params      ] = feval([domain '_parameters']);
+        [s2a         ] = feval([domain '_actions']);
+        [s2s, s2p    ] = feval([domain '_transitions']);
+        [s2f         ] = feval([domain '_features'], 'value');
+        [edges, parts] = feval([domain '_discrete'], 'value');
+        
+        [~  , s2i    ] = discretes(s2f, edges, parts);
+                
         N     = params.N;
         M     = params.M;
         T     = params.T;
@@ -25,7 +28,7 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar
         g_mat = cell2mat(arrayfun(@(w) { [zeros(1,w) gamma.^(0:T-1) zeros(1,W-w)] }, 0:W-1)');
     time(1) = toc(start);
 
-    policies{1} = @(s) randargmax(a_f(s), @(as) zeros(1,size(as,2)));
+    policies{1} = @(s) randargmax(@(as) zeros(1,size(as,2)), s2a(s));
     times(:,1)  = zeros(5,1);
 
     for n = 2:N
@@ -39,20 +42,20 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar
             for m = 1:M
                 i = zeros(1,T+W);
                 r = zeros(1,T+W);
-                s = t_s();
+                s = s2s();
 
                 for t = 1:T+W
-                    ps = t_p(s, a_f(s));
-                    is = v_i(ps);
+                    ps = s2p(s,s2a(s));
+                    is = s2i(ps);
 
                     if t == 1
-                        [i(t), p_i] = randargmax(is, @(is) Q_bar(is) + E(is));
+                        [i(t), p_i] = randargmax(@(is) Q_bar(is) + E(is), is);
                     else
-                        [i(t), p_i] = randargmax(is, @(is) Q_bar(is));
+                        [i(t), p_i] = randargmax(@(is) Q_bar(is), is);
                     end
 
                     %I don't need the last iteration of this
-                    s    = t_s(ps(:,p_i));
+                    s    = s2s(ps(:,p_i));
                     r(t) = reward(s);
                 end
 
@@ -121,7 +124,7 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar
             Q_bar = Q_bar(OSA_store(), Q_dot(OSA_store()));
         time(5) = time(5) + toc(start);
 
-        policies{n} = @(s) randargmax(a_f(s), @(as) Q_bar(v_i(t_p(s, as))));
+        policies{n} = @(s) randargmax(@(as) Q_bar(s2i(s2p(s, as))), s2a(s));
         times(:,n)  = time;
     end
 
