@@ -40,8 +40,8 @@ function v = fast_index(keys, values, default_if_none)
                 my_keys   = [my_keys keys];
                 my_values = [my_values values];
                 
-                [my_keys, I] = sort(keys);
-                [my_values ] = values(:,I);
+                [my_keys, I] = sort(my_keys);
+                [my_values ] = my_values(:,I);
             end
         end
     end

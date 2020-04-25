@@ -16,32 +16,11 @@ function [policy, time, policies, times] = kla_spd(domain, reward); global fitrs
 
     i2d = i2d(1:d2i());
 
-    Q_dot     = Q_dot_ctor(zeros(1,d2i()));
-    Q_bar     = Q_bar_ctor(KernelFunction, i2d, ones(1,d2i()));
-    OSA_store = OSA_store_ctor(zeros(6,d2i()));
+    Q_bar = Q_bar_ctor(KernelFunction, i2d, ones(1,d2i()));
 
-    [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar, OSA_store);
+    [policy, time, policies, times] = kla_core(domain, reward, Q_bar);
 
     clear k_fitrsvm_kernel
-end
-
-function f = Q_dot_ctor(Q)
-    function q = Q_dot(is, qs)
-
-        if(nargin == 0)
-            q = find(~isnan(Q));
-        end
-
-        if(nargin == 1)
-            q = Q(is);
-        end
-
-        if(nargin==2)
-            Q(is) = qs;
-            q = @Q_dot;
-        end
-    end
-    f = @Q_dot;
 end
 
 function f = Q_bar_ctor(K, v_p, G, X, ~)

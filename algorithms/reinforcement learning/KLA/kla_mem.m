@@ -12,39 +12,14 @@ function [policy, time, policies, times] = kla_mem(domain, reward); global fitrs
     else
         KernelFunction = params.v_kernel;
     end
+    
+    %how v_p functions
+    %how Q_bar(is) functions
+    
 
-    Q_dot     = Q_dot_ctor(containers.Map('KeyType','double','ValueType','double'));
-    Q_bar     = Q_bar_ctor(KernelFunction, i2d, @(is) ones(1,numel(is)));
-    OSA_store = OSA_store_ctor(containers.Map('KeyType','double','ValueType','any'));
+    Q_bar = Q_bar_ctor(KernelFunction, i2d, @(is) ones(1,numel(is)));
 
-    [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar, OSA_store);
-end
-
-function f = Q_dot_ctor(Q)
-    function q = Q_dot(is, qs)
-
-        if(nargin == 0)
-            q = keys(Q);
-        end
-
-        if(nargin == 1)
-            if ~iscell(is)
-                is = num2cell(is');
-            end
-
-            if ~isKey(Q,is)
-                q = 0;
-            else
-                q = cell2mat(values(Q,is));
-            end
-        end
-
-        if(nargin==2)
-            Q(is) = qs;
-            q = @Q_dot;
-        end
-    end
-    f = @Q_dot;
+    [policy, time, policies, times] = kla_core(domain, reward, Q_bar);
 end
 
 function f = Q_bar_ctor(K, i2d, G, X, ~)
@@ -90,41 +65,4 @@ function f = Q_bar_ctor(K, i2d, G, X, ~)
         end
     end
     f = @Q_bar;
-end
-
-function f = OSA_store_ctor(Z)
-    function varargout = OSA_store(is, zs)
-
-        if(nargin == 0)
-            varargout{1} = cell2mat(keys(Z));
-        end
-
-        if(nargin == 1)
-            if isempty(is)
-                varargout = cell(1,6);
-            else
-                
-                if ~iscell(is)
-                    is = num2cell(is);
-                end
-
-                is_key  = isKey(Z,is);
-                is_keys = is(is_key);
-
-                z = zeros(6, numel(is));
-
-                z(:,is_key) = cell2mat(values(Z, is_keys));
-
-                varargout = num2cell(z,2);
-
-            end
-        end
-
-        if(nargin==2)
-            Z(is) = zs;
-
-            varargout{1} = OSA_store_ctor(Z);
-        end
-    end
-    f = @OSA_store;
 end

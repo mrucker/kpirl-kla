@@ -1,8 +1,12 @@
-function [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar, OSA_store)
+function [policy, time, policies, times] = kla_core(domain, reward, Q_bar)
 
     gcp; %this is here to force the parallel pool to begin before we start timing
 
     start = tic;
+    
+        Q_dot     = fast_index([],[],0);
+        OSA_store = OSA_store_ctor(fast_index([],[],[0; 0; 0; 0; 0; 0]));
+    
         [params      ] = feval([domain '_parameters']);
         [s2a         ] = feval([domain '_actions']);
         [s2s, s2p    ] = feval([domain '_transitions']);
@@ -115,7 +119,7 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar
                 assert(~any(isnan([beta, delta, var, alpha, nu, lambda])));
                 assert(~any(isinf([beta, delta, var, alpha, nu, lambda])))
 
-                Q_dot = Q_dot(i, Q);
+                Q_dot(i, Q);
                 OSA_store(i, [c; beta; delta; var; nu; lambda]);
             end
         time(4) = time(4) + toc(start);
@@ -130,6 +134,24 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_dot, Q_bar
 
     policy = policies{end};
     time   = times(:,end);
+end
+
+function f = OSA_store_ctor(Z)
+    function varargout = OSA_store(is, zs)
+
+        if(nargin == 0)
+            varargout{1} = Z();
+        end
+
+        if(nargin == 1)
+            varargout = num2cell(Z(is),2);
+        end
+
+        if(nargin==2)
+            Z(is,zs);
+        end
+    end
+    f = @OSA_store;
 end
 
 function U = get_OSA_U(OSA_store, is)
