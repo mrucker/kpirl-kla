@@ -3,8 +3,7 @@ function [policy, time, policies, times] = kla_spd(domain, reward); global fitrs
     [params      ] = feval([domain '_parameters']);
     [s2f         ] = feval([domain '_features'], 'value');
     [edges, parts] = feval([domain '_discrete'], 'value');
-        
-    [i2d, d2i    ] = discretes(s2f, edges, parts);
+    [~, i2d      ] = discrete(s2f, edges, parts);
 
     
     if(isa(params.v_kernel,'function_handle'))
@@ -14,9 +13,9 @@ function [policy, time, policies, times] = kla_spd(domain, reward); global fitrs
         KernelFunction = params.v_kernel;
     end
 
-    i2d = i2d(1:d2i());
+    i2d = i2d();
 
-    Q_bar = Q_bar_ctor(KernelFunction, i2d, ones(1,d2i()));
+    Q_bar = Q_bar_ctor(KernelFunction, i2d, ones(1,size(i2d,2)));
 
     [policy, time, policies, times] = kla_core(domain, reward, Q_bar);
 

@@ -13,7 +13,7 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_bar)
         [s2f         ] = feval([domain '_features'], 'value');
         [edges, parts] = feval([domain '_discrete'], 'value');
         
-        [~  , s2i    ] = discretes(s2f, edges, parts);
+        [s2i         ] = discrete(s2f, edges, parts);
                 
         N     = params.N;
         M     = params.M;

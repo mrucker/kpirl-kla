@@ -6,17 +6,19 @@ function [reward_function, time_measurements] = kpirl_spd(domain)
         [s2f         ] = feval([domain '_features'], 'reward');
         [edges, parts] = feval([domain '_discrete'], 'reward');
 
-        [s2d, s2i] = discretes(s2f, edges, parts);
+        [s2i, i2d] = discrete(s2f, edges, parts);
 
         epsilon = params.epsilon;
         gamma   = params.gamma;
         kernel  = params.r_kernel;
-
-        r_n = s2i(); %determine this value once
         
-        s2d = s2d(1:r_n);
+        
+        s2d = i2d();
+        r_n = size(s2d,2);
         s2d = @(is) s2d(:,is); %this makes r_p behave identically to before except that it is already calculated.
 
+        
+        
         e_hat = @(s) double((1:r_n)' == s2i(s));
 
         reward_function = {};

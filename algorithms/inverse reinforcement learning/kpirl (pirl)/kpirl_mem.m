@@ -6,7 +6,7 @@ function [reward_function, time_measurements] = kpirl_mem(domain)
         [edges, parts] = feval([domain '_discrete'], 'reward');
         [params      ] = feval([domain '_parameters']);
 
-        [s2d, s2i] = discretes(s2f, edges, parts);
+        [s2i, i2d] = discrete(s2f, edges, parts);
 
         epsilon = params.epsilon;
         gamma   = params.gamma;
@@ -18,14 +18,14 @@ function [reward_function, time_measurements] = kpirl_mem(domain)
         
         i    = 1;
         mu_E = calculate_visitation(r2e(), gamma, s2i);
-        X    = cat_hashtable(containers.Map('KeyType','double','ValueType','any'), keys(mu_E), num2cell(s2d(keys(mu_E)),1));
+        X    = cat_hashtable(containers.Map('KeyType','double','ValueType','any'), keys(mu_E), num2cell(i2d(keys(mu_E)),1));
 
         tic_id = tic;
-            reward_values      = rand(1,s2i());
+            reward_values      = rand(1,numel(s2i()));
             reward_function{i} = @(s) reward_values(s2i(s));
             
             mu{i}              = calculate_visitation(r2e(reward_function{i}), gamma, s2i);
-            X                  = cat_hashtable(X, keys(mu{i}), num2cell(s2d(keys(mu{i})),1));
+            X                  = cat_hashtable(X, keys(mu{i}), num2cell(i2d(keys(mu{i})),1));
 
             basis = cell2mat(values(X));
             
@@ -46,10 +46,10 @@ function [reward_function, time_measurements] = kpirl_mem(domain)
             tic_id = tic;
                 alpha = cell2mat(values(sub_hashtables(mu_E, mu_bar{i-1})))';
 
-                reward_function{i} = @(s) alpha'*kernel(basis, s2d(s));
+                reward_function{i} = @(s) alpha'*kernel(basis, i2d(s2i(s)));
 
                 mu{i} = calculate_visitation(r2e(reward_function{i}), gamma, s2i);
-                X     = cat_hashtable(X, keys(mu{i}), num2cell(s2d(keys(mu{i})),1));
+                X     = cat_hashtable(X, keys(mu{i}), num2cell(i2d(keys(mu{i})),1));
 
                 basis      = cell2mat(values(X));
                 basis_gram = kernel(basis, basis);
