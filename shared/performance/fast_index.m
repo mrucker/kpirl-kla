@@ -22,7 +22,11 @@ function c = fast_index(default_if_none)
             v = repmat(default_if_none,1,numel(keys));
             v(:,loc~=0) = my_vals(:,loc(loc~=0));
             
-            varargout = num2cell(v,2);
+            if(iscell(v))
+                varargout = v;
+            else
+                varargout = num2cell(v,2);
+            end 
         end
 
         if(nargin == 2)

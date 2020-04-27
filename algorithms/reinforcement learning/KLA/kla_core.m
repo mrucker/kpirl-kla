@@ -1,12 +1,11 @@
-function [policy, time, policies, times] = kla_core(domain, reward, Q_bar_ctor); global fitrsvm_kernel;
+function [policy, time, policies, times] = kla_core(domain, reward, mem_or_spd); global fitrsvm_kernel;
 
     gcp; %this is here to force the parallel pool to begin before we start timing
 
     start = tic;
 
-        Q_bar     = Q_bar_ctor();
-        Q_dot     = fast_index(0);
-        OSA_store = fast_index([0; 0; 0; 0; 0; 0]);
+        %I can mem or speed i2d and Q_bar (getters)
+        %can I mem or speed Q_dot and OSA_store? (getters/setters)(I could, but they'd need a little work to adhere to interface)
 
         [params      ] = feval([domain '_parameters']);
         [s2a         ] = feval([domain '_actions']);
@@ -15,6 +14,12 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_bar_ctor);
         [edges, parts] = feval([domain '_discrete'], 'value');
         
         [s2i, i2d    ] = discrete(s2f, edges, parts);
+
+        i2d   = mem_or_spd(i2d);
+        
+        Q_bar     = mem_or_spd(indexable_interface(s2i,@(is) ones(1,numel(is))));
+        Q_dot     = fast_index(0);
+        OSA_store = fast_index([0; 0; 0; 0; 0; 0]);
 
         if(isa(params.v_kernel,'function_handle'))
             fitrsvm_kernel = params.v_kernel;
@@ -144,7 +149,17 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_bar_ctor);
                 BoxConstraint = iqr(Y)/1.349;
             end
 
-            Q_bar = Q_bar_ctor(make_predictor(fitrsvm(X', Y', 'KernelFunction',KernelFunction, 'BoxConstraint',BoxConstraint), i2d));
+            m = fitrsvm(X', Y', 'KernelFunction',KernelFunction, 'BoxConstraint',BoxConstraint);
+            
+            if(any(strcmp(m.KernelParameters.Function, ["linear","gaussian","rbf","polynomial"])))
+                p = @(is) m.predict(i2d(is));
+            else
+                %for some reason m.predict runs slower with custom kernels so we handle them manually
+                %https://www.mathworks.com/matlabcentral/answers/516513-fitrsvm-doesn-t-vectorize-my-custom-kernel
+                p = @(is) m.Bias + m.Alpha' * feval(m.KernelParameters.Function, m.SupportVectors, i2d(is)');
+            end
+            
+            Q_bar = mem_or_spd(indexable_interface(s2i,p));
 
         time(5) = time(5) + toc(start);
 
@@ -158,28 +173,18 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_bar_ctor);
     clear k_fitrsvm_kernel
 end
 
-function f = make_predictor(m, i2d)
+function f = indexable_interface(s2i,p)
 
-    f = @predictor;
+    f = @interface;
 
-    function y = predictor(is)
-        
+    function y = interface(is)
+
         if(nargin == 0)
-            x = i2d();
-        else
-            x = i2d(is);
+            is = s2i();
         end
-        
-        x = x';
-        
-        if(any(strcmp(m.KernelParameters.Function, ["linear","gaussian","rbf","polynomial"])))
-            y = predict(m, x);
-        else
-            %for some reason fitrsvm doesn't vectorize custom kernel functions well
-            %so I handle predicting manually to take advantage of vectorization
-            %https://www.mathworks.com/matlabcentral/answers/516513-fitrsvm-doesn-t-vectorize-my-custom-kernel
-            y = m.Bias + m.Alpha' * feval(m.KernelParameters.Function, m.SupportVectors, x);
-        end
+
+        y = p(is);
+
     end
 end
 
