@@ -1,14 +1,15 @@
-function v = fast_index(keys, values, default_if_none)
+function c = fast_index(default_if_none)
 
-    [my_keys, I] = sort(keys);
-    [my_values ] = values(:,I);
+    my_keys = [];
+    my_vals = [];
 
-    v = @fast_index;
+    c = @fast_index;
 
-    function v = fast_index(keys,values)
-        
+    function varargout = fast_index(keys,values)
+
         if(nargin == 0)
-            v = my_keys;
+            varargout{1} = my_keys;
+            varargout{2} = my_vals;
         end
         
         if(nargin == 1)
@@ -19,7 +20,9 @@ function v = fast_index(keys, values, default_if_none)
             end
 
             v = repmat(default_if_none,1,numel(keys));
-            v(:,loc~=0) = my_values(:,loc(loc~=0));            
+            v(:,loc~=0) = my_vals(:,loc(loc~=0));
+            
+            varargout = num2cell(v,2);
         end
 
         if(nargin == 2)
@@ -33,15 +36,15 @@ function v = fast_index(keys, values, default_if_none)
             is_insert = loc == 0;
 
             if(any(is_update))
-                my_values(:,loc(is_update)) = values;
+                my_vals(:,loc(is_update)) = values;
             end
 
             if(any(is_insert))
                 my_keys   = [my_keys keys];
-                my_values = [my_values values];
+                my_vals = [my_vals values];
                 
                 [my_keys, I] = sort(my_keys);
-                [my_values ] = my_values(:,I);
+                [my_vals ] = my_vals(:,I);
             end
         end
     end

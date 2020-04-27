@@ -1,20 +1,28 @@
-function [policy, time, policies, times] = kla_core(domain, reward, Q_bar)
+function [policy, time, policies, times] = kla_core(domain, reward, Q_bar_ctor); global fitrsvm_kernel;
 
     gcp; %this is here to force the parallel pool to begin before we start timing
 
     start = tic;
-    
-        Q_dot     = fast_index([],[],0);
-        OSA_store = OSA_store_ctor(fast_index([],[],[0; 0; 0; 0; 0; 0]));
-    
+
+        Q_bar     = Q_bar_ctor();
+        Q_dot     = fast_index(0);
+        OSA_store = fast_index([0; 0; 0; 0; 0; 0]);
+
         [params      ] = feval([domain '_parameters']);
         [s2a         ] = feval([domain '_actions']);
         [s2s, s2p    ] = feval([domain '_transitions']);
         [s2f         ] = feval([domain '_features'], 'value');
         [edges, parts] = feval([domain '_discrete'], 'value');
         
-        [s2i         ] = discrete(s2f, edges, parts);
-                
+        [s2i, i2d    ] = discrete(s2f, edges, parts);
+
+        if(isa(params.v_kernel,'function_handle'))
+            fitrsvm_kernel = params.v_kernel;
+            KernelFunction = 'fitrsvm_kernel_caller';
+        else
+            KernelFunction = params.v_kernel;
+        end
+        
         N     = params.N;
         M     = params.M;
         T     = params.T;
@@ -125,7 +133,19 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_bar)
         time(4) = time(4) + toc(start);
 
         start = tic;
-            Q_bar = Q_bar(OSA_store(), Q_dot(OSA_store()));
+        
+            [I,Y] = Q_dot();
+            X     = i2d(I);
+        
+            %https://www.mathworks.com/help/stats/fitrsvm.html#busljl4-BoxConstraint
+            if iqr(Y) < .0001
+                BoxConstraint = 1;
+            else
+                BoxConstraint = iqr(Y)/1.349;
+            end
+
+            Q_bar = Q_bar_ctor(make_predictor(fitrsvm(X', Y', 'KernelFunction',KernelFunction, 'BoxConstraint',BoxConstraint), i2d));
+
         time(5) = time(5) + toc(start);
 
         policies{n} = @(s) randargmax(@(as) Q_bar(s2i(s2p(s, as))), s2a(s));
@@ -134,24 +154,33 @@ function [policy, time, policies, times] = kla_core(domain, reward, Q_bar)
 
     policy = policies{end};
     time   = times(:,end);
+    
+    clear k_fitrsvm_kernel
 end
 
-function f = OSA_store_ctor(Z)
-    function varargout = OSA_store(is, zs)
+function f = make_predictor(m, i2d)
 
+    f = @predictor;
+
+    function y = predictor(is)
+        
         if(nargin == 0)
-            varargout{1} = Z();
+            x = i2d();
+        else
+            x = i2d(is);
         end
-
-        if(nargin == 1)
-            varargout = num2cell(Z(is),2);
-        end
-
-        if(nargin==2)
-            Z(is,zs);
+        
+        x = x';
+        
+        if(any(strcmp(m.KernelParameters.Function, ["linear","gaussian","rbf","polynomial"])))
+            y = predict(m, x);
+        else
+            %for some reason fitrsvm doesn't vectorize custom kernel functions well
+            %so I handle predicting manually to take advantage of vectorization
+            %https://www.mathworks.com/matlabcentral/answers/516513-fitrsvm-doesn-t-vectorize-my-custom-kernel
+            y = m.Bias + m.Alpha' * feval(m.KernelParameters.Function, m.SupportVectors, x);
         end
     end
-    f = @OSA_store;
 end
 
 function U = get_OSA_U(OSA_store, is)
