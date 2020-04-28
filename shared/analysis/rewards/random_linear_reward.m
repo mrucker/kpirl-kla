@@ -2,7 +2,9 @@ function f = random_linear_reward(domain, count, rand_w)
 
     [s2f         ] = feval([domain '_features'], 'reward');
     [edges, parts] = feval([domain '_discrete'], 'reward');
-    [s2i, i2d    ] = discrete(s2f, edges, parts);
+    
+    [f2i, i2d    ] = discrete(edges, parts);
+    [s2i         ] = @(s) f2i(s2f(s));
 
     if(nargin < 2)
         count = 1;

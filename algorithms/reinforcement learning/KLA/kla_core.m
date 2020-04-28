@@ -10,13 +10,14 @@ function [policy, time, policies, times] = kla_core(domain, reward, mem_or_spd);
         [s2f         ] = feval([domain '_features'], 'value');
         [edges, parts] = feval([domain '_discrete'], 'value');
 
-        [s2i, i2d    ] = discrete(s2f, edges, parts);
-
+        [f2i, i2d] = discrete(edges, parts);
+        [s2i     ] = @(s) f2i(s2f(s));
+        
         i2d = mem_or_spd(i2d);
 
         %can I mem or speed Q_dot and OSA_store? (getters/setters)(I could, but they'd need a little work to adhere to interface)
 
-        Q_bar     = mem_or_spd(indexable_interface(s2i,@(is) ones(1,numel(is))));
+        Q_bar     = mem_or_spd(indexable_interface(f2i,@(is) ones(1,numel(is))));
         Q_dot     = fast_index(0);
         OSA_store = fast_index([0; 0; 0; 0; 0; 0]);
 
@@ -158,7 +159,7 @@ function [policy, time, policies, times] = kla_core(domain, reward, mem_or_spd);
                 p = @(is) m.Bias + m.Alpha' * feval(m.KernelParameters.Function, m.SupportVectors, i2d(is)');
             end
             
-            Q_bar = mem_or_spd(indexable_interface(s2i,p));
+            Q_bar = mem_or_spd(indexable_interface(f2i,p));
 
         time(5) = time(5) + toc(start);
 

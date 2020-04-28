@@ -1,4 +1,4 @@
-function [s2i, i2d] = discrete(posts2features, edges, partitions)
+function [f2i, i2d] = discrete(edges, partitions)
 
     if(isempty(partitions))
         partitions = {1:numel(edges)};
@@ -7,7 +7,7 @@ function [s2i, i2d] = discrete(posts2features, edges, partitions)
     if(size(edges,2) == 1)
         edges = edges';
     end
-    
+
     sizes = cellfun(@numel, edges)-1;
 
     partition_feature_indexes = partitions;
@@ -30,30 +30,25 @@ function [s2i, i2d] = discrete(posts2features, edges, partitions)
     vector2index_shifts          = prod(vector2index_partitionshifts,2);         
     
     i2d = @out_indexes2discretes;
-    s2i = @out_states2indexes;
+    f2i = @out_features2indexes;
 
     function discretes = out_indexes2discretes(indexes)
-                
-        assert(nargin == 0 || is_potential_index(indexes), 'unsupported input');
-
         if nargin == 0
             discretes = indexes2discretes(1:n_discretes);
         else
             discretes = indexes2discretes(indexes);
         end
     end
-    
-    function indexes = out_states2indexes(states)
-        assert(nargin == 0 || is_potential_state(states), 'unsupported input');
 
+    function indexes = out_features2indexes(features)
         if nargin == 0
             indexes = 1:n_discretes;
         else
-            indexes = discretes2indexes(features2discretes(posts2features(states)));
+            indexes = discretes2indexes(features2discretes(features));
         end
     end
 
-function discretes = indexes2discretes(indexes)
+    function discretes = indexes2discretes(indexes)
 
         if iscell(indexes)
             indexes = cell2mat(indexes);
@@ -92,37 +87,6 @@ function discretes = indexes2discretes(indexes)
 
         assert(all(0 < indexes & indexes <= n_discretes), 'bad indexes')
     end
-end
-
-function is = is_potential_state(input)
-    % we assume the following in this check:
-        % structs will always represent a state
-        % states will always have more than one feature
-        % all vectorized input should be interpretted as collections of column vectors
-        % cells can contain either states or indexes
-
-    if iscell(input)
-       input = input{1};
-    end
-
-    is_struct_states = isstruct(input);
-    is_vector_states = size(input,1) > 1;
-
-    is = is_struct_states || is_vector_states;
-end
-
-function is = is_potential_index(input)
-    % we assume the following in this check:
-        % structs will always represent a state
-        % states will always have more than one feature
-        % all vectorized input should be interpretted as collections of column vectors
-        % cells can contain either states or indexes
-
-    if iscell(input)
-       input = input{1};
-    end
-
-    is = ~isstruct(input) && size(input,1) == 1;
 end
 
 function A = nan2zero(A)

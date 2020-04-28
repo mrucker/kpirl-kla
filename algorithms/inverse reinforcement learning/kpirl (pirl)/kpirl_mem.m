@@ -6,7 +6,8 @@ function [reward_function, time_measurements] = kpirl_mem(domain)
         [edges, parts] = feval([domain '_discrete'], 'reward');
         [params      ] = feval([domain '_parameters']);
 
-        [s2i, i2d] = discrete(s2f, edges, parts);
+        [f2i, i2d] = discrete(edges, parts);
+        [s2i     ] = @(s) f2i(s2f(s));
 
         epsilon = params.epsilon;
         gamma   = params.gamma;
@@ -21,7 +22,7 @@ function [reward_function, time_measurements] = kpirl_mem(domain)
         X    = cat_hashtable(containers.Map('KeyType','double','ValueType','any'), keys(mu_E), num2cell(i2d(keys(mu_E)),1));
 
         tic_id = tic;
-            reward_values      = rand(1,numel(s2i()));
+            reward_values      = rand(1,numel(f2i()));
             reward_function{i} = @(s) reward_values(s2i(s));
             
             mu{i}              = calculate_visitation(r2e(reward_function{i}), gamma, s2i);
