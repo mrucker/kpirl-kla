@@ -5,17 +5,24 @@ function f = huge_reward_features()
 end
 
 function f = feature_rollup(states)
-    touched = any(touched_targets(states));
 
-    f = [
-        cursor_x_features(states);
-        cursor_y_features(states);
-        cursor_v_features(states);
-        cursor_a_features(states);
-        cursor_d_features(states);
-    ];
+    if(iscell(states))
+        f = cell2mat(cellfun(@(s) {feature_rollup(s)}, states));
+    else
+        touched = any(touched_targets(states));
 
-    f = [f .* one_or_nan(touched); one_or_nan(~touched)];
+        f = [
+            cursor_x_features(states);
+            cursor_y_features(states);
+            cursor_v_features(states);
+            cursor_a_features(states);
+            cursor_d_features(states);
+        ];
+
+        f = [f .* one_or_nan(touched); one_or_nan(~touched)];
+    end
+
+    
 end
 
 function x = cursor_x_features(states)

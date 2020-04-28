@@ -1,5 +1,7 @@
 function c = fast_index(default_if_none)
 
+    assert(size(default_if_none,2) == 1, 'default value of incorrect dimension');
+
     my_keys = [];
     my_vals = [];
 
@@ -55,7 +57,7 @@ function c = fast_index(default_if_none)
 
     function loc = my_find_fasts(x,A)
         n_x = numel(x);
-        loc = zeros(1,n_x);
+        loc = zeros(1, n_x);
 
         for i = 1:n_x
             loc(i) = my_find_fast(x(i),A);
