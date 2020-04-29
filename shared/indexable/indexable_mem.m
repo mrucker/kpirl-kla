@@ -1,13 +1,31 @@
-function c = fast_index(default_if_none)
+function c = indexable_mem(values, keys)
 
-    assert(size(default_if_none,2) == 1, 'default value of incorrect dimension');
+    assert(nargin >=1, "Not enough input arguments");
+    
+    if(nargin == 1 && isa(values,'function_handle'))
+        func    = values;
+        my_keys = zeros(1,0);
+        my_vals = zeros(size(func(1),1),0);
+    elseif(nargin == 1 && isvector(values))
+        func    = @(is) repmat(values,1,numel(is));
+        my_keys = zeros(1,0);
+        my_vals = zeros(size(values,1),0);
+    elseif(nargin == 2 && isa(values,'function_handle'))
+        my_keys = keys;
+        my_vals = values(keys);
+    elseif(nargin == 2 && isvector(values) && size(values,2) == 1)
+        my_keys = keys;
+        my_vals = repmat(values,1,keys);
+    elseif(nargin == 2 && isvector(values) && size(values,2) ~= 1)
+        my_keys = keys;
+        my_vals = values;
+    else
+        assert(false, "invalid input arguments");
+    end
 
-    my_keys = [];
-    my_vals = [];
+    c = @indexable_mem;
 
-    c = @fast_index;
-
-    function varargout = fast_index(keys,values)
+    function varargout = indexable_mem(keys, values)
 
         if(nargin == 0)
             varargout{1} = my_keys;
@@ -21,14 +39,10 @@ function c = fast_index(default_if_none)
                 [~, loc] = ismember(keys, my_keys);
             end
 
-            v = repmat(default_if_none,1,numel(keys));
+            v = func(keys);
             v(:,loc~=0) = my_vals(:,loc(loc~=0));
-            
-            if(iscell(v))
-                varargout = v;
-            else
-                varargout = num2cell(v,2);
-            end 
+
+            varargout{1} = v;
         end
 
         if(nargin == 2)
@@ -42,15 +56,15 @@ function c = fast_index(default_if_none)
             is_insert = loc == 0;
 
             if(any(is_update))
-                my_vals(:,loc(is_update)) = values;
+                my_vals(:,loc(is_update)) = values(:,is_update);
             end
 
             if(any(is_insert))
-                my_keys   = [my_keys keys];
-                my_vals = [my_vals values];
+                my_keys = [my_keys keys(:,is_insert)];
+                my_vals = [my_vals values(:,is_insert)];
                 
                 [my_keys, I] = sort(my_keys);
-                [my_vals ] = my_vals(:,I);
+                [my_vals   ] = my_vals(:,I);
             end
         end
     end

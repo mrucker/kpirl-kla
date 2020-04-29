@@ -1,4 +1,4 @@
-function [reward_function, time_measurements] = kpirl_core(domain)
+function [reward_function, time_measurements] = kpirl_core(domain, indexable_func)
 
     a_tic = tic;
         [params      ] = feval([domain '_parameters']);    
@@ -8,7 +8,9 @@ function [reward_function, time_measurements] = kpirl_core(domain)
 
         [f2i, i2d] = discrete(edges, parts);
         [s2i     ] = @(s) f2i(s2f(s));
-
+        
+        i2d = indexable_func(i2d);
+        
         epsilon = params.epsilon;
         gamma   = params.gamma;
         kernel  = params.r_kernel;
@@ -22,8 +24,8 @@ function [reward_function, time_measurements] = kpirl_core(domain)
 
         tic_id = tic;
             reward_weights     = rand(size(i2d(1)));
-
-            reward_function{i} = @(s) reward_weights' * i2d(s2i(s));
+            reward_indexed     = indexable_func(@(is) reward_weights' * i2d(is));
+            reward_function{i} = @(s) reward_indexed(s2i(s));
             reward_episodes    = r2e(reward_function{i});
             reward_visits{i}   = episodes2visits(reward_episodes, s2i, gamma);
             convex_visits{i}   = reward_visits{i};
@@ -45,7 +47,8 @@ function [reward_function, time_measurements] = kpirl_core(domain)
                 alpha  = (expert_visits(union)-convex_visits{i-1}(union))';
                 basis  = i2d(union);
 
-                reward_function{i} = @(s) alpha'*kernel(basis, i2d(s2i(s)));
+                reward_indexed     = indexable_func(@(is) alpha'*kernel(basis, i2d(is)));
+                reward_function{i} = @(s) reward_indexed(s2i(s));
                 reward_episodes    = r2e(reward_function{i});
                 reward_visits{i}   = episodes2visits(reward_episodes, s2i, gamma);
 
@@ -83,13 +86,13 @@ function m = reward2convex(reward_visits, convex_visits, theta)
 
     union = union_index({reward_visits, convex_visits});
 
-    m = fast_index(0);
+    m = indexable_mem(0);
     m(union, convex_visits(union) + theta * (reward_visits(union)-convex_visits(union)));
 end
 
 function m = episodes2visits(episodes, s2i, gamma)
 
-    m = fast_index(0);
+    m = indexable_mem(0);
     
     n_episodes = numel(episodes);
 
@@ -114,18 +117,6 @@ function dist = discrete_distance(visitation_1, visitation_2, kernel, i2d)
     
     diff = (visitation_1(is) - visitation_2(is));
     dist = sqrt(diff*kernel(ds,ds)*diff');
-end
-
-function d = kern_dist(weights, kernel, features)
-    n_z     = find(any(weights ~= 0,2));
-    basis   = features(n_z);
-    weights = weights(n_z,:);
-    
-    d = gram_dist(weights, kernel(basis,basis));
-end
-
-function d = gram_dist(vectors, gramian)
-    d = sqrt(diag(vectors'*gramian*vectors));
 end
 
 function print_status(i, t, j, time)

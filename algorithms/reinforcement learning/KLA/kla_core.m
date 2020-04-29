@@ -1,4 +1,4 @@
-function [policy, time, policies, times] = kla_core(domain, reward, mem_or_spd); global fitrsvm_kernel;
+function [policy, time, policies, times] = kla_core(domain, reward, indexable_store, indexable_func); global fitrsvm_kernel;
 
     gcp; %this is here to force the parallel pool to begin before we start timing
 
@@ -13,13 +13,12 @@ function [policy, time, policies, times] = kla_core(domain, reward, mem_or_spd);
         [f2i, i2d] = discrete(edges, parts);
         [s2i     ] = @(s) f2i(s2f(s));
         
-        i2d = mem_or_spd(i2d);
+        
+        i2d = indexable_func(i2d);
 
-        %can I mem or speed Q_dot and OSA_store? (getters/setters)(I could, but they'd need a little work to adhere to interface)
-
-        Q_bar     = mem_or_spd(indexable_interface(f2i,@(is) ones(1,numel(is))));
-        Q_dot     = fast_index(0);
-        OSA_store = fast_index([0; 0; 0; 0; 0; 0]);
+        Q_bar     = indexable_func(@(is) ones(1,numel(is)));
+        Q_dot     = indexable_store(0);
+        OSA_store = indexable_OSA_store(indexable_store([0; 0; 0; 0; 0; 0]));
 
         if(isa(params.v_kernel,'function_handle'))
             fitrsvm_kernel = params.v_kernel;
@@ -159,7 +158,7 @@ function [policy, time, policies, times] = kla_core(domain, reward, mem_or_spd);
                 p = @(is) m.Bias + m.Alpha' * feval(m.KernelParameters.Function, m.SupportVectors, i2d(is)');
             end
             
-            Q_bar = mem_or_spd(indexable_interface(f2i,p));
+            Q_bar = indexable_func(p);
 
         time(5) = time(5) + toc(start);
 
@@ -171,20 +170,25 @@ function [policy, time, policies, times] = kla_core(domain, reward, mem_or_spd);
     time   = times(:,end);
     
     clear k_fitrsvm_kernel
+    
 end
 
-function f = indexable_interface(all_is,p)
+function f = indexable_OSA_store(indexable_store)
 
-    f = @interface;
+    f = @indexable_OSA_store;
 
-    function y = interface(is)
-
+    function varargout = indexable_OSA_store(keys,values)
         if(nargin == 0)
-            is = all_is();
+            [varargout{1}, varargout{2}] = indexable_store();
         end
 
-        y = p(is);
+        if(nargin == 1)
+            varargout = num2cell(indexable_store(keys),2);
+        end
 
+        if(nargin == 2)
+            indexable_store(keys,values);
+        end
     end
 end
 

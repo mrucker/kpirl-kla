@@ -1,7 +1,7 @@
 function expect = episodes2expect(episodes, func, gamma)
 
     expect   = 0;
-    episodes = cellfun( @(e) { ternary(iscell(e), @() e, @() num2cell(e,1)) }, episodes);
+    episodes = cellfun( @(e) { if_else(iscell(e), @() e, @() num2cell(e,1)) }, episodes);
 
     for episode = episodes
         for t = 1:numel(episode{1})
