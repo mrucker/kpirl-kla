@@ -13,7 +13,7 @@ The "huge" domain corresponds to the experiments and models described in the ori
 ## Requirements
 
 * Matlab
-	* Statistics and Machine Learning Toolbox (for `pdist` in k_norm.m)
+	* Statistics and Machine Learning Toolbox (for `pdist2` in k_gauss.m)
 	* Parallel Computing Toolbox (for `parfor` throughout the repository)
 
 ## Quick Start
@@ -107,34 +107,34 @@ Where the above methods are defined as
 				* given a collection of post-decision states return a random pre-decision state for each post-decision state according the transition probabilities of the MDP.
 				* given a state and a collection of actions return a random pre-decision state for each action according the transition probabilities of the MDP.
 			* s2p = a function with the following behavior:
-				* given a state and a collection of actions return a post-decision state for each action. (If one wants traditional Q-Learning the post-decision state s be (s,a))
+				* given a state and a collection of actions return a post-decision state for each action. (If one wants traditional Q-Learning the post-decision state should be (s,a))
 
 	* \<domain\>_features
 		* Input:
-			* a string indicating whether the features are being used to approximate a reward function or value function
+			* a string indicating whether the features are being used to approximate a reward or value function 
 		* Output:
-			* a function that accepts either a collection of either pre-decision or post-decision states and returns a feature vector for each state
+			* a function that accepts a collection of either pre-decision or post-decision states and returns a feature vector for each state
 			
 	* \<domain\>_discrete
 		* Input:
 			* a string indicating whether the features are being used to approximate a reward function or value function
 		* Output:
 			* edges = a cell array of edges used to discretize state features (discretization is necessary for kla and kpirl only)
-			* partitions = a cell array of edge indexes in order to define partitions. By default all edges belong to one partition.
+			* partitions = a cell array of edge indexes which define partitions. By default all edges belong to one partition.
 			
 	* \<domain\>_episodes
 		* Input:
 			* there is no input for this function
 		* Output:
 			* r2e = a function with the following behavior:
-				* given nothing return a cell array of expert trajectories used in IRL
+				* given nothing return a cell array of observed expert trajectories for IRL
 				* given a reward return sample trajectories that are approximately optimal
 
 	* \<domain\>_parameters
 		* Input:
 			* p_in -- a struct that will be used to change the current parameters. This input is optional. Without it the current parameter struct will be returned unchanged.
 		* Output:
-			* p_out -- a struct containing the parameters for the current domain. This function needs to persist the paramters from call to call in order to work properly. The example domains do this via matlab's `persistent` command though it could be done other ways if necessary.
+			* p_out -- a struct containing the parameters for the current domain. This function should persist the paramters from call to call in order to work properly. The example domains do this via matlab's `persistent` command though it could be done other ways if necessary.
 
 ## Algorithm Parameters
 
@@ -178,7 +178,7 @@ The repository also contains a custom made benchmarking API. This API follows a 
 
 Implemented examples can be seen in `qs_compare.m`, `huge_policy_compare.m` or `huge_policies_compare.m`
 	
-To start the pipline the API has two root methods that need to be called with appropriate parameters
+To start the pipline the API has two root methods, one of which needs to be called with appropriate parameters
 
 	* analyze_policy -- processes the pipeline and creates outputs for only the final policy iteration
 	* analyze_policies -- processes the pipeline and creates outputs for all policy iterations
