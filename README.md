@@ -4,7 +4,7 @@ This repository implements several RL and IRL algorithm via a consistent interfa
 
 Three example problem "domains" utilizing the algorithms are included in the project.
 
-The "huge" domain corresponds to the experiments and models described in the original KPIRL/KLA ([paper](https://arxiv.org/abs/2002.10904))
+The "huge" domain corresponds to the experiments and models described in the original KPIRL ([paper](https://arxiv.org/abs/2002.10904))
 
 ## Installation
 
@@ -54,7 +54,7 @@ root
 
 This repository contains five algorithm implementations:
 
-1. KLA - kernel lookup approximation ([paper](https://arxiv.org/abs/2002.10904))
+1. KLA - kernel lookup approximation (This is similar to [Neural Episodic Control](http://proceedings.mlr.press/v70/pritzel17a.html)))
 2. LSPI - least-squares policy iteration ([paper](http://www.jmlr.org/papers/v4/lagoudakis03a.html))
 3. KLSPI - kernel-based least squares policy iteration ([paper](http://www.jmlr.org/papers/v4/lagoudakis03a.html))
 4. PIRL - projection inverse reinforcemnt learning ([paper](https://dl.acm.org/citation.cfm?id=1015430))
